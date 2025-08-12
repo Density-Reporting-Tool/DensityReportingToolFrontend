@@ -56,9 +56,6 @@ const Dashboard: React.FC = () => {
           <Typography variant="h5" sx={{ fontWeight: 600 }}>
             GEOPACIFIC
           </Typography>
-          <IconButton size="small" sx={{ ml: 'auto' }}>
-            <InfoIcon color="secondary" />
-          </IconButton>
         </Box>
         
         {/* Search Bar */}
@@ -74,13 +71,6 @@ const Dashboard: React.FC = () => {
                   <SearchIcon color="action" />
                 </InputAdornment>
               ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton size="small">
-                    <InfoIcon color="secondary" />
-                  </IconButton>
-                </InputAdornment>
-              )
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -111,11 +101,8 @@ const Dashboard: React.FC = () => {
               <CardContent sx={{ py: 2, px: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    {schedule.time} Job #{schedule.jobNumber}
+                    {schedule.time} - Job #{schedule.jobNumber}
                   </Typography>
-                  <IconButton size="small">
-                    <InfoIcon color="secondary" />
-                  </IconButton>
                 </Box>
               </CardContent>
             </Card>
@@ -136,9 +123,6 @@ const Dashboard: React.FC = () => {
               <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                 {period.period}
               </Typography>
-              <IconButton size="small" sx={{ ml: 1 }}>
-                <InfoIcon color="secondary" fontSize="small" />
-              </IconButton>
             </Box>
             
             <Stack spacing={1}>
