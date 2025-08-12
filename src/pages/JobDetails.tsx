@@ -62,6 +62,12 @@ const JobDetails: React.FC = () => {
     console.log('Create new report for job:', jobId)
   }
 
+  const handleAddressClick = (address: string) => {
+    const encodedAddress = encodeURIComponent(address)
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`
+    window.open(googleMapsUrl, '_blank')
+  }
+
   return (
     <Container maxWidth="sm" sx={{ py: 2 }}>
       {/* Header */}
@@ -77,7 +83,15 @@ const JobDetails: React.FC = () => {
         
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <LocationIcon color="action" sx={{ mr: 1 }} />
-          <Typography variant="body1" color="text.secondary">
+          <Typography 
+            variant="body1" 
+            color="text.secondary"
+            sx={{ 
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => handleAddressClick(jobData.address)}
+          >
             Address: {jobData.address}
           </Typography>
         </Box>
