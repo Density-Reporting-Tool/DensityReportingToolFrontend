@@ -26,8 +26,8 @@ const jobData = {
   jobNumber: '000001',
   address: '123 Main St, Vancouver, BC',
   contacts: [
-    { initials: 'JS', name: 'Project Manager Jakub Szary', role: 'Project Manager' },
-    { initials: 'MK', name: 'Site Contact Matt Kokan', role: 'Site Contact' }
+    { initials: 'JS', name: 'Jakub Szary', role: 'Project Manager' },
+    { initials: 'MK', name: 'Matt Kokan', role: 'Site Contact' }
   ],
   notes: [
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -122,14 +122,6 @@ const JobDetails: React.FC = () => {
           </Typography>
           {/* Overlapping icons */}
           <Box sx={{ position: 'absolute', right: 0, top: 0 }}>
-            <Stack direction="row" spacing={0.5}>
-              <Avatar sx={{ width: 20, height: 20, bgcolor: 'primary.main', fontSize: '0.625rem' }}>
-                J
-              </Avatar>
-              <Avatar sx={{ width: 20, height: 20, bgcolor: 'primary.main', fontSize: '0.625rem' }}>
-                I
-              </Avatar>
-            </Stack>
           </Box>
         </Box>
         
@@ -159,17 +151,6 @@ const JobDetails: React.FC = () => {
           <Typography variant="h6">
             Recent Reports
           </Typography>
-          {/* Overlapping icons */}
-          <Box sx={{ position: 'absolute', right: 0, top: 0 }}>
-            <Stack direction="row" spacing={0.5}>
-              <Avatar sx={{ width: 20, height: 20, bgcolor: 'primary.main', fontSize: '0.625rem' }}>
-                J
-              </Avatar>
-              <Avatar sx={{ width: 20, height: 20, bgcolor: 'primary.main', fontSize: '0.625rem' }}>
-                I
-              </Avatar>
-            </Stack>
-          </Box>
           <Typography 
             variant="body2" 
             color="secondary.main" 
@@ -214,17 +195,6 @@ const JobDetails: React.FC = () => {
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <ChevronRightIcon color="action" />
-                    {/* Overlapping icons */}
-                    <Box sx={{ position: 'absolute', right: 0, top: 0 }}>
-                      <Stack direction="row" spacing={0.5}>
-                        <Avatar sx={{ width: 20, height: 20, bgcolor: 'primary.main', fontSize: '0.625rem' }}>
-                          J
-                        </Avatar>
-                        <Avatar sx={{ width: 20, height: 20, bgcolor: 'primary.main', fontSize: '0.625rem' }}>
-                          I
-                        </Avatar>
-                      </Stack>
-                    </Box>
                   </Box>
                 </Box>
               </CardContent>

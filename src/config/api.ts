@@ -1,7 +1,7 @@
 // API configuration for backend integration
 export const API_CONFIG = {
   // Base URL for API calls - can be overridden by environment variables
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
   
   // API endpoints
   ENDPOINTS: {
