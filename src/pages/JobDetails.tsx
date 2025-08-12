@@ -134,9 +134,6 @@ const JobDetails: React.FC = () => {
           <Typography variant="h6">
             Notes
           </Typography>
-          {/* Overlapping icons */}
-          <Box sx={{ position: 'absolute', right: 0, top: 0 }}>
-          </Box>
         </Box>
         
         <Card>
@@ -232,19 +229,6 @@ const JobDetails: React.FC = () => {
         >
           New Report
         </Button>
-        <IconButton 
-          size="small" 
-          sx={{ 
-            position: 'absolute', 
-            right: -40, 
-            top: '50%', 
-            transform: 'translateY(-50%)',
-            bgcolor: 'white',
-            boxShadow: 1
-          }}
-        >
-          <InfoIcon color="secondary" />
-        </IconButton>
       </Box>
     </Container>
   )
