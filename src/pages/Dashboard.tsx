@@ -5,7 +5,6 @@ import {
   Container,
   Typography,
   Card,
-  CardContent,
   TextField,
   InputAdornment,
   Avatar,
@@ -30,19 +29,22 @@ const todaysSchedule = [
 
 const reportsInProgress = [
   {
+    id: 1,
     period: "May 1 - May 31",
     reports: [
-      { jobNumber: "000101", reportNumber: "2" },
-      { jobNumber: "000102", reportNumber: "15" },
-      { jobNumber: "000103", reportNumber: "7" },
-      { jobNumber: "000104", reportNumber: "35" },
+      { id: 1, jobNumber: "000101", reportNumber: "2" },
+      { id: 2, jobNumber: "000102", reportNumber: "15" },
+      { id: 3, jobNumber: "000103", reportNumber: "7" },
+      { id: 4, jobNumber: "000104", reportNumber: "35" },
     ],
   },
   {
+    id: 2,
     period: "June 1 - June 30",
     reports: [
-      { jobNumber: "000001", reportNumber: "4" },
+      { id: 5, jobNumber: "000001", reportNumber: "4" },
       {
+        id: 6,
         jobNumber: "000021",
         reportNumber: "4",
         note: "Jakub - Needs Edits",
@@ -97,15 +99,17 @@ const Dashboard: React.FC = () => {
 
       {/* Today's Schedule */}
       <Box sx={{ mb: 3 }}>
-        <Typography
-          variant="h6"
+        <Box
           sx={{
-            mb: 2,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            mb: 1,
           }}
         >
           <ScheduleIcon sx={{ mr: 1, color: "primary.main" }} />
-          Today's Schedule
-        </Typography>
+          <Typography variant="h6">Today's Schedule</Typography>
+        </Box>
         <Stack spacing={1}>
           {todaysSchedule.map((schedule) => (
             <Box
@@ -126,14 +130,14 @@ const Dashboard: React.FC = () => {
                   cursor: "pointer",
                   "&:hover": { boxShadow: 3 },
                   flexGrow: 1,
+                  borderRadius: 2,
+                  padding: "14px",
                 }}
                 onClick={() => handleJobClick(schedule.jobNumber)}
               >
-                <CardContent>
-                  <Typography variant="body1">
-                    Job #{schedule.jobNumber}
-                  </Typography>
-                </CardContent>
+                <Typography variant="body1">
+                  Job #{schedule.jobNumber}
+                </Typography>
               </Card>
             </Box>
           ))}
@@ -141,17 +145,21 @@ const Dashboard: React.FC = () => {
       </Box>
 
       {/* Reports In Progress */}
-      <Box>
-        <Typography
-          variant="h6"
-          sx={{ mb: 2, display: "flex", alignItems: "center" }}
+      <Box sx={{ mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            mb: 1,
+          }}
         >
           <AssessmentIcon sx={{ mr: 1, color: "primary.main" }} />
-          Reports In Progress
-        </Typography>
+          <Typography variant="h6"> Reports In Progress</Typography>
+        </Box>
 
-        {reportsInProgress.map((period, periodIndex) => (
-          <Box key={periodIndex} sx={{ mb: 3 }}>
+        {reportsInProgress.map((period) => (
+          <Box key={period.id} sx={{ mb: 3 }}>
             <Box
               sx={{
                 display: "flex",
@@ -169,39 +177,49 @@ const Dashboard: React.FC = () => {
             </Box>
 
             <Stack spacing={1}>
-              {period.reports.map((report, reportIndex) => (
+              {period.reports.map((report) => (
                 <Card
-                  key={reportIndex}
+                  key={report.id}
                   sx={{
                     cursor: "pointer",
                     "&:hover": { boxShadow: 3 },
+                    flexGrow: 1,
+                    borderRadius: 2,
+                    padding: "14px 20px",
                   }}
                   onClick={() => handleJobClick(report.jobNumber)}
                 >
-                  <CardContent sx={{ py: 2, px: 3 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
                     <Box
                       sx={{
                         display: "flex",
-                        alignItems: "center",
+                        width: "100%",
                         justifyContent: "space-between",
                       }}
                     >
                       <Box>
                         <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                          Job #{report.jobNumber} Report #{report.reportNumber}
+                          Job #{report.jobNumber}
                         </Typography>
+                        <Typography variant="body2">
+                          Report #{report.reportNumber}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
                         {report.note && (
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 0.5 }}
-                          >
+                          <Typography variant="body2" color="error">
                             {report.note}
                           </Typography>
                         )}
                       </Box>
                     </Box>
-                  </CardContent>
+                  </Box>
                 </Card>
               ))}
             </Stack>
