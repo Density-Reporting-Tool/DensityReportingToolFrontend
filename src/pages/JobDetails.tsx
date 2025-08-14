@@ -100,7 +100,7 @@ const JobDetails: React.FC = () => {
                 {contact.initials}
               </Avatar>
               <Box>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
                   {contact.name}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -121,7 +121,7 @@ const JobDetails: React.FC = () => {
                 key={index}
                 sx={{ mb: index < jobData.notes.length - 1 ? 2 : 0 }}
               >
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body1" color="text.secondary">
                   {note}
                 </Typography>
                 {index < jobData.notes.length - 1 && <Divider sx={{ mt: 2 }} />}
@@ -185,7 +185,7 @@ const JobDetails: React.FC = () => {
                   >
                     {report.initials}
                   </Avatar>
-                  <Box>
+                  <Box sx={{ width: "75%" }}>
                     <Typography variant="body1" sx={{ fontWeight: 500 }}>
                       Report {report.id}
                     </Typography>
