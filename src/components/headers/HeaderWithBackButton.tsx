@@ -2,11 +2,8 @@ import { IconButton, AppBar, Typography, Box } from "@mui/material";
 import {
   ArrowBack as ArrowBackIcon,
   LocationOn as LocationIcon,
-  Info as InfoIcon,
-  Add as AddIcon,
-  ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   title: string;
@@ -41,7 +38,7 @@ const HeaderWithBackButton: React.FC<HeaderProps> = ({
             sx={{
               display: "flex",
               alignItems: "center",
-              mr: 1,
+              mr: 2,
             }}
           >
             <ArrowBackIcon sx={{ fontSize: "1.25rem" }} />
@@ -53,7 +50,7 @@ const HeaderWithBackButton: React.FC<HeaderProps> = ({
               mb: 1,
             }}
           >
-            <Typography variant="h6" sx={{ fontWeight: 400, color: "black" }}>
+            <Typography variant="h4" sx={{ fontWeight: 400, color: "black" }}>
               {title}
             </Typography>
             {subtitle && (
@@ -64,7 +61,7 @@ const HeaderWithBackButton: React.FC<HeaderProps> = ({
                 }}
               >
                 <Typography
-                  variant="body2"
+                  variant="body1"
                   color="text.secondary"
                   sx={{
                     cursor: onSubtitleClick ? "pointer" : "default",
