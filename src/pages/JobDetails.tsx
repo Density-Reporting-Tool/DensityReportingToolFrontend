@@ -1,18 +1,16 @@
 import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Container,
   Typography,
   Card,
-  CardContent,
   Avatar,
   Button,
   Stack,
   Divider,
 } from "@mui/material";
 import {
-  LocationOn as LocationIcon,
   Add as AddIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";

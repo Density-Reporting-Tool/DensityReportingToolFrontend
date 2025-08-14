@@ -7,15 +7,10 @@ import {
   Card,
   TextField,
   InputAdornment,
-  Avatar,
-  IconButton,
-  Chip,
   Stack,
-  Divider,
 } from "@mui/material";
 import {
   Search as SearchIcon,
-  Info as InfoIcon,
   Schedule as ScheduleIcon,
   Assessment as AssessmentIcon,
 } from "@mui/icons-material";
