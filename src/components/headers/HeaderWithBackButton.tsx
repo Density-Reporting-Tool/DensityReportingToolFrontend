@@ -27,7 +27,7 @@ const HeaderWithBackButton: React.FC<HeaderProps> = ({
   return (
     <>
       <AppBar
-        position="static"
+        position="sticky"
         sx={{
           display: "flex",
           flexDirection: "row",
