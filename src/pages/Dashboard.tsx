@@ -131,9 +131,9 @@ const Dashboard: React.FC = () => {
                   "&:hover": { boxShadow: 2 },
                   flexGrow: 1,
                   borderRadius: 2,
-                  padding: "14px",
+                  padding: 2,
                   boxShadow: 0,
-                  border: "1px gray solid",
+                  border: "1px lightgray solid",
                 }}
                 onClick={() => handleJobClick(schedule.jobNumber)}
               >
@@ -187,9 +187,10 @@ const Dashboard: React.FC = () => {
                     "&:hover": { boxShadow: 3 },
                     flexGrow: 1,
                     borderRadius: 2,
-                    padding: "14px 20px",
+                    px: 2,
+                    py: 1,
                     boxShadow: 0,
-                    border: "1px gray solid",
+                    border: "1px lightgray solid",
                   }}
                   onClick={() => handleJobClick(report.jobNumber)}
                 >
