@@ -66,7 +66,7 @@ const Dashboard: React.FC = () => {
       <Box sx={{ mb: 3 }}>
         <Box sx={{ alignItems: "center", mb: 2 }}>
           <Typography
-            variant="h5"
+            variant="h3"
             sx={{ fontWeight: 500, textAlign: "center" }}
           >
             GEOPACIFIC
