@@ -20,16 +20,18 @@ import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
 
 // Mock data
 const jobData = {
+  id: 1,
   jobNumber: "000001",
   address: "123 Main St, Vancouver, BC",
   contacts: [
-    { initials: "JS", name: "Jakub Szary", role: "Project Manager" },
-    { initials: "MK", name: "Matt Kokan", role: "Site Contact" },
+    { id: 1, initials: "JS", name: "Jakub Szary", role: "Project Manager" },
+    { id: 2, initials: "MK", name: "Matt Kokan", role: "Site Contact" },
   ],
   notes: [
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam, quis nostrud exercitation ullamco",
+    "laboris nisi ut aliquip ex ea commodo consequat.",
   ],
+
   recentReports: [
     {
       id: 4,
@@ -69,26 +71,35 @@ const JobDetails: React.FC = () => {
         subtitle={`${jobData.address}`}
         onSubtitleClick={handleAddressClick}
       />
-      <Container maxWidth="xl" sx={{ py: 2 }}>
-        {/* Header */}
-
+      <Container maxWidth="xl" sx={{ my: 2, mb: 12 }}>
         {/* Contact Information */}
-        <Box sx={{ mb: 3 }}>
-          <Stack direction="row" spacing={2}>
-            {jobData.contacts.map((contact, index) => (
-              <Box key={index} sx={{ textAlign: "center", flex: 1 }}>
-                <Avatar
-                  sx={{
-                    width: 60,
-                    height: 60,
-                    bgcolor: "primary.main",
-                    fontSize: "1.25rem",
-                    mx: "auto",
-                    mb: 1,
-                  }}
-                >
-                  {contact.initials}
-                </Avatar>
+        <Box
+          sx={{
+            my: 3,
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-around",
+          }}
+        >
+          {jobData.contacts.map((contact, index) => (
+            <Box
+              key={index}
+              sx={{
+                display: "flex",
+                gap: 1,
+                justifyContent: "space-between",
+              }}
+            >
+              <Avatar
+                sx={{
+                  width: 45,
+                  height: 45,
+                  bgcolor: "primary.main",
+                }}
+              >
+                {contact.initials}
+              </Avatar>
+              <Box>
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>
                   {contact.name}
                 </Typography>
@@ -96,32 +107,26 @@ const JobDetails: React.FC = () => {
                   {contact.role}
                 </Typography>
               </Box>
-            ))}
-          </Stack>
+            </Box>
+          ))}
         </Box>
 
         {/* Notes Section */}
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ position: "relative", mb: 2 }}>
+          <Card sx={{ p: 2 }}>
             <Typography variant="h6">Notes</Typography>
-          </Box>
 
-          <Card>
-            <CardContent>
-              {jobData.notes.map((note, index) => (
-                <Box
-                  key={index}
-                  sx={{ mb: index < jobData.notes.length - 1 ? 2 : 0 }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {note}
-                  </Typography>
-                  {index < jobData.notes.length - 1 && (
-                    <Divider sx={{ mt: 2 }} />
-                  )}
-                </Box>
-              ))}
-            </CardContent>
+            {jobData.notes.map((note, index) => (
+              <Box
+                key={index}
+                sx={{ mb: index < jobData.notes.length - 1 ? 2 : 0 }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {note}
+                </Typography>
+                {index < jobData.notes.length - 1 && <Divider sx={{ mt: 2 }} />}
+              </Box>
+            ))}
           </Card>
         </Box>
 
@@ -151,52 +156,55 @@ const JobDetails: React.FC = () => {
           </Box>
 
           <Stack spacing={1}>
-            {jobData.recentReports.map((report, index) => (
+            {jobData.recentReports.map((report) => (
               <Card
                 key={report.id}
-                sx={{ cursor: "pointer", "&:hover": { boxShadow: 3 } }}
+                sx={{
+                  cursor: "pointer",
+                  "&:hover": { boxShadow: 3 },
+                  p: 2,
+                  boxShadow: 0,
+                  borderRadius: 2,
+                }}
               >
-                <CardContent sx={{ py: 2, px: 3 }}>
-                  <Box
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Avatar
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      width: 40,
+                      height: 40,
+                      bgcolor: "primary.main",
+                      fontSize: "0.875rem",
+                      mr: 2,
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Avatar
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          bgcolor: "primary.main",
-                          fontSize: "0.875rem",
-                          mr: 2,
-                        }}
-                      >
-                        {report.initials}
-                      </Avatar>
-                      <Box>
-                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                          Report {report.id}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mt: 0.5 }}
-                        >
-                          {report.description}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {report.date}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <ChevronRightIcon color="action" />
-                    </Box>
+                    {report.initials}
+                  </Avatar>
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      Report {report.id}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {report.description}
+                    </Typography>
+                    <Typography
+                      display="block"
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 1 }}
+                    >
+                      {report.date}
+                    </Typography>
                   </Box>
-                </CardContent>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <ChevronRightIcon color="action" />
+                  </Box>
+                </Box>
               </Card>
             ))}
           </Stack>
