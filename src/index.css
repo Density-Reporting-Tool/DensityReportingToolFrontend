@@ -3,6 +3,10 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 16px
+}
+
 body {
   margin: 0;
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
@@ -40,4 +44,4 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
-} 
+}

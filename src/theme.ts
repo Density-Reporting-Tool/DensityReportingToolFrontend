@@ -42,17 +42,17 @@ let theme = createTheme({
       fontWeight: 400,
     },
     body1: {
-      fontSize: "0.875rem", // 14px
+      fontSize: "1rem", // 16px
     },
     body2: {
-      fontSize: "0.75rem", // 12px
+      fontSize: "0.875rem", // 14px
     },
     caption: {
-      fontSize: "0.625rem", // 10px
+      fontSize: "0.75rem", // 12px
     },
   },
 });
 
-theme = responsiveFontSizes(theme);
+// theme = responsiveFontSizes(theme);
 
 export default theme;
