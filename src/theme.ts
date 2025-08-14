@@ -16,27 +16,39 @@ let theme = createTheme({
     },
   },
   typography: {
-    fontFamily: "'Roboto', sans-serif", // change if you want a different font
+    fontFamily: "'Roboto', sans-serif",
     h1: {
-      fontSize: "3rem", // 48px
+      fontSize: "2.625rem", // 42px
       fontWeight: 700,
     },
     h2: {
-      fontSize: "2.5rem", // 40px
+      fontSize: "2.25rem", // 36px
       fontWeight: 600,
     },
     h3: {
-      fontSize: "2rem", // 32px
+      fontSize: "1.875rem", // 30px
       fontWeight: 500,
     },
-    body1: {
-      fontSize: "0.8rem", // 16px
+    h4: {
+      fontSize: "1.5rem", // 24px
+      fontWeight: 500,
     },
-    body2: {
+    h5: {
+      fontSize: "1.25rem", // 20px
+      fontWeight: 500,
+    },
+    h6: {
+      fontSize: "1.125rem", // 18px
+      fontWeight: 400,
+    },
+    body1: {
       fontSize: "0.875rem", // 14px
     },
-    caption: {
+    body2: {
       fontSize: "0.75rem", // 12px
+    },
+    caption: {
+      fontSize: "0.625rem", // 10px
     },
   },
 });
