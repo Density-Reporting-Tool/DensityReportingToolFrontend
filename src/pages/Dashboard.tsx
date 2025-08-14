@@ -59,13 +59,24 @@ const Dashboard: React.FC = () => {
     <Container maxWidth="xl" sx={{ py: 2 }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Box sx={{ alignItems: "center", mb: 2 }}>
-          <Typography
-            variant="h3"
-            sx={{ fontWeight: 500, textAlign: "center" }}
-          >
-            GEOPACIFIC
-          </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 2,
+            justifyContent: "center",
+          }}
+        >
+          <Box
+            component="img"
+            sx={{
+              width: "100%",
+              height: "auto",
+              maxWidth: 250,
+            }}
+            alt="GeoPacific logo"
+            src="/assets/GeoPacificLogo.png"
+          />
         </Box>
 
         {/* Search Bar */}
