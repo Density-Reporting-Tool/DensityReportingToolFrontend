@@ -61,7 +61,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 2 }}>
+    <Container maxWidth="xl" sx={{ py: 2 }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Box sx={{ alignItems: "center", mb: 2 }}>
@@ -128,10 +128,12 @@ const Dashboard: React.FC = () => {
               <Card
                 sx={{
                   cursor: "pointer",
-                  "&:hover": { boxShadow: 3 },
+                  "&:hover": { boxShadow: 2 },
                   flexGrow: 1,
                   borderRadius: 2,
                   padding: "14px",
+                  boxShadow: 0,
+                  border: "1px gray solid",
                 }}
                 onClick={() => handleJobClick(schedule.jobNumber)}
               >
@@ -186,6 +188,8 @@ const Dashboard: React.FC = () => {
                     flexGrow: 1,
                     borderRadius: 2,
                     padding: "14px 20px",
+                    boxShadow: 0,
+                    border: "1px gray solid",
                   }}
                   onClick={() => handleJobClick(report.jobNumber)}
                 >
