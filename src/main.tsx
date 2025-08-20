@@ -8,6 +8,7 @@ import JobDetails from "./pages/JobDetails";
 import LandingPage from "./pages/LandingPage";
 import LabAdminDashboard from "./pages/LabAdminDashboard";
 import LabAdminCreateJob from "./pages/LabAdminCreateJob";
+import LabAdminAddProctor from "./pages/LabAdminAddProctor";
 import "./index.css";
 
 // Register PWA service worker
@@ -31,8 +32,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/lab-admin" element={<LabAdminDashboard />} />
-          <Route path="/lab-admin/create-job" element={<LabAdminCreateJob />} />
+                  <Route path="/lab-admin" element={<LabAdminDashboard />} />
+        <Route path="/lab-admin/create-job" element={<LabAdminCreateJob />} />
+        <Route path="/lab-admin/add-proctor" element={<LabAdminAddProctor />} />
           <Route path="/job/:id" element={<JobDetails />} />
         </Routes>
       </BrowserRouter>

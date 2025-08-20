@@ -26,6 +26,10 @@ const LabAdminDashboard: React.FC = () => {
     navigate('/lab-admin/create-job')
   }
 
+  const handleEnterProctor = () => {
+    navigate('/lab-admin/add-proctor')
+  }
+
   const renderContent = () => {
     switch (selectedSection) {
       case 'schedule':
@@ -177,7 +181,7 @@ const LabAdminDashboard: React.FC = () => {
             {/* Enter Proctor Button */}
             <Button
               variant="contained"
-              onClick={() => handleNavigation('enterProctor')}
+              onClick={handleEnterProctor}
               sx={{
                 backgroundColor: 'primary.main',
                 color: 'white',
