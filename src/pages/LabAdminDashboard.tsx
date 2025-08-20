@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -14,10 +15,15 @@ import {
 } from '@mui/icons-material'
 
 const LabAdminDashboard: React.FC = () => {
+  const navigate = useNavigate()
   const [selectedSection, setSelectedSection] = useState<string>('')
 
   const handleNavigation = (section: string) => {
     setSelectedSection(section)
+  }
+
+  const handleCreateJob = () => {
+    navigate('/lab-admin/create-job')
   }
 
   const renderContent = () => {
@@ -152,7 +158,7 @@ const LabAdminDashboard: React.FC = () => {
             {/* Create Job Button */}
             <Button
               variant="contained"
-              onClick={() => handleNavigation('createJob')}
+              onClick={handleCreateJob}
               sx={{
                 backgroundColor: '#E1BEE7',
                 color: '#424242',
