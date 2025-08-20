@@ -55,14 +55,23 @@ const LandingPage: React.FC = () => {
             }}
             onClick={() => handleNavigation('/field-tech-dashboard')}
           >
-            <CardContent sx={{ textAlign: 'center', py: 4 }}>
-              <DashboardIcon sx={{ fontSize: 64, color: 'primary.main', mb: 3 }} />
-              <Typography variant="h4" sx={{ fontWeight: 600, mb: 2 }}>
-                Dashboard
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                Access job schedules, reports in progress, and density reporting tools.
-              </Typography>
+            <CardContent sx={{ 
+              textAlign: 'center', 
+              py: 4, 
+              display: 'flex', 
+              flexDirection: 'column',
+              height: '100%',
+              justifyContent: 'space-between'
+            }}>
+              <Box>
+                <DashboardIcon sx={{ fontSize: 64, color: 'primary.main', mb: 3 }} />
+                <Typography variant="h4" sx={{ fontWeight: 600, mb: 2 }}>
+                  Field Tech Dashboard
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                  Access job schedules, reports in progress, and density reporting tools.
+                </Typography>
+              </Box>
               <Button 
                 variant="contained" 
                 size="large"
@@ -88,16 +97,25 @@ const LandingPage: React.FC = () => {
             }}
             onClick={() => handleNavigation('/lab-admin')}
           >
-            <CardContent sx={{ textAlign: 'center', py: 4 }}>
-              <ScienceIcon sx={{ fontSize: 64, color: 'primary.main', mb: 3 }} />
-              <Typography variant="h4" sx={{ fontWeight: 600, mb: 2 }}>
-                Lab Admin
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                Manage laboratory operations, equipment, personnel, and sample tracking.
-              </Typography>
+            <CardContent sx={{ 
+              textAlign: 'center', 
+              py: 4, 
+              display: 'flex', 
+              flexDirection: 'column',
+              height: '100%',
+              justifyContent: 'space-between'
+            }}>
+              <Box>
+                <ScienceIcon sx={{ fontSize: 64, color: 'primary.main', mb: 3 }} />
+                <Typography variant="h4" sx={{ fontWeight: 600, mb: 2 }}>
+                  Lab Admin Dashboard
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                  Manage laboratory operations, equipment, personnel, and sample tracking.
+                </Typography>
+              </Box>
               <Button 
-                variant="outlined" 
+                variant="contained" 
                 size="large"
                 sx={{ px: 4, py: 1.5 }}
               >
