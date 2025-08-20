@@ -15,6 +15,7 @@ import {
   Science as ScienceIcon,
   Business as BusinessIcon
 } from '@mui/icons-material'
+import BackendStatus from '../components/BackendStatus'
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate()
@@ -111,7 +112,7 @@ const LandingPage: React.FC = () => {
                   Lab Admin Dashboard
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                  Manage laboratory operations, equipment, personnel, and sample tracking.
+                  Manage schedules, jobs, and lab test results.
                 </Typography>
               </Box>
               <Button 
@@ -119,7 +120,7 @@ const LandingPage: React.FC = () => {
                 size="large"
                 sx={{ px: 4, py: 1.5 }}
               >
-                Enter Lab Admin
+                Enter Dashboard
               </Button>
             </CardContent>
           </Card>
@@ -133,6 +134,11 @@ const LandingPage: React.FC = () => {
             This is a temporary landing page. Choose your destination above to access the main application.
           </Typography>
         </Paper>
+      </Box>
+
+      {/* Backend Status (for testing) */}
+      <Box sx={{ mt: 4 }}>
+        <BackendStatus />
       </Box>
     </Container>
   )
