@@ -1,4 +1,4 @@
-import { API_CONFIG, buildApiUrl, getAuthHeaders, getRequestTimeout } from '../config/api'
+import { buildApiUrl, getAuthHeaders, getRequestTimeout } from '../config/api'
 
 interface ApiResponse<T> {
   data: T
