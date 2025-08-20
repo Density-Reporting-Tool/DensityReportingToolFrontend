@@ -53,7 +53,7 @@ const LandingPage: React.FC = () => {
                 boxShadow: 8 
               }
             }}
-            onClick={() => handleNavigation('/dashboard')}
+            onClick={() => handleNavigation('/field-tech-dashboard')}
           >
             <CardContent sx={{ textAlign: 'center', py: 4 }}>
               <DashboardIcon sx={{ fontSize: 64, color: 'primary.main', mb: 3 }} />

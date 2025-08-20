@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
-import Dashboard from "./pages/Dashboard";
+import FieldTechDashboard from "./pages/FieldTechDashboard";
 import theme from "./theme";
 import JobDetails from "./pages/JobDetails";
 import LandingPage from "./pages/LandingPage";
@@ -20,7 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/field-tech-dashboard" element={<FieldTechDashboard />} />
                   <Route path="/lab-admin" element={<LabAdminDashboard />} />
         <Route path="/lab-admin/create-job" element={<LabAdminCreateJob />} />
         <Route path="/lab-admin/add-proctor" element={<LabAdminAddProctor />} />
