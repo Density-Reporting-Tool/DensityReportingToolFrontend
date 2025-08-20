@@ -26,6 +26,7 @@ import {
   Schedule as ScheduleIcon,
   Add as AddIcon
 } from '@mui/icons-material'
+import DistributionListManager, { Contact } from '../components/DistributionListManager'
 
 const LabAdminCreateJob: React.FC = () => {
   const navigate = useNavigate()
@@ -39,6 +40,17 @@ const LabAdminCreateJob: React.FC = () => {
     email: 'Peter.Senyk@DRT.ca',
     phone: '1-604-329-9559'
   })
+  const [contacts, setContacts] = useState<Contact[]>([
+    {
+      id: '1',
+      lastName: 'Senyk',
+      firstName: 'Peter',
+      email: 'Peter.Senyk@DRT.ca',
+      phone: '1-604-329-9559',
+      company: 'GeoPacific'
+    }
+  ])
+  const [contactManagerOpen, setContactManagerOpen] = useState(false)
 
   const handleNavigation = (section: string) => {
     switch (section) {
@@ -415,6 +427,7 @@ const LabAdminCreateJob: React.FC = () => {
               <Button
                 variant="contained"
                 fullWidth
+                onClick={() => setContactManagerOpen(true)}
                 sx={{
                   backgroundColor: 'primary.main',
                   color: 'white',
@@ -590,9 +603,20 @@ const LabAdminCreateJob: React.FC = () => {
             Add Additional Contact
           </Button>
         </DialogActions>
-       </Dialog>
-     </Box>
-   )
- }
+               </Dialog>
+
+        {/* Distribution List Manager */}
+        <DistributionListManager
+          open={contactManagerOpen}
+          onClose={() => setContactManagerOpen(false)}
+          contacts={contacts}
+          onContactsChange={setContacts}
+          title="Distribution List Manager"
+          jobNumber="25900"
+          mode="dialog"
+        />
+      </Box>
+    )
+  }
 
 export default LabAdminCreateJob;
