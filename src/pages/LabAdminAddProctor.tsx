@@ -235,21 +235,22 @@ const LabAdminAddProctor: React.FC = () => {
                   <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                     Date Sampled
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <TextField
-                      value="Aug 8, 2025"
-                      variant="outlined"
-                      size="small"
-                      sx={{
-                        flex: 1,
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: 'white',
-                          borderRadius: 1
-                        }
-                      }}
-                    />
-                    <CalendarIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </Box>
+                  <TextField
+                    type="date"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    defaultValue="2025-08-08"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'white',
+                        borderRadius: 1
+                      }
+                    }}
+                  />
                 </Box>
 
                 {/* Proctor Type */}
@@ -357,21 +358,22 @@ const LabAdminAddProctor: React.FC = () => {
                   <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                     Date Tested
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <TextField
-                      value="Aug 8, 2025"
-                      variant="outlined"
-                      size="small"
-                      sx={{
-                        flex: 1,
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: 'white',
-                          borderRadius: 1
-                        }
-                      }}
-                    />
-                    <CalendarIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </Box>
+                  <TextField
+                    type="date"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    defaultValue="2025-08-08"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'white',
+                        borderRadius: 1
+                      }
+                    }}
+                  />
                 </Box>
 
                 {/* Oversize Percentage */}
