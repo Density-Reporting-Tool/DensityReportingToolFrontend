@@ -93,14 +93,14 @@ const LabAdminCreateJob: React.FC = () => {
       {/* Header Bar */}
       <Box sx={{ 
         height: 64, 
-        backgroundColor: '#424242', 
+        backgroundColor: 'primary.main', 
         display: 'flex', 
         alignItems: 'center',
         width: '100%'
       }}>
         {/* Title Section */}
         <Box sx={{ 
-          backgroundColor: '#757575', 
+          backgroundColor: 'primary.dark', 
           height: '100%', 
           display: 'flex', 
           alignItems: 'center',
@@ -110,8 +110,8 @@ const LabAdminCreateJob: React.FC = () => {
           {/* Avatar Circle */}
           <Avatar 
             sx={{ 
-              bgcolor: '#E1BEE7', 
-              color: 'white', 
+              bgcolor: 'white', 
+              color: 'primary.main', 
               fontWeight: 'bold',
               fontSize: '1.2rem',
               width: 40,
@@ -139,7 +139,7 @@ const LabAdminCreateJob: React.FC = () => {
         {/* Left Sidebar */}
         <Box sx={{ 
           width: 200, 
-          backgroundColor: '#757575',
+          backgroundColor: 'grey.100',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -152,13 +152,13 @@ const LabAdminCreateJob: React.FC = () => {
               fullWidth
               sx={{
                 backgroundColor: 'white',
-                color: '#424242',
+                color: 'text.primary',
                 fontWeight: 'bold',
                 py: 1.5,
                 mb: 2,
-                borderRadius: 1,
+                borderRadius: 2,
                 '&:hover': {
-                  backgroundColor: '#f5f5f5'
+                  backgroundColor: 'grey.50'
                 }
               }}
             >
@@ -171,13 +171,13 @@ const LabAdminCreateJob: React.FC = () => {
               fullWidth
               sx={{
                 backgroundColor: 'white',
-                color: '#424242',
+                color: 'text.primary',
                 fontWeight: 'bold',
                 py: 1.5,
                 mb: 2,
-                borderRadius: 1,
+                borderRadius: 2,
                 '&:hover': {
-                  backgroundColor: '#f5f5f5'
+                  backgroundColor: 'grey.50'
                 }
               }}
             >
@@ -189,13 +189,13 @@ const LabAdminCreateJob: React.FC = () => {
               variant="contained"
               fullWidth
               sx={{
-                backgroundColor: '#E1BEE7',
-                color: '#424242',
+                backgroundColor: 'primary.main',
+                color: 'white',
                 fontWeight: 'bold',
                 py: 1.5,
-                borderRadius: 1,
+                borderRadius: 2,
                 '&:hover': {
-                  backgroundColor: '#CE93D8'
+                  backgroundColor: 'primary.dark'
                 }
               }}
             >
@@ -207,7 +207,7 @@ const LabAdminCreateJob: React.FC = () => {
         {/* Main Content Area - Job Details Form */}
         <Box sx={{ 
           flex: 1, 
-          backgroundColor: '#F3E5F5',
+          backgroundColor: 'background.default',
           p: 4
         }}>
           <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
@@ -267,10 +267,10 @@ const LabAdminCreateJob: React.FC = () => {
                 <IconButton
                   onClick={handleAddPerson}
                   sx={{
-                    backgroundColor: '#E1BEE7',
-                    color: '#424242',
+                    backgroundColor: 'primary.main',
+                    color: 'white',
                     '&:hover': {
-                      backgroundColor: '#CE93D8'
+                      backgroundColor: 'primary.dark'
                     },
                     width: 40,
                     height: 40
@@ -398,13 +398,13 @@ const LabAdminCreateJob: React.FC = () => {
                 variant="contained"
                 fullWidth
                 sx={{
-                  backgroundColor: '#E1BEE7',
-                  color: '#424242',
+                  backgroundColor: 'primary.main',
+                  color: 'white',
                   fontWeight: 'bold',
                   py: 1.5,
-                  borderRadius: 1,
+                  borderRadius: 2,
                   '&:hover': {
-                    backgroundColor: '#CE93D8'
+                    backgroundColor: 'primary.dark'
                   }
                 }}
               >
@@ -414,13 +414,13 @@ const LabAdminCreateJob: React.FC = () => {
                 variant="contained"
                 fullWidth
                 sx={{
-                  backgroundColor: '#E1BEE7',
-                  color: '#424242',
+                  backgroundColor: 'primary.main',
+                  color: 'white',
                   fontWeight: 'bold',
                   py: 1.5,
-                  borderRadius: 1,
+                  borderRadius: 2,
                   '&:hover': {
-                    backgroundColor: '#CE93D8'
+                    backgroundColor: 'primary.dark'
                   }
                 }}
               >
@@ -438,10 +438,10 @@ const LabAdminCreateJob: React.FC = () => {
          maxWidth="sm"
          fullWidth
        >
-         <DialogTitle sx={{ backgroundColor: '#F3E5F5', color: '#424242' }}>
-           Add New Person
-         </DialogTitle>
-         <DialogContent sx={{ backgroundColor: '#F3E5F5', pt: 2 }}>
+                 <DialogTitle sx={{ backgroundColor: 'grey.50', color: 'text.primary' }}>
+          Add New Person
+        </DialogTitle>
+        <DialogContent sx={{ backgroundColor: 'grey.50', pt: 2 }}>
            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
              {/* Client Name */}
              <Box>
@@ -544,34 +544,34 @@ const LabAdminCreateJob: React.FC = () => {
              </Box>
            </Box>
          </DialogContent>
-         <DialogActions sx={{ backgroundColor: '#F3E5F5', p: 2, gap: 2 }}>
-           <Button
-             variant="contained"
-             onClick={handleSavePerson}
-             sx={{
-               backgroundColor: '#E1BEE7',
-               color: '#424242',
-               fontWeight: 'bold',
-               px: 3,
-               py: 1
-             }}
-           >
-             Save Client
-           </Button>
-           <Button
-             variant="contained"
-             onClick={handleAddPerson}
-             sx={{
-               backgroundColor: '#E1BEE7',
-               color: '#424242',
-               fontWeight: 'bold',
-               px: 3,
-               py: 1
-             }}
-           >
-             Add Additional Contact
-           </Button>
-         </DialogActions>
+                 <DialogActions sx={{ backgroundColor: 'grey.50', p: 2, gap: 2 }}>
+          <Button
+            variant="contained"
+            onClick={handleSavePerson}
+            sx={{
+              backgroundColor: 'primary.main',
+              color: 'white',
+              fontWeight: 'bold',
+              px: 3,
+              py: 1
+            }}
+          >
+            Save Client
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleAddPerson}
+            sx={{
+              backgroundColor: 'primary.main',
+              color: 'white',
+              fontWeight: 'bold',
+              px: 3,
+              py: 1
+            }}
+          >
+            Add Additional Contact
+          </Button>
+        </DialogActions>
        </Dialog>
      </Box>
    )

@@ -83,14 +83,14 @@ const LabAdminDashboard: React.FC = () => {
       {/* Header Bar */}
       <Box sx={{ 
         height: 64, 
-        backgroundColor: '#424242', 
+        backgroundColor: 'primary.main', 
         display: 'flex', 
         alignItems: 'center',
         width: '100%'
       }}>
         {/* Title Section */}
         <Box sx={{ 
-          backgroundColor: '#757575', 
+          backgroundColor: 'primary.dark', 
           height: '100%', 
           display: 'flex', 
           alignItems: 'center',
@@ -100,8 +100,8 @@ const LabAdminDashboard: React.FC = () => {
           {/* Avatar Circle */}
           <Avatar 
             sx={{ 
-              bgcolor: '#E1BEE7', 
-              color: 'white', 
+              bgcolor: 'white', 
+              color: 'primary.main', 
               fontWeight: 'bold',
               fontSize: '1.2rem',
               width: 40,
@@ -129,7 +129,7 @@ const LabAdminDashboard: React.FC = () => {
         {/* Left Sidebar */}
         <Box sx={{ 
           width: 200, 
-          backgroundColor: '#757575',
+          backgroundColor: 'grey.100',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -141,13 +141,13 @@ const LabAdminDashboard: React.FC = () => {
               variant="contained"
               onClick={() => handleNavigation('schedule')}
               sx={{
-                backgroundColor: '#E1BEE7',
-                color: '#424242',
+                backgroundColor: 'primary.main',
+                color: 'white',
                 fontWeight: 'bold',
                 py: 1.5,
-                borderRadius: 1,
+                borderRadius: 2,
                 '&:hover': {
-                  backgroundColor: '#CE93D8'
+                  backgroundColor: 'primary.dark'
                 }
               }}
               startIcon={<ScheduleIcon />}
@@ -160,13 +160,13 @@ const LabAdminDashboard: React.FC = () => {
               variant="contained"
               onClick={handleCreateJob}
               sx={{
-                backgroundColor: '#E1BEE7',
-                color: '#424242',
+                backgroundColor: 'primary.main',
+                color: 'white',
                 fontWeight: 'bold',
                 py: 1.5,
-                borderRadius: 1,
+                borderRadius: 2,
                 '&:hover': {
-                  backgroundColor: '#CE93D8'
+                  backgroundColor: 'primary.dark'
                 }
               }}
               startIcon={<AddIcon />}
@@ -179,13 +179,13 @@ const LabAdminDashboard: React.FC = () => {
               variant="contained"
               onClick={() => handleNavigation('enterProctor')}
               sx={{
-                backgroundColor: '#E1BEE7',
-                color: '#424242',
+                backgroundColor: 'primary.main',
+                color: 'white',
                 fontWeight: 'bold',
                 py: 1.5,
-                borderRadius: 1,
+                borderRadius: 2,
                 '&:hover': {
-                  backgroundColor: '#CE93D8'
+                  backgroundColor: 'primary.dark'
                 }
               }}
               startIcon={<PersonIcon />}
@@ -198,8 +198,8 @@ const LabAdminDashboard: React.FC = () => {
         {/* Main Content Area */}
         <Box sx={{ 
           flex: 1, 
-          backgroundColor: 'white',
-          borderLeft: '1px solid #e0e0e0'
+          backgroundColor: 'background.default',
+          borderLeft: '1px solid grey.300'
         }}>
           {renderContent()}
         </Box>
