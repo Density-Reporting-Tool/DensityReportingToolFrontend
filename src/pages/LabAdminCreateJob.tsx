@@ -31,8 +31,18 @@ const LabAdminCreateJob: React.FC = () => {
     'Private Developer B'
   ]
 
-  const handleProjectManagerChange = (event: SelectChangeEvent) => {
-    setProjectManager(event.target.value)
+  // Sample project manager options
+  const projectManagerOptions = [
+    'Jakub Szary',
+    'John Doe',
+    'Jane Smith',
+    'Mike Johnson',
+    'Sarah Wilson',
+    'David Brown'
+  ]
+
+  const handleProjectManagerChange = (event: any, newValue: string | null) => {
+    setProjectManager(newValue || '')
   }
 
   const handleClientChange = (event: any, newValue: string | null) => {
@@ -190,20 +200,29 @@ const LabAdminCreateJob: React.FC = () => {
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Project Manager
               </Typography>
-              <FormControl fullWidth size="small">
-                <Select
-                  value={projectManager}
-                  onChange={handleProjectManagerChange}
-                  sx={{
-                    backgroundColor: 'white',
-                    borderRadius: 1
-                  }}
-                >
-                  <MenuItem value="Jakub Szary">Jakub Szary</MenuItem>
-                  <MenuItem value="John Doe">John Doe</MenuItem>
-                  <MenuItem value="Jane Smith">Jane Smith</MenuItem>
-                </Select>
-              </FormControl>
+              <Autocomplete
+                value={projectManager}
+                onChange={handleProjectManagerChange}
+                options={projectManagerOptions}
+                freeSolo
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    size="small"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'white',
+                        borderRadius: 1
+                      }
+                    }}
+                  />
+                )}
+                sx={{
+                  '& .MuiAutocomplete-popupIndicator': {
+                    color: '#666'
+                  }
+                }}
+              />
             </Box>
 
             {/* Client */}
