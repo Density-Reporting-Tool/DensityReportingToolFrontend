@@ -405,21 +405,21 @@ const LabAdminCreateJob: React.FC = () => {
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Start Date
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <TextField
-                  value="August 15, 2025"
-                  variant="outlined"
-                  size="small"
-                  sx={{
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'white',
-                      borderRadius: 1
-                    }
-                  }}
-                />
-                <CalendarIcon sx={{ color: '#666', fontSize: 20 }} />
-              </Box>
+              <TextField
+                type="date"
+                variant="outlined"
+                size="small"
+                defaultValue="2025-08-15"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'white',
+                    borderRadius: 1
+                  }
+                }}
+              />
             </Box>
 
             {/* Action Buttons */}
