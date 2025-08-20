@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   Button,
-  Paper,
   Avatar,
   Stack
 } from '@mui/material'

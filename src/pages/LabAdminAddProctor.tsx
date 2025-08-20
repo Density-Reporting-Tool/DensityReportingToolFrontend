@@ -6,7 +6,6 @@ import {
   TextField,
   Button,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Avatar,
@@ -14,7 +13,6 @@ import {
   Stack
 } from '@mui/material'
 import {
-  CalendarToday as CalendarIcon,
   Person as PersonIcon,
   Schedule as ScheduleIcon,
   Add as AddIcon

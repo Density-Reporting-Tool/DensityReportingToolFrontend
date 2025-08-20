@@ -5,12 +5,7 @@ import {
   Typography,
   TextField,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Avatar,
-  SelectChangeEvent,
   Autocomplete,
   Dialog,
   DialogTitle,
@@ -20,7 +15,6 @@ import {
   Stack
 } from '@mui/material'
 import {
-  CalendarToday as CalendarIcon,
   Person as PersonIcon,
   PersonAdd as PersonAddIcon,
   Schedule as ScheduleIcon,
@@ -85,11 +79,11 @@ const LabAdminCreateJob: React.FC = () => {
     'David Brown'
   ]
 
-  const handleProjectManagerChange = (event: any, newValue: string | null) => {
+  const handleProjectManagerChange = (_event: any, newValue: string | null) => {
     setProjectManager(newValue || '')
   }
 
-  const handleClientChange = (event: any, newValue: string | null) => {
+  const handleClientChange = (_event: any, newValue: string | null) => {
     setClient(newValue || '')
   }
 
