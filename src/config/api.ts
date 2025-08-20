@@ -1,3 +1,11 @@
+// Debug environment variables
+console.log('Environment Variables:', {
+  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  NODE_ENV: import.meta.env.NODE_ENV,
+  PROD: import.meta.env.PROD,
+  DEV: import.meta.env.DEV
+})
+
 // API configuration for backend integration
 export const API_CONFIG = {
   // Base URL for API calls - can be overridden by environment variables
@@ -50,7 +58,9 @@ export const API_CONFIG = {
 
 // Helper function to build full API URL
 export const buildApiUrl = (endpoint: string): string => {
-  return `${API_CONFIG.BASE_URL}${endpoint}`
+  const fullUrl = `${API_CONFIG.BASE_URL}${endpoint}`
+  console.log(`Building API URL: ${fullUrl} (BASE_URL: ${API_CONFIG.BASE_URL})`)
+  return fullUrl
 }
 
 // Helper function to get auth headers
