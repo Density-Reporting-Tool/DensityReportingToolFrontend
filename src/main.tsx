@@ -5,6 +5,8 @@ import { ThemeProvider } from "@mui/material";
 import Dashboard from "./pages/Dashboard";
 import theme from "./theme";
 import JobDetails from "./pages/JobDetails";
+import LandingPage from "./pages/LandingPage";
+import LabAdminDashboard from "./pages/LabAdminDashboard";
 import "./index.css";
 
 // Register PWA service worker
@@ -26,7 +28,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/lab-admin" element={<LabAdminDashboard />} />
           <Route path="/job/:id" element={<JobDetails />} />
         </Routes>
       </BrowserRouter>
