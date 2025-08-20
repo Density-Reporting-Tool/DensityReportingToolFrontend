@@ -10,16 +10,30 @@ import {
   MenuItem,
   Avatar,
   SelectChangeEvent,
-  Autocomplete
+  Autocomplete,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton
 } from '@mui/material'
 import {
   CalendarToday as CalendarIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  PersonAdd as PersonAddIcon
 } from '@mui/icons-material'
 
 const LabAdminCreateJob: React.FC = () => {
   const [projectManager, setProjectManager] = useState('Jakub Szary')
   const [client, setClient] = useState('GeoPacific')
+  const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false)
+  const [newPerson, setNewPerson] = useState({
+    clientName: 'GeoPacific',
+    firstName: 'Peter',
+    lastName: 'Senyk',
+    email: 'Peter.Senyk@DRT.ca',
+    phone: '1-604-329-9559'
+  })
 
   // Sample client options - you can expand this list
   const clientOptions = [
@@ -47,6 +61,31 @@ const LabAdminCreateJob: React.FC = () => {
 
   const handleClientChange = (event: any, newValue: string | null) => {
     setClient(newValue || '')
+  }
+
+  const handleAddPerson = () => {
+    setAddPersonDialogOpen(true)
+  }
+
+  const handleCloseDialog = () => {
+    setAddPersonDialogOpen(false)
+  }
+
+  const handleSavePerson = () => {
+    // Add the new person to the project manager options
+    const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`
+    if (!projectManagerOptions.includes(newPersonName)) {
+      projectManagerOptions.push(newPersonName)
+    }
+    setProjectManager(newPersonName)
+    setAddPersonDialogOpen(false)
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setNewPerson(prev => ({
+      ...prev,
+      [field]: value
+    }))
   }
 
   return (
@@ -200,29 +239,46 @@ const LabAdminCreateJob: React.FC = () => {
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Project Manager
               </Typography>
-              <Autocomplete
-                value={projectManager}
-                onChange={handleProjectManagerChange}
-                options={projectManagerOptions}
-                freeSolo
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    size="small"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
-                    }}
-                  />
-                )}
-                sx={{
-                  '& .MuiAutocomplete-popupIndicator': {
-                    color: '#666'
-                  }
-                }}
-              />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Autocomplete
+                  value={projectManager}
+                  onChange={handleProjectManagerChange}
+                  options={projectManagerOptions}
+                  freeSolo
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      size="small"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: 'white',
+                          borderRadius: 1
+                        }
+                      }}
+                    />
+                  )}
+                  sx={{
+                    flex: 1,
+                    '& .MuiAutocomplete-popupIndicator': {
+                      color: '#666'
+                    }
+                  }}
+                />
+                <IconButton
+                  onClick={handleAddPerson}
+                  sx={{
+                    backgroundColor: '#E1BEE7',
+                    color: '#424242',
+                    '&:hover': {
+                      backgroundColor: '#CE93D8'
+                    },
+                    width: 40,
+                    height: 40
+                  }}
+                >
+                  <PersonAddIcon />
+                </IconButton>
+              </Box>
             </Box>
 
             {/* Client */}
@@ -371,11 +427,154 @@ const LabAdminCreateJob: React.FC = () => {
                 Save Job
               </Button>
             </Box>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
-  )
-}
+                     </Box>
+         </Box>
+       </Box>
+
+       {/* Add Person Dialog */}
+       <Dialog 
+         open={addPersonDialogOpen} 
+         onClose={handleCloseDialog}
+         maxWidth="sm"
+         fullWidth
+       >
+         <DialogTitle sx={{ backgroundColor: '#F3E5F5', color: '#424242' }}>
+           Add New Person
+         </DialogTitle>
+         <DialogContent sx={{ backgroundColor: '#F3E5F5', pt: 2 }}>
+           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+             {/* Client Name */}
+             <Box>
+               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                 Client Name
+               </Typography>
+               <TextField
+                 fullWidth
+                 value={newPerson.clientName}
+                 onChange={(e) => handleInputChange('clientName', e.target.value)}
+                 variant="outlined"
+                 size="small"
+                 sx={{
+                   '& .MuiOutlinedInput-root': {
+                     backgroundColor: 'white',
+                     borderRadius: 1
+                   }
+                 }}
+               />
+             </Box>
+
+             {/* Contact First Name */}
+             <Box>
+               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                 Contact First Name
+               </Typography>
+               <TextField
+                 fullWidth
+                 value={newPerson.firstName}
+                 onChange={(e) => handleInputChange('firstName', e.target.value)}
+                 variant="outlined"
+                 size="small"
+                 sx={{
+                   '& .MuiOutlinedInput-root': {
+                     backgroundColor: 'white',
+                     borderRadius: 1
+                   }
+                 }}
+               />
+             </Box>
+
+             {/* Contact Last Name */}
+             <Box>
+               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                 Contact Last Name
+               </Typography>
+               <TextField
+                 fullWidth
+                 value={newPerson.lastName}
+                 onChange={(e) => handleInputChange('lastName', e.target.value)}
+                 variant="outlined"
+                 size="small"
+                 sx={{
+                   '& .MuiOutlinedInput-root': {
+                     backgroundColor: 'white',
+                     borderRadius: 1
+                   }
+                 }}
+               />
+             </Box>
+
+             {/* Contact Email */}
+             <Box>
+               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                 Contact Email
+               </Typography>
+               <TextField
+                 fullWidth
+                 value={newPerson.email}
+                 onChange={(e) => handleInputChange('email', e.target.value)}
+                 variant="outlined"
+                 size="small"
+                 sx={{
+                   '& .MuiOutlinedInput-root': {
+                     backgroundColor: 'white',
+                     borderRadius: 1
+                   }
+                 }}
+               />
+             </Box>
+
+             {/* Contact Phone Number */}
+             <Box>
+               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                 Contact Phone Number
+               </Typography>
+               <TextField
+                 fullWidth
+                 value={newPerson.phone}
+                 onChange={(e) => handleInputChange('phone', e.target.value)}
+                 variant="outlined"
+                 size="small"
+                 sx={{
+                   '& .MuiOutlinedInput-root': {
+                     backgroundColor: 'white',
+                     borderRadius: 1
+                   }
+                 }}
+               />
+             </Box>
+           </Box>
+         </DialogContent>
+         <DialogActions sx={{ backgroundColor: '#F3E5F5', p: 2, gap: 2 }}>
+           <Button
+             variant="contained"
+             onClick={handleSavePerson}
+             sx={{
+               backgroundColor: '#E1BEE7',
+               color: '#424242',
+               fontWeight: 'bold',
+               px: 3,
+               py: 1
+             }}
+           >
+             Save Client
+           </Button>
+           <Button
+             variant="contained"
+             onClick={handleAddPerson}
+             sx={{
+               backgroundColor: '#E1BEE7',
+               color: '#424242',
+               fontWeight: 'bold',
+               px: 3,
+               py: 1
+             }}
+           >
+             Add Additional Contact
+           </Button>
+         </DialogActions>
+       </Dialog>
+     </Box>
+   )
+ }
 
 export default LabAdminCreateJob;
