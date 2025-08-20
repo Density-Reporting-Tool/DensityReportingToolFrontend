@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -15,15 +16,19 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton
+  IconButton,
+  Stack
 } from '@mui/material'
 import {
   CalendarToday as CalendarIcon,
   Person as PersonIcon,
-  PersonAdd as PersonAddIcon
+  PersonAdd as PersonAddIcon,
+  Schedule as ScheduleIcon,
+  Add as AddIcon
 } from '@mui/icons-material'
 
 const LabAdminCreateJob: React.FC = () => {
+  const navigate = useNavigate()
   const [projectManager, setProjectManager] = useState('Jakub Szary')
   const [client, setClient] = useState('GeoPacific')
   const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false)
@@ -34,6 +39,19 @@ const LabAdminCreateJob: React.FC = () => {
     email: 'Peter.Senyk@DRT.ca',
     phone: '1-604-329-9559'
   })
+
+  const handleNavigation = (section: string) => {
+    switch (section) {
+      case 'schedule':
+        navigate('/lab-admin')
+        break
+      case 'enterProctor':
+        navigate('/lab-admin/add-proctor')
+        break
+      default:
+        break
+    }
+  }
 
   // Sample client options - you can expand this list
   const clientOptions = [
@@ -145,49 +163,29 @@ const LabAdminCreateJob: React.FC = () => {
           alignItems: 'center',
           pt: 3
         }}>
-          <Box sx={{ width: '90%' }}>
+          <Stack spacing={2} sx={{ width: '90%' }}>
             {/* Schedule Button */}
             <Button
               variant="contained"
-              fullWidth
+              onClick={() => handleNavigation('schedule')}
               sx={{
                 backgroundColor: 'white',
                 color: 'text.primary',
                 fontWeight: 'bold',
                 py: 1.5,
-                mb: 2,
                 borderRadius: 2,
                 '&:hover': {
                   backgroundColor: 'grey.50'
                 }
               }}
+              startIcon={<ScheduleIcon />}
             >
               Schedule
-            </Button>
-
-            {/* Enter Proctor Button */}
-            <Button
-              variant="contained"
-              fullWidth
-              sx={{
-                backgroundColor: 'white',
-                color: 'text.primary',
-                fontWeight: 'bold',
-                py: 1.5,
-                mb: 2,
-                borderRadius: 2,
-                '&:hover': {
-                  backgroundColor: 'grey.50'
-                }
-              }}
-            >
-              Enter Proctor
             </Button>
 
             {/* Create Job Button - Active State */}
             <Button
               variant="contained"
-              fullWidth
               sx={{
                 backgroundColor: 'primary.main',
                 color: 'white',
@@ -198,10 +196,30 @@ const LabAdminCreateJob: React.FC = () => {
                   backgroundColor: 'primary.dark'
                 }
               }}
+              startIcon={<AddIcon />}
             >
               Create Job
             </Button>
-          </Box>
+
+            {/* Enter Proctor Button */}
+            <Button
+              variant="contained"
+              onClick={() => handleNavigation('enterProctor')}
+              sx={{
+                backgroundColor: 'white',
+                color: 'text.primary',
+                fontWeight: 'bold',
+                py: 1.5,
+                borderRadius: 2,
+                '&:hover': {
+                  backgroundColor: 'grey.50'
+                }
+              }}
+              startIcon={<PersonIcon />}
+            >
+              Enter Proctor
+            </Button>
+          </Stack>
         </Box>
 
         {/* Main Content Area - Job Details Form */}
