@@ -56,7 +56,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 2 }}>
+    <Container maxWidth="xl" sx={{ my: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Box
