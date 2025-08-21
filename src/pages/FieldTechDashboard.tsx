@@ -56,7 +56,7 @@ const FieldTechDashboard: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 2 }}>
+    <Container maxWidth="xl" sx={{ my: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Box
@@ -114,7 +114,7 @@ const FieldTechDashboard: React.FC = () => {
           }}
         >
           <ScheduleIcon sx={{ mr: 1, color: "primary.main" }} />
-          <Typography variant="h6">Today's Schedule</Typography>
+          <Typography variant="h6">{"Today's Schedule"}</Typography>
         </Box>
         <Stack spacing={1}>
           {todaysSchedule.map((schedule) => (

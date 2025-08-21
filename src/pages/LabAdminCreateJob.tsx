@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -12,145 +12,151 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Stack
-} from '@mui/material'
+  Stack,
+} from "@mui/material";
 import {
   Person as PersonIcon,
   PersonAdd as PersonAddIcon,
   Schedule as ScheduleIcon,
-  Add as AddIcon
-} from '@mui/icons-material'
-import DistributionListManager, { Contact } from '../components/DistributionListManager'
+  Add as AddIcon,
+} from "@mui/icons-material";
+import DistributionListManager, {
+  Contact,
+} from "../components/DistributionListManager";
 
 const LabAdminCreateJob: React.FC = () => {
-  const navigate = useNavigate()
-  const [projectManager, setProjectManager] = useState('Jakub Szary')
-  const [client, setClient] = useState('GeoPacific')
-  const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false)
+  const navigate = useNavigate();
+  const [projectManager, setProjectManager] = useState("Jakub Szary");
+  const [client, setClient] = useState("GeoPacific");
+  const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false);
   const [newPerson, setNewPerson] = useState({
-    clientName: 'GeoPacific',
-    firstName: 'Peter',
-    lastName: 'Senyk',
-    email: 'Peter.Senyk@DRT.ca',
-    phone: '1-604-329-9559'
-  })
+    clientName: "GeoPacific",
+    firstName: "Peter",
+    lastName: "Senyk",
+    email: "Peter.Senyk@DRT.ca",
+    phone: "1-604-329-9559",
+  });
   const [contacts, setContacts] = useState<Contact[]>([
     {
-      id: '1',
-      lastName: 'Senyk',
-      firstName: 'Peter',
-      email: 'Peter.Senyk@DRT.ca',
-      phone: '1-604-329-9559',
-      company: 'GeoPacific'
-    }
-  ])
-  const [contactManagerOpen, setContactManagerOpen] = useState(false)
+      id: "1",
+      lastName: "Senyk",
+      firstName: "Peter",
+      email: "Peter.Senyk@DRT.ca",
+      phone: "1-604-329-9559",
+      company: "GeoPacific",
+    },
+  ]);
+  const [contactManagerOpen, setContactManagerOpen] = useState(false);
 
   const handleNavigation = (section: string) => {
     switch (section) {
-      case 'schedule':
-        navigate('/lab-admin')
-        break
-      case 'enterProctor':
-        navigate('/lab-admin/add-proctor')
-        break
+      case "schedule":
+        navigate("/lab-admin");
+        break;
+      case "enterProctor":
+        navigate("/lab-admin/add-proctor");
+        break;
       default:
-        break
+        break;
     }
-  }
+  };
 
   // Sample client options - you can expand this list
   const clientOptions = [
-    'GeoPacific',
-    'City of Vancouver',
-    'Metro Vancouver',
-    'BC Ministry of Transportation',
-    'Private Developer A',
-    'Private Developer B'
-  ]
+    "GeoPacific",
+    "City of Vancouver",
+    "Metro Vancouver",
+    "BC Ministry of Transportation",
+    "Private Developer A",
+    "Private Developer B",
+  ];
 
   // Sample project manager options
   const projectManagerOptions = [
-    'Jakub Szary',
-    'John Doe',
-    'Jane Smith',
-    'Mike Johnson',
-    'Sarah Wilson',
-    'David Brown'
-  ]
+    "Jakub Szary",
+    "John Doe",
+    "Jane Smith",
+    "Mike Johnson",
+    "Sarah Wilson",
+    "David Brown",
+  ];
 
   const handleProjectManagerChange = (_event: any, newValue: string | null) => {
-    setProjectManager(newValue || '')
-  }
+    setProjectManager(newValue || "");
+  };
 
   const handleClientChange = (_event: any, newValue: string | null) => {
-    setClient(newValue || '')
-  }
+    setClient(newValue || "");
+  };
 
   const handleAddPerson = () => {
-    setAddPersonDialogOpen(true)
-  }
+    setAddPersonDialogOpen(true);
+  };
 
   const handleCloseDialog = () => {
-    setAddPersonDialogOpen(false)
-  }
+    setAddPersonDialogOpen(false);
+  };
 
   const handleSavePerson = () => {
     // Add the new person to the project manager options
-    const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`
+    const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`;
     if (!projectManagerOptions.includes(newPersonName)) {
-      projectManagerOptions.push(newPersonName)
+      projectManagerOptions.push(newPersonName);
     }
-    setProjectManager(newPersonName)
-    setAddPersonDialogOpen(false)
-  }
+    setProjectManager(newPersonName);
+    setAddPersonDialogOpen(false);
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    setNewPerson(prev => ({
+    setNewPerson((prev) => ({
       ...prev,
-      [field]: value
-    }))
-  }
+      [field]: value,
+    }));
+  };
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header Bar */}
-      <Box sx={{ 
-        height: 64, 
-        backgroundColor: 'primary.main', 
-        display: 'flex', 
-        alignItems: 'center',
-        width: '100%'
-      }}>
+      <Box
+        sx={{
+          height: 64,
+          backgroundColor: "primary.main",
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
         {/* Title Section */}
-        <Box sx={{ 
-          backgroundColor: 'primary.dark', 
-          height: '100%', 
-          display: 'flex', 
-          alignItems: 'center',
-          px: 3,
-          minWidth: 200
-        }}>
+        <Box
+          sx={{
+            backgroundColor: "primary.dark",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            px: 3,
+            minWidth: 200,
+          }}
+        >
           {/* Avatar Circle */}
-          <Avatar 
-            sx={{ 
-              bgcolor: 'white', 
-              color: 'primary.main', 
-              fontWeight: 'bold',
-              fontSize: '1.2rem',
+          <Avatar
+            sx={{
+              bgcolor: "white",
+              color: "primary.main",
+              fontWeight: "bold",
+              fontSize: "1.2rem",
               width: 40,
               height: 40,
-              mr: 2
+              mr: 2,
             }}
           >
             LA
           </Avatar>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              color: 'white', 
-              fontWeight: 'bold',
-              fontSize: '1.1rem'
+          <Typography
+            variant="h6"
+            sx={{
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "1.1rem",
             }}
           >
             Lab Admin
@@ -159,30 +165,32 @@ const LabAdminCreateJob: React.FC = () => {
       </Box>
 
       {/* Main Content Area */}
-      <Box sx={{ display: 'flex', flex: 1 }}>
+      <Box sx={{ display: "flex", flex: 1 }}>
         {/* Left Sidebar */}
-        <Box sx={{ 
-          width: 200, 
-          backgroundColor: 'grey.100',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          pt: 3
-        }}>
-          <Stack spacing={2} sx={{ width: '90%' }}>
+        <Box
+          sx={{
+            width: 200,
+            backgroundColor: "grey.100",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            pt: 3,
+          }}
+        >
+          <Stack spacing={2} sx={{ width: "90%" }}>
             {/* Schedule Button */}
             <Button
               variant="contained"
-              onClick={() => handleNavigation('schedule')}
+              onClick={() => handleNavigation("schedule")}
               sx={{
-                backgroundColor: 'white',
-                color: 'text.primary',
-                fontWeight: 'bold',
+                backgroundColor: "white",
+                color: "text.primary",
+                fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                '&:hover': {
-                  backgroundColor: 'grey.50'
-                }
+                "&:hover": {
+                  backgroundColor: "grey.50",
+                },
               }}
               startIcon={<ScheduleIcon />}
             >
@@ -193,14 +201,14 @@ const LabAdminCreateJob: React.FC = () => {
             <Button
               variant="contained"
               sx={{
-                backgroundColor: 'primary.main',
-                color: 'white',
-                fontWeight: 'bold',
+                backgroundColor: "primary.main",
+                color: "white",
+                fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                '&:hover': {
-                  backgroundColor: 'primary.dark'
-                }
+                "&:hover": {
+                  backgroundColor: "primary.dark",
+                },
               }}
               startIcon={<AddIcon />}
             >
@@ -210,16 +218,16 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Enter Proctor Button */}
             <Button
               variant="contained"
-              onClick={() => handleNavigation('enterProctor')}
+              onClick={() => handleNavigation("enterProctor")}
               sx={{
-                backgroundColor: 'white',
-                color: 'text.primary',
-                fontWeight: 'bold',
+                backgroundColor: "white",
+                color: "text.primary",
+                fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                '&:hover': {
-                  backgroundColor: 'grey.50'
-                }
+                "&:hover": {
+                  backgroundColor: "grey.50",
+                },
               }}
               startIcon={<PersonIcon />}
             >
@@ -229,11 +237,13 @@ const LabAdminCreateJob: React.FC = () => {
         </Box>
 
         {/* Main Content Area - Job Details Form */}
-        <Box sx={{ 
-          flex: 1, 
-          backgroundColor: 'background.default',
-          p: 4
-        }}>
+        <Box
+          sx={{
+            flex: 1,
+            backgroundColor: "background.default",
+            p: 4,
+          }}
+        >
           <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
             Job Details
           </Typography>
@@ -250,10 +260,10 @@ const LabAdminCreateJob: React.FC = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'white',
-                    borderRadius: 1
-                  }
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
                 }}
               />
             </Box>
@@ -263,7 +273,7 @@ const LabAdminCreateJob: React.FC = () => {
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Project Manager
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Autocomplete
                   value={projectManager}
                   onChange={handleProjectManagerChange}
@@ -274,30 +284,30 @@ const LabAdminCreateJob: React.FC = () => {
                       {...params}
                       size="small"
                       sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: 'white',
-                          borderRadius: 1
-                        }
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "white",
+                          borderRadius: 1,
+                        },
                       }}
                     />
                   )}
                   sx={{
                     flex: 1,
-                    '& .MuiAutocomplete-popupIndicator': {
-                      color: '#666'
-                    }
+                    "& .MuiAutocomplete-popupIndicator": {
+                      color: "#666",
+                    },
                   }}
                 />
                 <IconButton
                   onClick={handleAddPerson}
                   sx={{
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                    '&:hover': {
-                      backgroundColor: 'primary.dark'
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "primary.dark",
                     },
                     width: 40,
-                    height: 40
+                    height: 40,
                   }}
                 >
                   <PersonAddIcon />
@@ -320,17 +330,17 @@ const LabAdminCreateJob: React.FC = () => {
                     {...params}
                     size="small"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 )}
                 sx={{
-                  '& .MuiAutocomplete-popupIndicator': {
-                    color: '#666'
-                  }
+                  "& .MuiAutocomplete-popupIndicator": {
+                    color: "#666",
+                  },
                 }}
               />
             </Box>
@@ -346,10 +356,10 @@ const LabAdminCreateJob: React.FC = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'white',
-                    borderRadius: 1
-                  }
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
                 }}
               />
             </Box>
@@ -365,10 +375,10 @@ const LabAdminCreateJob: React.FC = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'white',
-                    borderRadius: 1
-                  }
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
                 }}
               />
             </Box>
@@ -386,10 +396,10 @@ const LabAdminCreateJob: React.FC = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'white',
-                    borderRadius: 1
-                  }
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
                 }}
               />
             </Box>
@@ -408,29 +418,29 @@ const LabAdminCreateJob: React.FC = () => {
                   shrink: true,
                 }}
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'white',
-                    borderRadius: 1
-                  }
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
                 }}
               />
             </Box>
 
             {/* Action Buttons */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Button
                 variant="contained"
                 fullWidth
                 onClick={() => setContactManagerOpen(true)}
                 sx={{
-                  backgroundColor: 'primary.main',
-                  color: 'white',
-                  fontWeight: 'bold',
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontWeight: "bold",
                   py: 1.5,
                   borderRadius: 2,
-                  '&:hover': {
-                    backgroundColor: 'primary.dark'
-                  }
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                  },
                 }}
               >
                 Edit Distribution List
@@ -439,146 +449,148 @@ const LabAdminCreateJob: React.FC = () => {
                 variant="contained"
                 fullWidth
                 sx={{
-                  backgroundColor: 'primary.main',
-                  color: 'white',
-                  fontWeight: 'bold',
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontWeight: "bold",
                   py: 1.5,
                   borderRadius: 2,
-                  '&:hover': {
-                    backgroundColor: 'primary.dark'
-                  }
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                  },
                 }}
               >
                 Save Job
               </Button>
             </Box>
-                     </Box>
-         </Box>
-       </Box>
+          </Box>
+        </Box>
+      </Box>
 
-       {/* Add Person Dialog */}
-       <Dialog 
-         open={addPersonDialogOpen} 
-         onClose={handleCloseDialog}
-         maxWidth="sm"
-         fullWidth
-       >
-                 <DialogTitle sx={{ backgroundColor: 'grey.50', color: 'text.primary' }}>
+      {/* Add Person Dialog */}
+      <Dialog
+        open={addPersonDialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ backgroundColor: "grey.50", color: "text.primary" }}>
           Add New Person
         </DialogTitle>
-        <DialogContent sx={{ backgroundColor: 'grey.50', pt: 2 }}>
-           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-             {/* Client Name */}
-             <Box>
-               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                 Client Name
-               </Typography>
-               <TextField
-                 fullWidth
-                 value={newPerson.clientName}
-                 onChange={(e) => handleInputChange('clientName', e.target.value)}
-                 variant="outlined"
-                 size="small"
-                 sx={{
-                   '& .MuiOutlinedInput-root': {
-                     backgroundColor: 'white',
-                     borderRadius: 1
-                   }
-                 }}
-               />
-             </Box>
+        <DialogContent sx={{ backgroundColor: "grey.50", pt: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {/* Client Name */}
+            <Box>
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                Client Name
+              </Typography>
+              <TextField
+                fullWidth
+                value={newPerson.clientName}
+                onChange={(e) =>
+                  handleInputChange("clientName", e.target.value)
+                }
+                variant="outlined"
+                size="small"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+            </Box>
 
-             {/* Contact First Name */}
-             <Box>
-               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                 Contact First Name
-               </Typography>
-               <TextField
-                 fullWidth
-                 value={newPerson.firstName}
-                 onChange={(e) => handleInputChange('firstName', e.target.value)}
-                 variant="outlined"
-                 size="small"
-                 sx={{
-                   '& .MuiOutlinedInput-root': {
-                     backgroundColor: 'white',
-                     borderRadius: 1
-                   }
-                 }}
-               />
-             </Box>
+            {/* Contact First Name */}
+            <Box>
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                Contact First Name
+              </Typography>
+              <TextField
+                fullWidth
+                value={newPerson.firstName}
+                onChange={(e) => handleInputChange("firstName", e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+            </Box>
 
-             {/* Contact Last Name */}
-             <Box>
-               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                 Contact Last Name
-               </Typography>
-               <TextField
-                 fullWidth
-                 value={newPerson.lastName}
-                 onChange={(e) => handleInputChange('lastName', e.target.value)}
-                 variant="outlined"
-                 size="small"
-                 sx={{
-                   '& .MuiOutlinedInput-root': {
-                     backgroundColor: 'white',
-                     borderRadius: 1
-                   }
-                 }}
-               />
-             </Box>
+            {/* Contact Last Name */}
+            <Box>
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                Contact Last Name
+              </Typography>
+              <TextField
+                fullWidth
+                value={newPerson.lastName}
+                onChange={(e) => handleInputChange("lastName", e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+            </Box>
 
-             {/* Contact Email */}
-             <Box>
-               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                 Contact Email
-               </Typography>
-               <TextField
-                 fullWidth
-                 value={newPerson.email}
-                 onChange={(e) => handleInputChange('email', e.target.value)}
-                 variant="outlined"
-                 size="small"
-                 sx={{
-                   '& .MuiOutlinedInput-root': {
-                     backgroundColor: 'white',
-                     borderRadius: 1
-                   }
-                 }}
-               />
-             </Box>
+            {/* Contact Email */}
+            <Box>
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                Contact Email
+              </Typography>
+              <TextField
+                fullWidth
+                value={newPerson.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+            </Box>
 
-             {/* Contact Phone Number */}
-             <Box>
-               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                 Contact Phone Number
-               </Typography>
-               <TextField
-                 fullWidth
-                 value={newPerson.phone}
-                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                 variant="outlined"
-                 size="small"
-                 sx={{
-                   '& .MuiOutlinedInput-root': {
-                     backgroundColor: 'white',
-                     borderRadius: 1
-                   }
-                 }}
-               />
-             </Box>
-           </Box>
-         </DialogContent>
-                 <DialogActions sx={{ backgroundColor: 'grey.50', p: 2, gap: 2 }}>
+            {/* Contact Phone Number */}
+            <Box>
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                Contact Phone Number
+              </Typography>
+              <TextField
+                fullWidth
+                value={newPerson.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ backgroundColor: "grey.50", p: 2, gap: 2 }}>
           <Button
             variant="contained"
             onClick={handleSavePerson}
             sx={{
-              backgroundColor: 'primary.main',
-              color: 'white',
-              fontWeight: 'bold',
+              backgroundColor: "primary.main",
+              color: "white",
+              fontWeight: "bold",
               px: 3,
-              py: 1
+              py: 1,
             }}
           >
             Save Client
@@ -587,30 +599,30 @@ const LabAdminCreateJob: React.FC = () => {
             variant="contained"
             onClick={handleAddPerson}
             sx={{
-              backgroundColor: 'primary.main',
-              color: 'white',
-              fontWeight: 'bold',
+              backgroundColor: "primary.main",
+              color: "white",
+              fontWeight: "bold",
               px: 3,
-              py: 1
+              py: 1,
             }}
           >
             Add Additional Contact
           </Button>
         </DialogActions>
-               </Dialog>
+      </Dialog>
 
-        {/* Distribution List Manager */}
-        <DistributionListManager
-          open={contactManagerOpen}
-          onClose={() => setContactManagerOpen(false)}
-          contacts={contacts}
-          onContactsChange={setContacts}
-          title="Distribution List Manager"
-          jobNumber="25900"
-          mode="dialog"
-        />
-      </Box>
-    )
-  }
+      {/* Distribution List Manager */}
+      <DistributionListManager
+        open={contactManagerOpen}
+        onClose={() => setContactManagerOpen(false)}
+        contacts={contacts}
+        onContactsChange={setContacts}
+        title="Distribution List Manager"
+        jobNumber="25900"
+        mode="dialog"
+      />
+    </Box>
+  );
+};
 
 export default LabAdminCreateJob;

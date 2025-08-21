@@ -1,14 +1,14 @@
 import { IconButton, AppBar, Typography, Box } from "@mui/material";
 import {
   ArrowBack as ArrowBackIcon,
-  LocationOn as LocationIcon,
+  // LocationOn as LocationIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   title: string;
   subtitle?: string;
-  onSubtitleClick?: (text: string) => void;
+  onSubtitleClick?: () => void;
 }
 
 const HeaderWithBackButton: React.FC<HeaderProps> = ({
@@ -69,11 +69,11 @@ const HeaderWithBackButton: React.FC<HeaderProps> = ({
                       ? { textDecoration: "underline" }
                       : {},
                   }}
-                  onClick={() => onSubtitleClick && onSubtitleClick(subtitle)}
+                  onClick={() => onSubtitleClick && onSubtitleClick()}
                 >
                   {subtitle}
                 </Typography>
-                <LocationIcon color="action" sx={{ fontSize: "24px" }} />
+                {/* <LocationIcon color="action" sx={{ fontSize: "24px" }} /> */}
               </Box>
             )}
           </Box>

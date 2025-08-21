@@ -1,6 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 
-let theme = createTheme({
+const theme = createTheme({
   palette: {
     primary: {
       main: "#346598",
@@ -13,6 +13,9 @@ let theme = createTheme({
     },
     background: {
       default: "#f4f6f8",
+    },
+    success: {
+      main: "#228808",
     },
   },
   typography: {

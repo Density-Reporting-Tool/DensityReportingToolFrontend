@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -10,74 +10,78 @@ import {
   MenuItem,
   Avatar,
   SelectChangeEvent,
-  Stack
-} from '@mui/material'
+  Stack,
+} from "@mui/material";
 import {
   Person as PersonIcon,
   Schedule as ScheduleIcon,
-  Add as AddIcon
-} from '@mui/icons-material'
+  Add as AddIcon,
+} from "@mui/icons-material";
 
 const LabAdminAddProctor: React.FC = () => {
-  const navigate = useNavigate()
-  const [proctorType, setProctorType] = useState('MPDD')
+  const navigate = useNavigate();
+  const [proctorType, setProctorType] = useState("MPDD");
 
   const handleProctorTypeChange = (event: SelectChangeEvent) => {
-    setProctorType(event.target.value)
-  }
+    setProctorType(event.target.value);
+  };
 
   const handleNavigation = (section: string) => {
     switch (section) {
-      case 'schedule':
-        navigate('/lab-admin')
-        break
-      case 'createJob':
-        navigate('/lab-admin/create-job')
-        break
+      case "schedule":
+        navigate("/lab-admin");
+        break;
+      case "createJob":
+        navigate("/lab-admin/create-job");
+        break;
       default:
-        break
+        break;
     }
-  }
+  };
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header Bar */}
-      <Box sx={{ 
-        height: 64, 
-        backgroundColor: 'primary.main', 
-        display: 'flex', 
-        alignItems: 'center',
-        width: '100%'
-      }}>
+      <Box
+        sx={{
+          height: 64,
+          backgroundColor: "primary.main",
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
         {/* Title Section */}
-        <Box sx={{ 
-          backgroundColor: 'primary.dark', 
-          height: '100%', 
-          display: 'flex', 
-          alignItems: 'center',
-          px: 3,
-          minWidth: 200
-        }}>
+        <Box
+          sx={{
+            backgroundColor: "primary.dark",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            px: 3,
+            minWidth: 200,
+          }}
+        >
           {/* Avatar Circle */}
-          <Avatar 
-            sx={{ 
-              bgcolor: 'white', 
-              color: 'primary.main', 
-              fontWeight: 'bold',
-              fontSize: '1.2rem',
+          <Avatar
+            sx={{
+              bgcolor: "white",
+              color: "primary.main",
+              fontWeight: "bold",
+              fontSize: "1.2rem",
               width: 40,
               height: 40,
-              mr: 2
+              mr: 2,
             }}
           >
             LA
           </Avatar>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              color: 'white', 
-              fontWeight: 'bold',
-              fontSize: '1.1rem'
+          <Typography
+            variant="h6"
+            sx={{
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "1.1rem",
             }}
           >
             Lab Admin
@@ -86,30 +90,32 @@ const LabAdminAddProctor: React.FC = () => {
       </Box>
 
       {/* Main Content Area */}
-      <Box sx={{ display: 'flex', flex: 1 }}>
+      <Box sx={{ display: "flex", flex: 1 }}>
         {/* Left Sidebar */}
-        <Box sx={{ 
-          width: 200, 
-          backgroundColor: 'grey.100',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          pt: 3
-        }}>
-          <Stack spacing={2} sx={{ width: '90%' }}>
+        <Box
+          sx={{
+            width: 200,
+            backgroundColor: "grey.100",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            pt: 3,
+          }}
+        >
+          <Stack spacing={2} sx={{ width: "90%" }}>
             {/* Schedule Button */}
             <Button
               variant="contained"
-              onClick={() => handleNavigation('schedule')}
+              onClick={() => handleNavigation("schedule")}
               sx={{
-                backgroundColor: 'white',
-                color: 'text.primary',
-                fontWeight: 'bold',
+                backgroundColor: "white",
+                color: "text.primary",
+                fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                '&:hover': {
-                  backgroundColor: 'grey.50'
-                }
+                "&:hover": {
+                  backgroundColor: "grey.50",
+                },
               }}
               startIcon={<ScheduleIcon />}
             >
@@ -119,16 +125,16 @@ const LabAdminAddProctor: React.FC = () => {
             {/* Create Job Button */}
             <Button
               variant="contained"
-              onClick={() => handleNavigation('createJob')}
+              onClick={() => handleNavigation("createJob")}
               sx={{
-                backgroundColor: 'white',
-                color: 'text.primary',
-                fontWeight: 'bold',
+                backgroundColor: "white",
+                color: "text.primary",
+                fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                '&:hover': {
-                  backgroundColor: 'grey.50'
-                }
+                "&:hover": {
+                  backgroundColor: "grey.50",
+                },
               }}
               startIcon={<AddIcon />}
             >
@@ -139,14 +145,14 @@ const LabAdminAddProctor: React.FC = () => {
             <Button
               variant="contained"
               sx={{
-                backgroundColor: 'primary.main',
-                color: 'white',
-                fontWeight: 'bold',
+                backgroundColor: "primary.main",
+                color: "white",
+                fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                '&:hover': {
-                  backgroundColor: 'primary.dark'
-                }
+                "&:hover": {
+                  backgroundColor: "primary.dark",
+                },
               }}
               startIcon={<PersonIcon />}
             >
@@ -156,21 +162,24 @@ const LabAdminAddProctor: React.FC = () => {
         </Box>
 
         {/* Main Content Area - Proctor Data Entry Form */}
-        <Box sx={{ 
-          flex: 1, 
-          backgroundColor: 'background.default',
-          p: 4
-        }}>
+        <Box
+          sx={{
+            flex: 1,
+            backgroundColor: "background.default",
+            p: 4,
+          }}
+        >
           <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
             Proctor Data Entry
           </Typography>
 
           <Box sx={{ maxWidth: 1200 }}>
             {/* Form Grid - Two Columns */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-              
+            <Box
+              sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}
+            >
               {/* Left Column */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 {/* Job # */}
                 <Box>
                   <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
@@ -182,10 +191,10 @@ const LabAdminAddProctor: React.FC = () => {
                     variant="outlined"
                     size="small"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
@@ -201,10 +210,10 @@ const LabAdminAddProctor: React.FC = () => {
                     variant="outlined"
                     size="small"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
@@ -220,10 +229,10 @@ const LabAdminAddProctor: React.FC = () => {
                     variant="outlined"
                     size="small"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
@@ -243,10 +252,10 @@ const LabAdminAddProctor: React.FC = () => {
                       shrink: true,
                     }}
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
@@ -261,8 +270,8 @@ const LabAdminAddProctor: React.FC = () => {
                       value={proctorType}
                       onChange={handleProctorTypeChange}
                       sx={{
-                        backgroundColor: 'white',
-                        borderRadius: 1
+                        backgroundColor: "white",
+                        borderRadius: 1,
                       }}
                     >
                       <MenuItem value="MPDD">MPDD</MenuItem>
@@ -283,10 +292,10 @@ const LabAdminAddProctor: React.FC = () => {
                     variant="outlined"
                     size="small"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
@@ -302,17 +311,17 @@ const LabAdminAddProctor: React.FC = () => {
                     variant="outlined"
                     size="small"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
               </Box>
 
               {/* Right Column */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 {/* Lab Location */}
                 <Box>
                   <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
@@ -324,10 +333,10 @@ const LabAdminAddProctor: React.FC = () => {
                     variant="outlined"
                     size="small"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
@@ -343,10 +352,10 @@ const LabAdminAddProctor: React.FC = () => {
                     variant="outlined"
                     size="small"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
@@ -366,10 +375,10 @@ const LabAdminAddProctor: React.FC = () => {
                       shrink: true,
                     }}
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
@@ -379,20 +388,23 @@ const LabAdminAddProctor: React.FC = () => {
                   <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                     Oversize Percentage
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <TextField
                       value="13.2"
                       variant="outlined"
                       size="small"
                       sx={{
                         flex: 1,
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: 'white',
-                          borderRadius: 1
-                        }
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "white",
+                          borderRadius: 1,
+                        },
                       }}
                     />
-                    <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: "text.secondary" }}
+                    >
                       %
                     </Typography>
                   </Box>
@@ -403,20 +415,23 @@ const LabAdminAddProctor: React.FC = () => {
                   <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                     Optimum Moisture
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <TextField
                       value="13"
                       variant="outlined"
                       size="small"
                       sx={{
                         flex: 1,
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: 'white',
-                          borderRadius: 1
-                        }
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "white",
+                          borderRadius: 1,
+                        },
                       }}
                     />
-                    <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: "text.secondary" }}
+                    >
                       %
                     </Typography>
                   </Box>
@@ -433,10 +448,10 @@ const LabAdminAddProctor: React.FC = () => {
                     variant="outlined"
                     size="small"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
-                        borderRadius: 1
-                      }
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "white",
+                        borderRadius: 1,
+                      },
                     }}
                   />
                 </Box>
@@ -444,19 +459,19 @@ const LabAdminAddProctor: React.FC = () => {
             </Box>
 
             {/* Action Buttons */}
-            <Box sx={{ display: 'flex', gap: 2, mt: 4 }}>
+            <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
               <Button
                 variant="contained"
                 sx={{
-                  backgroundColor: 'primary.main',
-                  color: 'white',
-                  fontWeight: 'bold',
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontWeight: "bold",
                   px: 4,
                   py: 1.5,
                   borderRadius: 2,
-                  '&:hover': {
-                    backgroundColor: 'primary.dark'
-                  }
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                  },
                 }}
               >
                 Save Proctor Data
@@ -464,16 +479,16 @@ const LabAdminAddProctor: React.FC = () => {
               <Button
                 variant="outlined"
                 sx={{
-                  borderColor: 'primary.main',
-                  color: 'primary.main',
-                  fontWeight: 'bold',
+                  borderColor: "primary.main",
+                  color: "primary.main",
+                  fontWeight: "bold",
                   px: 4,
                   py: 1.5,
                   borderRadius: 2,
-                  '&:hover': {
-                    borderColor: 'primary.dark',
-                    backgroundColor: 'primary.50'
-                  }
+                  "&:hover": {
+                    borderColor: "primary.dark",
+                    backgroundColor: "primary.50",
+                  },
                 }}
               >
                 Clear Form
@@ -483,7 +498,7 @@ const LabAdminAddProctor: React.FC = () => {
         </Box>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default LabAdminAddProctor
+export default LabAdminAddProctor;

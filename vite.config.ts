@@ -92,23 +92,26 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    proxy: process.env.NODE_ENV === 'development' ? {
-      "/api": {
-        target: "http://localhost:8000", // Only used in development
-        changeOrigin: true,
-        secure: false,
-      },
-      "/health": {
-        target: "http://localhost:8000", // Add health endpoint proxy
-        changeOrigin: true,
-        secure: false,
-      },
-      "/home": {
-        target: "http://localhost:8000", // Add home endpoint proxy
-        changeOrigin: true,
-        secure: false,
-      },
-    } : undefined,
+    proxy:
+      process.env.NODE_ENV === "development"
+        ? {
+            "/api": {
+              target: "http://localhost:8000", // Only used in development
+              changeOrigin: true,
+              secure: false,
+            },
+            "/health": {
+              target: "http://localhost:8000", // Add health endpoint proxy
+              changeOrigin: true,
+              secure: false,
+            },
+            "/home": {
+              target: "http://localhost:8000", // Add home endpoint proxy
+              changeOrigin: true,
+              secure: false,
+            },
+          }
+        : undefined,
   },
   build: {
     outDir: "dist",
