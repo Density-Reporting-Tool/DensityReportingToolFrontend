@@ -53,7 +53,7 @@ const JobDetails: React.FC = () => {
   const navigate = useNavigate();
 
   const handleClickReport = (reportId: number) => {
-    navigate(`/report/${reportId}`);
+    navigate(`report/${reportId}`);
   };
 
   const handleNewReport = () => {
@@ -69,7 +69,7 @@ const JobDetails: React.FC = () => {
   return (
     <>
       <HeaderWithBackButton
-        title={`Job #${jobData.jobNumber}`}
+        title={`Job #${jobId}`}
         subtitle={`${jobData.address}`}
         onSubtitleClick={handleAddressClick}
       />
