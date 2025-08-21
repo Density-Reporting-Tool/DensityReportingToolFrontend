@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams } from "react-router-dom";
 import {
   Box,
@@ -56,8 +55,8 @@ const JobDetails: React.FC = () => {
     console.log("Create new report for job:", jobId);
   };
 
-  const handleAddressClick = (address: string) => {
-    const encodedAddress = encodeURIComponent(address);
+  const handleAddressClick = () => {
+    const encodedAddress = encodeURIComponent(jobData.address);
     const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
     window.open(googleMapsUrl, "_blank");
   };

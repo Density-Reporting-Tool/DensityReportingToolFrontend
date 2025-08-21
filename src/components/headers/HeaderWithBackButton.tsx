@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 interface HeaderProps {
   title: string;
   subtitle?: string;
-  onSubtitleClick?: (text: string) => void;
+  onSubtitleClick?: () => void;
 }
 
 const HeaderWithBackButton: React.FC<HeaderProps> = ({
@@ -69,7 +69,7 @@ const HeaderWithBackButton: React.FC<HeaderProps> = ({
                       ? { textDecoration: "underline" }
                       : {},
                   }}
-                  onClick={() => onSubtitleClick && onSubtitleClick(subtitle)}
+                  onClick={() => onSubtitleClick && onSubtitleClick()}
                 >
                   {subtitle}
                 </Typography>
