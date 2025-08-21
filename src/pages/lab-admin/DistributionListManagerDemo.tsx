@@ -3,7 +3,7 @@ import { Box, Button, Typography, Paper } from "@mui/material";
 import { Add as AddIcon, People as PeopleIcon } from "@mui/icons-material";
 import DistributionListManager, {
   Contact,
-} from "../components/DistributionListManager";
+} from "../../components/DistributionListManager";
 
 const DistributionListManagerDemo: React.FC = () => {
   const [contacts, setContacts] = useState<Contact[]>([

@@ -2,16 +2,16 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
-import FieldTechDashboard from "./pages/FieldTechDashboard";
+import FieldTechDashboard from "./pages/field-tech/FieldTechDashboard";
 import theme from "./theme";
-import JobDetails from "./pages/JobDetails";
+import JobDetails from "./pages/field-tech/JobDetails";
 import LandingPage from "./pages/LandingPage";
-import LabAdminDashboard from "./pages/LabAdminDashboard";
-import LabAdminCreateJob from "./pages/LabAdminCreateJob";
-import LabAdminAddProctor from "./pages/LabAdminAddProctor";
-import DistributionListManagerDemo from "./pages/DistributionListManagerDemo";
+import LabAdminDashboard from "./pages/lab-admin/LabAdminDashboard";
+import LabAdminCreateJob from "./pages/lab-admin/LabAdminCreateJob";
+import LabAdminAddProctor from "./pages/lab-admin/LabAdminAddProctor";
+import DistributionListManagerDemo from "./pages/lab-admin/DistributionListManagerDemo";
 import "./index.css";
-import ReportDetails from "./pages/ReportDetails";
+import ReportDetails from "./pages/field-tech/ReportDetails";
 
 // PWA service worker registration is handled automatically by vite-plugin-pwa
 
@@ -21,10 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route
-            path="/field-tech-dashboard"
-            element={<FieldTechDashboard />}
-          />
+          <Route path="/field-tech" element={<FieldTechDashboard />} />
           <Route path="/lab-admin" element={<LabAdminDashboard />} />
           <Route path="/lab-admin/create-job" element={<LabAdminCreateJob />} />
           <Route
