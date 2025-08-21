@@ -1,7 +1,7 @@
 import { IconButton, AppBar, Typography, Box } from "@mui/material";
 import {
   ArrowBack as ArrowBackIcon,
-  LocationOn as LocationIcon,
+  // LocationOn as LocationIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
@@ -73,7 +73,7 @@ const HeaderWithBackButton: React.FC<HeaderProps> = ({
                 >
                   {subtitle}
                 </Typography>
-                <LocationIcon color="action" sx={{ fontSize: "24px" }} />
+                {/* <LocationIcon color="action" sx={{ fontSize: "24px" }} /> */}
               </Box>
             )}
           </Box>
