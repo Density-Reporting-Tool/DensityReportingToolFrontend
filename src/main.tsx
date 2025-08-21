@@ -20,8 +20,16 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         <Routes>
+          {/* Field tech pages */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/field-tech" element={<FieldTechDashboard />} />
+          <Route path="/field-tech/job/:jobId" element={<JobDetails />} />
+          <Route
+            path="/field-tech/job/:jobId/report/:reportId"
+            element={<ReportDetails />}
+          />
+
+          {/* Lab admin pages */}
           <Route path="/lab-admin" element={<LabAdminDashboard />} />
           <Route path="/lab-admin/create-job" element={<LabAdminCreateJob />} />
           <Route
@@ -31,11 +39,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route
             path="/distribution-list-manager-demo"
             element={<DistributionListManagerDemo />}
-          />
-          <Route path="/job/:jobId" element={<JobDetails />} />
-          <Route
-            path="/job/:jobId/report/:reportId"
-            element={<ReportDetails />}
           />
         </Routes>
       </BrowserRouter>
