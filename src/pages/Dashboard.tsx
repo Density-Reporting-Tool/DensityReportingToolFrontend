@@ -114,7 +114,7 @@ const Dashboard: React.FC = () => {
           }}
         >
           <ScheduleIcon sx={{ mr: 1, color: "primary.main" }} />
-          <Typography variant="h6">Today's Schedule</Typography>
+          <Typography variant="h6">{"Today's Schedule"}</Typography>
         </Box>
         <Stack spacing={1}>
           {todaysSchedule.map((schedule) => (
