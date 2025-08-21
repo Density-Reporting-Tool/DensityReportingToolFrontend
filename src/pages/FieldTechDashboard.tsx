@@ -55,6 +55,10 @@ const FieldTechDashboard: React.FC = () => {
     navigate(`/job/${jobNumber}`);
   };
 
+  const handleReportClick = (jobNumber: string, reportNumber: string) => {
+    navigate(`/job/${jobNumber}/report/${reportNumber}`);
+  };
+
   return (
     <Container maxWidth="xl" sx={{ my: 3 }}>
       {/* Header */}
@@ -198,7 +202,9 @@ const FieldTechDashboard: React.FC = () => {
                     boxShadow: 0,
                     border: "1px lightgray solid",
                   }}
-                  onClick={() => handleJobClick(report.jobNumber)}
+                  onClick={() =>
+                    handleReportClick(report.jobNumber, report.reportNumber)
+                  }
                 >
                   <Box
                     sx={{
