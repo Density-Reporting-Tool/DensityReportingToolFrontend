@@ -19,7 +19,29 @@ export default defineConfig({
               cacheName: "api-cache",
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24, // 24 hours
+                maxAgeSeconds: 5 * 60, // 5 minutes for API responses
+              },
+            },
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "images-cache",
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
+          },
+          {
+            urlPattern: /\.(?:css|js)$/,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "assets-cache",
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
               },
             },
           },
@@ -28,23 +50,40 @@ export default defineConfig({
       manifest: {
         name: "Density Reporting Tool",
         short_name: "DRT",
-        description: "A tool for density reporting and analysis",
+        description: "A comprehensive tool for density reporting and analysis",
         theme_color: "#1976d2",
         background_color: "#ffffff",
         display: "standalone",
-        orientation: "portrait",
+        orientation: "portrait-primary",
         scope: "/",
         start_url: "/",
+        categories: ["productivity", "business"],
         icons: [
           {
             src: "pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
+            purpose: "any maskable",
           },
           {
             src: "pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any maskable",
+          },
+        ],
+        screenshots: [
+          {
+            src: "screenshot-wide.png",
+            sizes: "1280x720",
+            type: "image/png",
+            form_factor: "wide",
+          },
+          {
+            src: "screenshot-narrow.png",
+            sizes: "750x1334",
+            type: "image/png",
+            form_factor: "narrow",
           },
         ],
       },
@@ -53,13 +92,23 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    proxy: {
+    proxy: process.env.NODE_ENV === 'development' ? {
       "/api": {
-        target: "http://localhost:8000", // Adjust this to match your backend port
+        target: "http://localhost:8000", // Only used in development
         changeOrigin: true,
         secure: false,
       },
-    },
+      "/health": {
+        target: "http://localhost:8000", // Add health endpoint proxy
+        changeOrigin: true,
+        secure: false,
+      },
+      "/home": {
+        target: "http://localhost:8000", // Add home endpoint proxy
+        changeOrigin: true,
+        secure: false,
+      },
+    } : undefined,
   },
   build: {
     outDir: "dist",
