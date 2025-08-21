@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import theme from "./theme";
 import JobDetails from "./pages/JobDetails";
 import "./index.css";
+import ReportDetails from "./pages/ReportDetails";
 
 // Register PWA service worker
 if ("serviceWorker" in navigator) {
@@ -28,6 +29,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/job/:id" element={<JobDetails />} />
+          <Route path="/report/:id" element={<ReportDetails />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
