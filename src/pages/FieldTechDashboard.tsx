@@ -48,7 +48,7 @@ const reportsInProgress = [
   },
 ];
 
-const Dashboard: React.FC = () => {
+const FieldTechDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const handleJobClick = (jobNumber: string) => {
@@ -241,4 +241,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default FieldTechDashboard;
