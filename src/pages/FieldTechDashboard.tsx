@@ -79,7 +79,7 @@ const FieldTechDashboard: React.FC = () => {
               maxWidth: 250,
             }}
             alt="GeoPacific logo"
-            src="/assets/GeoPacificLogo.png"
+            src="/assets/Geo_Logo_Landscape_WithConsultants_Lrg.png"
           />
         </Box>
 
