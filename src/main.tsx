@@ -35,8 +35,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             path="/distribution-list-manager-demo"
             element={<DistributionListManagerDemo />}
           />
-          <Route path="/job/:id" element={<JobDetails />} />
-          <Route path="/report/:id" element={<ReportDetails />} />
+          <Route path="/job/:jobId" element={<JobDetails />} />
+          <Route
+            path="/job/:jobId/report/:reportId"
+            element={<ReportDetails />}
+          />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

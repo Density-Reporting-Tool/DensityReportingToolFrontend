@@ -13,7 +13,6 @@ import {
 import {
   Dashboard as DashboardIcon,
   Science as ScienceIcon,
-  Business as BusinessIcon,
 } from "@mui/icons-material";
 import BackendStatus from "../components/BackendStatus";
 
@@ -28,11 +27,18 @@ const LandingPage: React.FC = () => {
     <Container maxWidth="md" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ textAlign: "center", mb: 6 }}>
-        <BusinessIcon sx={{ fontSize: 64, color: "primary.main", mb: 2 }} />
-        <Typography variant="h3" sx={{ fontWeight: 700, mb: 2 }}>
-          GEOPACIFIC
-        </Typography>
-        <Typography variant="h5" color="text.secondary" sx={{ mb: 3 }}>
+        <Box
+          component="img"
+          sx={{
+            width: "100%",
+            height: "auto",
+            maxWidth: 100,
+            mb: 4,
+          }}
+          alt="GeoPacific logo"
+          src="/assets/Geo_Logo_Portrait_WithConsultants_Lrg.png"
+        />
+        <Typography variant="h5" color="text" sx={{ mb: 1 }}>
           Density Reporting Tool
         </Typography>
         <Typography

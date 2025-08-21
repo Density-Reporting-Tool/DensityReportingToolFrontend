@@ -60,7 +60,7 @@ const report = {
 };
 
 const Report: React.FC = () => {
-  const { reportId } = useParams();
+  const { jobId, reportId } = useParams<{ jobId: string; reportId: string }>();
   const navigate = useNavigate();
 
   const handleNewDensityShot = () => {
@@ -77,8 +77,8 @@ const Report: React.FC = () => {
   return (
     <>
       <HeaderWithBackButton
-        title={`Job #${report.jobId}`}
-        subtitle={`Report ${report.id}`}
+        title={`Job #${jobId}`}
+        subtitle={`Report ${reportId}`}
       />
       <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
         {/* Density Test Section */}
@@ -139,9 +139,7 @@ const Report: React.FC = () => {
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <SolidBackgroundColorButton
                 icon={<AddIcon sx={{ fontSize: "1.25rem" }} />}
-                handleClick={(reportId?: string) =>
-                  handleNewDensityShot(reportId)
-                }
+                handleClick={() => handleNewDensityShot()}
               >
                 Add Density Test
               </SolidBackgroundColorButton>

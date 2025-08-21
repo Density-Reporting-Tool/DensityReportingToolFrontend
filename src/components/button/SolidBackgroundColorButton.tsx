@@ -3,8 +3,7 @@ import { Button, Box } from "@mui/material";
 interface ButtonProps {
   icon?: React.ReactElement;
   children: React.ReactNode;
-  handleClick: (reportId?: string) => void;
-  reportId?: string;
+  handleClick: () => void;
 }
 
 const SolidBackgroundColorButton: React.FC<ButtonProps> = ({
@@ -20,7 +19,7 @@ const SolidBackgroundColorButton: React.FC<ButtonProps> = ({
         borderRadius: 10,
       }}
       onClick={() => {
-        handleClick(reportId);
+        handleClick;
       }}
     >
       {icon}
