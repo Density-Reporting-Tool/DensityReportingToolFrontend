@@ -12,6 +12,7 @@ import LabAdminAddProctor from "./pages/LabAdminAddProctor";
 import DistributionListManagerDemo from "./pages/DistributionListManagerDemo";
 import "./index.css";
 import ReportDetails from "./pages/ReportDetails";
+import AllDensityShots from "./pages/AllDensityShots";
 
 // PWA service worker registration is handled automatically by vite-plugin-pwa
 
@@ -39,6 +40,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route
             path="/job/:jobId/report/:reportId"
             element={<ReportDetails />}
+          />
+          <Route
+            path="/job/:jobId/report/:reportId/all-density-shots"
+            element={<AllDensityShots />}
           />
         </Routes>
       </BrowserRouter>
