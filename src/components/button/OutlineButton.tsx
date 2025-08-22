@@ -6,18 +6,17 @@ interface ButtonProps {
   handleClick: () => void;
 }
 
-const SolidBackgroundColorButton: React.FC<ButtonProps> = ({
+const OutlinedButton: React.FC<ButtonProps> = ({
   icon,
   children,
   handleClick,
 }) => {
   return (
     <Button
-      size="medium"
-      variant="contained"
+      variant="outlined"
       disableElevation
       sx={{
-        borderRadius: 5,
+        borderRadius: 10,
       }}
       onClick={handleClick}
     >
@@ -27,4 +26,4 @@ const SolidBackgroundColorButton: React.FC<ButtonProps> = ({
     </Button>
   );
 };
-export default SolidBackgroundColorButton;
+export default OutlinedButton;
