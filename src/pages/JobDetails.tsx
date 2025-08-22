@@ -14,7 +14,7 @@ import {
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
-import HeaderTitleWithShowAll from "@/components/headers/HeaderTitleWithShowAll";
+import HeaderTitle from "@/components/headers/HeaderTitle";
 
 // Mock data
 const jobData = {
@@ -134,7 +134,7 @@ const JobDetails: React.FC = () => {
 
         {/* Recent Reports */}
         <Box sx={{ mb: 3 }}>
-          <HeaderTitleWithShowAll title="Recent Reports" />
+          <HeaderTitle title="Recent Reports" showAll={true} />
           <Stack spacing={1}>
             {jobData.recentReports.map((report) => (
               <Card
