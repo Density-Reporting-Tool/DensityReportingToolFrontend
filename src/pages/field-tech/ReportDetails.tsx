@@ -63,8 +63,9 @@ const Report: React.FC = () => {
   const { jobId, reportId } = useParams<{ jobId: string; reportId: string }>();
   const navigate = useNavigate();
 
-  const handleNewDensityShot = () => {
-    navigate(`/report/${reportId}/densityShot/new`);
+  const handleAddDensityShot = () => {
+    console.log("new density shot");
+    navigate(`/field-tech/add-density-test`);
   };
 
   const handleTakePhoto = () => {
@@ -139,7 +140,7 @@ const Report: React.FC = () => {
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <SolidBackgroundColorButton
                 icon={<AddIcon sx={{ fontSize: "1.25rem" }} />}
-                handleClick={() => handleNewDensityShot()}
+                handleClick={handleAddDensityShot}
               >
                 Add Density Test
               </SolidBackgroundColorButton>
