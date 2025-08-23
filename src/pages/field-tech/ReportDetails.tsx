@@ -14,7 +14,8 @@ import {
   FileUpload as FileUploadIcon,
   CameraAlt as CameraAltIcon,
 } from "@mui/icons-material";
-import HeaderTitleWithShowAll from "@/components/headers/HeaderTitleWithShowAll";
+import HeaderTitle from "@/components/headers/HeaderTitle";
+import BottomNavBar from "@/components/navbar/BottomNavBar";
 
 const report = {
   id: 4,
@@ -75,6 +76,15 @@ const Report: React.FC = () => {
   const handleUploadImage = () => {
     console.log("Upload image");
   };
+
+  const handleShowAllDensity = () => {
+    console.log("show all density shot");
+    navigate(`/job/${jobId}/report/${reportId}/all-density-shots`);
+  };
+
+  const handleShowAllPhotos = () => {
+    console.log("show all photos");
+  };
   return (
     <>
       <HeaderWithBackButton
@@ -85,7 +95,11 @@ const Report: React.FC = () => {
         {/* Density Test Section */}
         <Stack gap={3}>
           <Box id="densityTestSection">
-            <HeaderTitleWithShowAll title="Density Tests" />
+            <HeaderTitle
+              title="Density Tests"
+              showAll={true}
+              onClick={handleShowAllDensity}
+            />
 
             <Box
               sx={{
@@ -193,7 +207,7 @@ const Report: React.FC = () => {
             </Stack>
           </Box>
           <Box id="reportPhotos">
-            <HeaderTitleWithShowAll title="Report Photos" />
+            <HeaderTitle title="Report Photos" onClick={handleShowAllPhotos} />
             {report.reportPhotos.length > 0 ? (
               <Stack gap={2}>
                 {report.reportPhotos.map((photo) => (
@@ -263,6 +277,7 @@ const Report: React.FC = () => {
           </Box>
         </Stack>
       </Container>
+      <BottomNavBar />
     </>
   );
 };
