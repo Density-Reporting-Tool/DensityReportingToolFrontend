@@ -7,15 +7,10 @@ import {
   Card,
   TextField,
   InputAdornment,
-  Avatar,
-  IconButton,
-  Chip,
   Stack,
-  Divider,
 } from "@mui/material";
 import {
   Search as SearchIcon,
-  Info as InfoIcon,
   Schedule as ScheduleIcon,
   Assessment as AssessmentIcon,
 } from "@mui/icons-material";
@@ -53,24 +48,39 @@ const reportsInProgress = [
   },
 ];
 
-const Dashboard: React.FC = () => {
+const FieldTechDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const handleJobClick = (jobNumber: string) => {
-    navigate(`/job/${jobNumber}`);
+    navigate(`job/${jobNumber}`);
+  };
+
+  const handleReportClick = (jobNumber: string, reportNumber: string) => {
+    navigate(`job/${jobNumber}/report/${reportNumber}`);
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 2 }}>
+    <Container maxWidth="xl" sx={{ my: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Box sx={{ alignItems: "center", mb: 2 }}>
-          <Typography
-            variant="h3"
-            sx={{ fontWeight: 500, textAlign: "center" }}
-          >
-            GEOPACIFIC
-          </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 2,
+            justifyContent: "center",
+          }}
+        >
+          <Box
+            component="img"
+            sx={{
+              width: "100%",
+              height: "auto",
+              maxWidth: 250,
+            }}
+            alt="GeoPacific logo"
+            src="/assets/Geo_Logo_Landscape_WithConsultants_Lrg.png"
+          />
         </Box>
 
         {/* Search Bar */}
@@ -108,7 +118,7 @@ const Dashboard: React.FC = () => {
           }}
         >
           <ScheduleIcon sx={{ mr: 1, color: "primary.main" }} />
-          <Typography variant="h6">Today's Schedule</Typography>
+          <Typography variant="h6">{"Today's Schedule"}</Typography>
         </Box>
         <Stack spacing={1}>
           {todaysSchedule.map((schedule) => (
@@ -192,7 +202,9 @@ const Dashboard: React.FC = () => {
                     boxShadow: 0,
                     border: "1px lightgray solid",
                   }}
-                  onClick={() => handleJobClick(report.jobNumber)}
+                  onClick={() =>
+                    handleReportClick(report.jobNumber, report.reportNumber)
+                  }
                 >
                   <Box
                     sx={{
@@ -235,4 +247,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default FieldTechDashboard;
