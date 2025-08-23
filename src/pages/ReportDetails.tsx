@@ -15,6 +15,7 @@ import {
   CameraAlt as CameraAltIcon,
 } from "@mui/icons-material";
 import HeaderTitle from "@/components/headers/HeaderTitle";
+import BottomNavBar from "@/components/navbar/BottomNavBar";
 
 const report = {
   id: 4,
@@ -275,6 +276,7 @@ const Report: React.FC = () => {
           </Box>
         </Stack>
       </Container>
+      <BottomNavBar />
     </>
   );
 };
