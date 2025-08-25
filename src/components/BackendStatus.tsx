@@ -25,30 +25,17 @@ const BackendStatus: React.FC = () => {
     setMessage("");
 
     try {
-      // Try multiple endpoints to test connectivity
+      // Try the configured health endpoint
       let response;
       let endpoint = "";
 
-      // First try health endpoint (most reliable)
       try {
-        response = await apiService.get("/health");
-        endpoint = "health (/health)";
-      } catch (healthError) {
-        // Try home endpoint
-        try {
-          response = await apiService.get("/home");
-          endpoint = "home (/home)";
-        } catch (homeError) {
-          // Try API health endpoint
-          try {
-            response = await apiService.get("/api/health");
-            endpoint = "api health (/api/health)";
-          } catch (apiHealthError) {
-            throw new Error(
-              "All endpoints failed. Backend might be down or endpoints are different.",
-            );
-          }
-        }
+        response = await apiService.get("/api/test/health");
+        endpoint = "test health (/api/test/health)";
+      } catch (error) {
+        throw new Error(
+          "Backend endpoint /api/test/health failed. Backend might be down or endpoint is different.",
+        );
       }
 
       setStatus("success");
@@ -106,15 +93,9 @@ const BackendStatus: React.FC = () => {
         onClick={async () => {
           setStatus("loading");
           try {
-            // Test with different endpoints and show detailed info
+            // Test with the configured health endpoint
             const endpoints = [
-              "/",
-              "/api",
-              "/api/health",
-              "/health",
-              "/status",
-              "/swagger",
-              "/swagger/index.html",
+              "/api/test/health",
             ];
             let successEndpoint = "";
             let lastError = "";

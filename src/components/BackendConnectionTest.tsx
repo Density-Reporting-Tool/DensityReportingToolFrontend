@@ -26,7 +26,7 @@ const BackendConnectionTest: React.FC = () => {
     
     try {
       // Test with a simple endpoint - you can change this to match your backend
-      const response = await apiService.get('/api/health');
+      await apiService.get('/api/test/health');
       const responseTime = Date.now() - startTime;
       
       setStatus({
