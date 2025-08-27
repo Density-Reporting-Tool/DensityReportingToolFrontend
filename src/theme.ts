@@ -54,6 +54,24 @@ const theme = createTheme({
       fontSize: "0.75rem", // 12px
     },
   },
+  components: {
+    MuiButton: {
+      defaultProps: {
+        disableRipple: true,
+        disableElevation: true,
+      },
+      styleOverrides: {
+        root: {
+          backgroundColor: "primary.main",
+          textTransform: "none",
+          "&.hover": {
+            backgroundColor: "secondary.main",
+          },
+          borderRadius: 5,
+        },
+      },
+    },
+  },
 });
 
 export default theme;

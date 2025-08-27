@@ -15,7 +15,6 @@ const SolidBackgroundColorButton: React.FC<ButtonProps> = ({
     <Button
       size="medium"
       variant="contained"
-      disableElevation
       sx={{
         borderRadius: 5,
       }}
