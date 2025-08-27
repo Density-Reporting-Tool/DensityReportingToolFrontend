@@ -39,7 +39,7 @@ const LandingPage: React.FC = () => {
           src="/assets/Geo_Logo_Portrait_WithConsultants_Lrg.png"
         />
         <Typography variant="h5" color="text" sx={{ mb: 1 }}>
-          Density Reporting Tool
+          Density Reporting Tool 2
         </Typography>
         <Typography
           variant="body1"
@@ -47,7 +47,7 @@ const LandingPage: React.FC = () => {
           sx={{ maxWidth: 600, mx: "auto" }}
         >
           Welcome to the GEOPACIFIC Density Reporting Tool. Choose your
-          dashboard to get started.
+          dashboard to get started. 2
         </Typography>
       </Box>
 
