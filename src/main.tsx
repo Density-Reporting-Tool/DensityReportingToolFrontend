@@ -9,6 +9,7 @@ import LandingPage from "./pages/LandingPage";
 import LabAdminDashboard from "./pages/LabAdminDashboard";
 import LabAdminCreateJob from "./pages/LabAdminCreateJob";
 import LabAdminAddProctor from "./pages/LabAdminAddProctor";
+import AllReports from "./pages/AllReports";
 import DistributionListManagerDemo from "./pages/DistributionListManagerDemo";
 import "./index.css";
 import ReportDetails from "./pages/ReportDetails";
@@ -45,6 +46,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             path="/job/:jobId/report/:reportId/all-density-shots"
             element={<AllDensityShots />}
           />
+          <Route path="/job/:jobId/all-reports" element={<AllReports />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
