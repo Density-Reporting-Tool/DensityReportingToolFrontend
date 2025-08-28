@@ -32,17 +32,17 @@ type FormFields = {
 const AddDensityTest = () => {
   const form = useForm<FormFields>({
     defaultValues: {
-      location: "",
-      elevation: "",
+      location: "Garage Bay",
+      elevation: "1.5m below final grade",
       testArea: "",
-      oversizePercentage: 0,
-      probeDepth: 0,
-      probeDepthUnit: "m",
-      compactionSpecification: 0,
+      oversizePercentage: 15,
+      probeDepth: undefined,
+      probeDepthUnit: "cm",
+      compactionSpecification: undefined,
       compactionSpecificationUnit: "MPDD",
-      density: 0,
-      moistureContent: 0,
-      compactionPercentage: 0,
+      density: undefined,
+      moistureContent: undefined,
+      compactionPercentage: undefined,
       sitePlan: "",
     },
   });
@@ -68,7 +68,7 @@ const AddDensityTest = () => {
       <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Density Info */}
-          <Stack id="density-info" sx={{ mb: 2 }} gap={1}>
+          <Stack id="density-info" sx={{ mb: 2 }} gap={2}>
             <Typography variant="h5">Shot #102</Typography>
             <Card
               elevation={0}
@@ -107,33 +107,36 @@ const AddDensityTest = () => {
               </Stack>
             </Card>
             <Stack gap={1} sx={{ mb: 2 }}>
-              <TextField {...register("location")} label="Location" />
-              <TextField {...register("elevation")} label="Elevation" />
-              <TextField {...register("testArea")} label="Test Area" />
-              <TextField
-                {...register("compactionSpecification")}
-                label="Compaction Specification"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <Typography>%</Typography>
-                        <Select
-                          {...register("compactionSpecificationUnit")}
-                          value={compactionSpecificationUnit}
-                          disableUnderline // Optional: To remove underline from Select
-                          variant="standard" // Optional: To match TextField's variant if needed
+              <Stack gap={1} sx={{ mb: 4 }}>
+                <TextField {...register("location")} label="Location" />
+                <TextField {...register("elevation")} label="Elevation" />
+                <TextField {...register("testArea")} label="Test Area" />
+
+                <TextField
+                  {...register("compactionSpecification")}
+                  label="Compaction Specification"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
                         >
-                          <MenuItem value="MPDD">MPDD</MenuItem>
-                          <MenuItem value="SPDD">SPDD</MenuItem>
-                        </Select>
-                      </Box>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+                          <Typography>%</Typography>
+                          <Select
+                            {...register("compactionSpecificationUnit")}
+                            value={compactionSpecificationUnit}
+                            disableUnderline // Optional: To remove underline from Select
+                            variant="standard" // Optional: To match TextField's variant if needed
+                          >
+                            <MenuItem value="MPDD">MPDD</MenuItem>
+                            <MenuItem value="SPDD">SPDD</MenuItem>
+                          </Select>
+                        </Box>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Stack>
               <TextField
                 label="Oversize Percentage"
                 {...register("oversizePercentage")}
@@ -144,7 +147,6 @@ const AddDensityTest = () => {
                   ),
                 }}
               />
-
               <TextField
                 {...register("probeDepth")}
                 label="Probe Depth"
@@ -187,22 +189,23 @@ const AddDensityTest = () => {
                     ),
                   }}
                 />
-                <TextField
-                  label="Compaction Percentage"
-                  fullWidth={false}
-                  {...register("compactionPercentage")}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">%</InputAdornment>
-                    ),
-                  }}
-                />
               </Stack>
+
+              <TextField
+                label="Compaction Percentage"
+                fullWidth={false}
+                {...register("compactionPercentage")}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+              />
             </Stack>
           </Stack>
 
           {/* Site plans */}
-          <Stack id="density-shot-placement" sx={{ mb: 2 }} gap={1}>
+          <Stack id="density-shot-placement" sx={{ mb: 2 }} gap={2}>
             <Typography variant="h5"> Density Shot Location</Typography>
             <Stack gap={1}>
               {/* <Autocomplete
