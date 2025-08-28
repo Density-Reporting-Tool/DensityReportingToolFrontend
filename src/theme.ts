@@ -71,6 +71,27 @@ const theme = createTheme({
         },
       },
     },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "white",
+          borderRadius: "10px",
+          // "&:hover .MuiOutlinedInput-notchedOutline": {
+          //   borderColor: "secondary.main", // hover border color
+          // },
+          // "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+          //   borderColor: "primary.main", // focused border color
+          // },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        notchedOutline: {
+          borderRadius: "10px", // makes sure outline follows
+        },
+      },
+    },
   },
 });
 
