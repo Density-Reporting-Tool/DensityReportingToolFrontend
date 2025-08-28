@@ -1,22 +1,20 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Container,
   Typography,
   Card,
-  CardContent,
   Avatar,
   Button,
   Stack,
   Divider,
 } from "@mui/material";
 import {
-  LocationOn as LocationIcon,
   Add as AddIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
+import HeaderTitle from "@/components/headers/HeaderTitle";
 
 // Mock data
 const jobData = {
@@ -52,14 +50,18 @@ const jobData = {
 
 const JobDetails: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
+  const navigate = useNavigate();
+
+  const handleClickReport = (reportId: number) => {
+    navigate(`report/${reportId}`);
+  };
 
   const handleNewReport = () => {
-    // Handle new report creation
     console.log("Create new report for job:", jobId);
   };
 
-  const handleAddressClick = (address: string) => {
-    const encodedAddress = encodeURIComponent(address);
+  const handleAddressClick = () => {
+    const encodedAddress = encodeURIComponent(jobData.address);
     const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
     window.open(googleMapsUrl, "_blank");
   };
@@ -67,11 +69,11 @@ const JobDetails: React.FC = () => {
   return (
     <>
       <HeaderWithBackButton
-        title={`Job #${jobData.jobNumber}`}
+        title={`Job #${jobId}`}
         subtitle={`${jobData.address}`}
         onSubtitleClick={handleAddressClick}
       />
-      <Container maxWidth="xl" sx={{ my: 2, mb: 12 }}>
+      <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
         {/* Contact Information */}
         <Box
           sx={{
@@ -132,29 +134,7 @@ const JobDetails: React.FC = () => {
 
         {/* Recent Reports */}
         <Box sx={{ mb: 3 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 2,
-              position: "relative",
-            }}
-          >
-            <Typography variant="h6">Recent Reports</Typography>
-            <Typography
-              variant="body2"
-              color="secondary.main"
-              sx={{
-                cursor: "pointer",
-                fontWeight: 500,
-                "&:hover": { textDecoration: "underline" },
-              }}
-            >
-              Show all
-            </Typography>
-          </Box>
-
+          <HeaderTitle title="Recent Reports" showAll={true} />
           <Stack spacing={1}>
             {jobData.recentReports.map((report) => (
               <Card
@@ -166,6 +146,7 @@ const JobDetails: React.FC = () => {
                   boxShadow: 0,
                   borderRadius: 2,
                 }}
+                onClick={() => handleClickReport(report.id)}
               >
                 <Box
                   sx={{
