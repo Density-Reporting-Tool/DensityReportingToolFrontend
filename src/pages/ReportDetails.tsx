@@ -1,6 +1,9 @@
 import SolidBackgroundColorButton from "@/components/button/SolidBackgroundColorButton";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Card,
   Container,
@@ -13,6 +16,7 @@ import {
   Add as AddIcon,
   FileUpload as FileUploadIcon,
   CameraAlt as CameraAltIcon,
+  ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import HeaderTitle from "@/components/headers/HeaderTitle";
 import BottomNavBar from "@/components/navbar/BottomNavBar";
@@ -24,10 +28,11 @@ const report = {
   densityTests: [
     {
       id: 1,
-      name: "Desnity Shot 1",
+      name: "Density Shot 1",
       location: "Grid AB-07",
       elevation: " 1.2m below final",
       material: "Riversand",
+      density: "1789",
       compactionSpecification: "96% SPMDD",
       pass: 1,
     },
@@ -37,8 +42,19 @@ const report = {
       location: "Grid AB-07",
       elevation: " 1.2m below final",
       material: "Riversand",
+      density: "1789",
       compactionSpecification: "96% SPMDD",
       pass: 0,
+    },
+    {
+      id: 3,
+      name: "Density Shot 3",
+      location: "Grid AB-07",
+      elevation: " 1.2m below final",
+      material: "Riversand",
+      density: "1789",
+      compactionSpecification: "96% SPMDD",
+      pass: 1,
     },
   ],
   reportPhotos: [
@@ -110,20 +126,45 @@ const Report: React.FC = () => {
             >
               {report.densityTests.length > 0 ? (
                 report.densityTests.map((test) => (
-                  <Card
+                  <Accordion
                     key={test.id}
+                    disableGutters
+                    square={true}
                     sx={{
-                      padding: 2,
-                      borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      borderRadius: "5px",
+                      border: "1px solid lightgrey",
                     }}
                   >
-                    <Box>
-                      <Typography variant="body1" fontWeight="700">
-                        Density shot {test.id}
-                      </Typography>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1-content"
+                      id="panel1-header"
+                      sx={{
+                        minHeight: 40, // reduce overall height
+                        "&.Mui-expanded": {
+                          minHeight: 40,
+                        },
+                        "& .MuiAccordionSummary-content": {
+                          margin: 0, // remove default margin
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
+                        <Typography component="span">{test.name}</Typography>
+                        <Typography
+                          color={test.pass ? "success.main" : "error.main"}
+                        >
+                          {test.pass ? "PASS" : "FAIL"}
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
                       <Typography variant="body2">
                         Location: {test.location}
                       </Typography>
@@ -134,15 +175,14 @@ const Report: React.FC = () => {
                         Material: {test.material}
                       </Typography>
                       <Typography variant="body2">
-                        Compaction Specification {test.compactionSpecification}
+                        Density: {test.density}
                       </Typography>
-                    </Box>
-                    <Typography
-                      color={test.pass ? "success.main" : "error.main"}
-                    >
-                      {test.pass ? "PASS" : "FAIL"}
-                    </Typography>
-                  </Card>
+                      <Typography variant="body2">
+                        Compaction Specification:
+                        {test.compactionSpecification}
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
                 ))
               ) : (
                 <Card sx={{ padding: 2, borderRadius: 2 }}>
