@@ -101,7 +101,7 @@ export default defineConfig({
               secure: false,
             },
             "/health": {
-              target: "http://localhost:9080", // Add health endpoint proxy
+              target: "http://localhost:8080", // Add health endpoint proxy
               changeOrigin: true,
               secure: false,
             },

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -23,30 +23,58 @@ import {
 import DistributionListManager, {
   Contact,
 } from "../components/DistributionListManager";
+import { apiService } from "../services/apiService";
 
 const LabAdminCreateJob: React.FC = () => {
   const navigate = useNavigate();
-  const [projectManager, setProjectManager] = useState("Jakub Szary");
-  const [client, setClient] = useState("GeoPacific");
+  const [projectManager, setProjectManager] = useState("");
+  const [client, setClient] = useState("");
+  const [jobNumber, setJobNumber] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [siteAddress, setSiteAddress] = useState("");
+  const [jobNotes, setJobNotes] = useState("");
+  const [startDate, setStartDate] = useState("");
   const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false);
   const [newPerson, setNewPerson] = useState({
-    clientName: "GeoPacific",
-    firstName: "Peter",
-    lastName: "Senyk",
-    email: "Peter.Senyk@DRT.ca",
-    phone: "1-604-329-9559",
+    clientName: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
   });
-  const [contacts, setContacts] = useState<Contact[]>([
-    {
-      id: "1",
-      lastName: "Senyk",
-      firstName: "Peter",
-      email: "Peter.Senyk@DRT.ca",
-      phone: "1-604-329-9559",
-      company: "GeoPacific",
-    },
-  ]);
+  
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [contactManagerOpen, setContactManagerOpen] = useState(false);
+  const [clientOptions, setClientOptions] = useState<string[]>([]);
+  const [projectManagerOptions, setProjectManagerOptions] = useState<string[]>([]);
+
+  // Form validation states
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Fetch initial data when component mounts
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        // Fetch clients and project managers in parallel
+        const [clientsResponse, managersResponse] = await Promise.all([
+          apiService.getClients(),
+          apiService.getProjectManagers()
+        ]);
+
+        setClientOptions(clientsResponse.data || []);
+        setProjectManagerOptions(managersResponse.data || []);
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+        // Don't show error to user for initial data fetch
+        // Just log it and continue with empty arrays
+      }
+    };
+
+    fetchInitialData();
+  }, []);
 
   const handleNavigation = (section: string) => {
     switch (section) {
@@ -61,32 +89,36 @@ const LabAdminCreateJob: React.FC = () => {
     }
   };
 
-  // Sample client options - you can expand this list
-  const clientOptions = [
-    "GeoPacific",
-    "City of Vancouver",
-    "Metro Vancouver",
-    "BC Ministry of Transportation",
-    "Private Developer A",
-    "Private Developer B",
-  ];
-
-  // Sample project manager options
-  const projectManagerOptions = [
-    "Jakub Szary",
-    "John Doe",
-    "Jane Smith",
-    "Mike Johnson",
-    "Sarah Wilson",
-    "David Brown",
-  ];
+  // Client and project manager options will be populated from API or user input
 
   const handleProjectManagerChange = (_event: any, newValue: string | null) => {
-    setProjectManager(newValue || "");
+    const newManager = newValue || "";
+    setProjectManager(newManager);
+    
+    // Clear error when user starts typing
+    if (errors.projectManager) {
+      setErrors(prev => ({ ...prev, projectManager: '' }));
+    }
+    
+    // Add new project manager to options if it doesn't exist
+    if (newManager && !projectManagerOptions.includes(newManager)) {
+      setProjectManagerOptions(prev => [...prev, newManager]);
+    }
   };
 
   const handleClientChange = (_event: any, newValue: string | null) => {
-    setClient(newValue || "");
+    const newClient = newValue || "";
+    setClient(newClient);
+    
+    // Clear error when user starts typing
+    if (errors.client) {
+      setErrors(prev => ({ ...prev, client: '' }));
+    }
+    
+    // Add new client to options if it doesn't exist
+    if (newClient && !clientOptions.includes(newClient)) {
+      setClientOptions(prev => [...prev, newClient]);
+    }
   };
 
   const handleAddPerson = () => {
@@ -97,14 +129,42 @@ const LabAdminCreateJob: React.FC = () => {
     setAddPersonDialogOpen(false);
   };
 
-  const handleSavePerson = () => {
-    // Add the new person to the project manager options
-    const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`;
-    if (!projectManagerOptions.includes(newPersonName)) {
-      projectManagerOptions.push(newPersonName);
+  const handleSavePerson = async () => {
+    try {
+      // Prepare manager data for API
+      const managerData = {
+        firstName: newPerson.firstName,
+        lastName: newPerson.lastName,
+        email: newPerson.email,
+        phone: newPerson.phone,
+        clientName: newPerson.clientName
+      };
+
+      // Save to API
+      await apiService.createProjectManager(managerData);
+      
+      // Add the new person to the project manager options
+      const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`;
+      if (!projectManagerOptions.includes(newPersonName)) {
+        setProjectManagerOptions(prev => [...prev, newPersonName]);
+      }
+      
+      setProjectManager(newPersonName);
+      setAddPersonDialogOpen(false);
+      
+      // Clear the form
+      setNewPerson({
+        clientName: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+      });
+      
+    } catch (error) {
+      console.error('Error saving person:', error);
+      // You could add error handling here if needed
     }
-    setProjectManager(newPersonName);
-    setAddPersonDialogOpen(false);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -112,6 +172,131 @@ const LabAdminCreateJob: React.FC = () => {
       ...prev,
       [field]: value,
     }));
+  };
+
+  // Validation functions
+  const validateField = (field: string, value: string): string => {
+    switch (field) {
+      case 'jobNumber':
+        return value.trim() === '' ? 'Job Number is required' : '';
+      case 'projectName':
+        return value.trim() === '' ? 'Project Name is required' : '';
+      case 'siteAddress':
+        return value.trim() === '' ? 'Site Address is required' : '';
+      case 'startDate':
+        return value === '' ? 'Start Date is required' : '';
+      default:
+        return '';
+    }
+  };
+
+  const handleFieldChange = (field: string, value: string, setter: (value: string) => void) => {
+    setter(value);
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const handleFieldBlur = (field: string, value: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!jobNumber.trim()) newErrors.jobNumber = "Job number is required";
+    if (!projectName.trim()) newErrors.projectName = "Project name is required";
+    if (!siteAddress.trim()) newErrors.siteAddress = "Site address is required";
+    if (!startDate) newErrors.startDate = "Start date is required";
+    if (!client.trim()) newErrors.client = "Client is required";
+    if (!projectManager.trim()) newErrors.projectManager = "Project manager is required";
+    
+    setErrors(newErrors);
+    
+    // Mark all fields as touched
+    setTouched({
+      jobNumber: true,
+      projectName: true,
+      siteAddress: true,
+      startDate: true,
+      client: true,
+      projectManager: true,
+    });
+    
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSaveJob = async () => {
+    if (!validateForm()) {
+      return; // Don't save if validation fails
+    }
+
+    setIsLoading(true);
+    setErrors({});
+    setSubmitSuccess(false);
+
+    try {
+      // Prepare job data for API
+      const jobData = {
+        jobNumber,
+        projectManager,
+        client,
+        projectName,
+        siteAddress,
+        jobNotes,
+        startDate,
+        contacts
+      };
+
+      // Make API call to create job
+      const response = await apiService.createJob(jobData);
+      
+      console.log("Job created successfully:", response.data);
+      setSubmitSuccess(true);
+      
+      // Clear the form after successful save
+      setJobNumber("");
+      setProjectManager("");
+      setClient("");
+      setProjectName("");
+      setSiteAddress("");
+      setJobNotes("");
+      setStartDate("");
+      setContacts([]);
+      setErrors({});
+      setTouched({});
+      
+      // Reset success state after a delay
+      setTimeout(() => setSubmitSuccess(false), 3000);
+      
+    } catch (error: any) {
+      console.error('Error creating job:', error);
+      
+      // Handle different types of errors
+      let errorMessage = 'Failed to save job. Please try again.';
+      
+      if (error?.message) {
+        if (error.message.includes('HTTP error! status: 400')) {
+          errorMessage = 'Invalid job data. Please check your inputs.';
+        } else if (error.message.includes('HTTP error! status: 409')) {
+          errorMessage = 'Job number already exists. Please use a different number.';
+        } else if (error.message.includes('HTTP error! status: 500')) {
+          errorMessage = 'Server error. Please try again later.';
+        } else if (error.message.includes('timeout')) {
+          errorMessage = 'Request timed out. Please check your connection and try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setErrors({ submit: errorMessage });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -252,11 +437,16 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Job Number */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Job Number
+                Job Number <span style={{ color: 'red' }}>*</span>
               </Typography>
               <TextField
                 fullWidth
-                value="25900"
+                required
+                value={jobNumber}
+                onChange={(e) => handleFieldChange('jobNumber', e.target.value, setJobNumber)}
+                onBlur={() => handleFieldBlur('jobNumber', jobNumber)}
+                error={touched.jobNumber && !!errors.jobNumber}
+                helperText={touched.jobNumber && errors.jobNumber}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -271,7 +461,7 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Project Manager */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Project Manager
+                Project Manager <span style={{ color: 'red' }}>*</span>
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Autocomplete
@@ -282,7 +472,10 @@ const LabAdminCreateJob: React.FC = () => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
+                      required
                       size="small"
+                      error={touched.projectManager && !!errors.projectManager}
+                      helperText={touched.projectManager && errors.projectManager}
                       sx={{
                         "& .MuiOutlinedInput-root": {
                           backgroundColor: "white",
@@ -318,7 +511,7 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Client */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Client
+                Client <span style={{ color: 'red' }}>*</span>
               </Typography>
               <Autocomplete
                 value={client}
@@ -328,7 +521,10 @@ const LabAdminCreateJob: React.FC = () => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
+                    required
                     size="small"
+                    error={touched.client && !!errors.client}
+                    helperText={touched.client && errors.client}
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         backgroundColor: "white",
@@ -348,11 +544,16 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Project Name */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Project Name
+                Project Name <span style={{ color: 'red' }}>*</span>
               </Typography>
               <TextField
                 fullWidth
-                value="West Parking Lot Improvement"
+                required
+                value={projectName}
+                onChange={(e) => handleFieldChange('projectName', e.target.value, setProjectName)}
+                onBlur={() => handleFieldBlur('projectName', projectName)}
+                error={touched.projectName && !!errors.projectName}
+                helperText={touched.projectName && errors.projectName}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -367,11 +568,16 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Site Address */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Site Address
+                Site Address <span style={{ color: 'red' }}>*</span>
               </Typography>
               <TextField
                 fullWidth
-                value="1779 W 75th Ave, Vancouver, BC V6P 3T1"
+                required
+                value={siteAddress}
+                onChange={(e) => handleFieldChange('siteAddress', e.target.value, setSiteAddress)}
+                onBlur={() => handleFieldBlur('siteAddress', siteAddress)}
+                error={touched.siteAddress && !!errors.siteAddress}
+                helperText={touched.siteAddress && errors.siteAddress}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -392,7 +598,8 @@ const LabAdminCreateJob: React.FC = () => {
                 fullWidth
                 multiline
                 rows={4}
-                value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis ante ut eros venenatis lacinia ut in nisl. Sed malesuada risus in nisi convallis aliquet. Aliquam convallis scelerisque gravida."
+                value={jobNotes}
+                onChange={(e) => setJobNotes(e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -407,13 +614,18 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Start Date */}
             <Box sx={{ mb: 4 }}>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Start Date
+                Start Date <span style={{ color: 'red' }}>*</span>
               </Typography>
               <TextField
                 type="date"
+                required
                 variant="outlined"
                 size="small"
-                defaultValue="2025-08-15"
+                value={startDate}
+                onChange={(e) => handleFieldChange('startDate', e.target.value, setStartDate)}
+                onBlur={() => handleFieldBlur('startDate', startDate)}
+                error={touched.startDate && !!errors.startDate}
+                helperText={touched.startDate && errors.startDate}
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -448,6 +660,8 @@ const LabAdminCreateJob: React.FC = () => {
               <Button
                 variant="contained"
                 fullWidth
+                disabled={isLoading}
+                onClick={handleSaveJob}
                 sx={{
                   backgroundColor: "primary.main",
                   color: "white",
@@ -455,13 +669,35 @@ const LabAdminCreateJob: React.FC = () => {
                   py: 1.5,
                   borderRadius: 2,
                   "&:hover": {
-                    backgroundColor: "primary.dark",
+                    backgroundColor: isLoading ? "primary.main" : "primary.dark",
+                  },
+                  "&:disabled": {
+                    backgroundColor: "grey.400",
+                    color: "grey.600",
                   },
                 }}
               >
-                Save Job
+                {isLoading ? "Saving..." : "Save Job"}
               </Button>
             </Box>
+
+            {/* Success Message */}
+            {submitSuccess && (
+              <Box sx={{ mt: 2, p: 2, backgroundColor: 'success.light', borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ color: 'success.contrastText', textAlign: 'center' }}>
+                 Job saved successfully!
+                </Typography>
+              </Box>
+            )}
+
+            {/* Submit Error Message */}
+            {errors.submit && (
+              <Box sx={{ mt: 2, p: 2, backgroundColor: 'error.light', borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ color: 'error.contrastText', textAlign: 'center' }}>
+                 {errors.submit}
+                </Typography>
+              </Box>
+            )}
           </Box>
         </Box>
       </Box>
@@ -618,7 +854,7 @@ const LabAdminCreateJob: React.FC = () => {
         contacts={contacts}
         onContactsChange={setContacts}
         title="Distribution List Manager"
-        jobNumber="25900"
+        jobNumber=""
         mode="dialog"
       />
     </Box>
