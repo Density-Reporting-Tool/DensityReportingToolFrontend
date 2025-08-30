@@ -60,6 +60,11 @@ const JobDetails: React.FC = () => {
     console.log("Create new report for job:", jobId);
   };
 
+  const handleClickShowAll = () => {
+    console.log("CLICK SHOW");
+    navigate(`/job/${jobId}/all-reports`);
+  };
+
   const handleAddressClick = () => {
     const encodedAddress = encodeURIComponent(jobData.address);
     const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
@@ -134,7 +139,11 @@ const JobDetails: React.FC = () => {
 
         {/* Recent Reports */}
         <Box sx={{ mb: 3 }}>
-          <HeaderTitle title="Recent Reports" showAll={true} />
+          <HeaderTitle
+            title="Recent Reports"
+            showAll={true}
+            onClick={handleClickShowAll}
+          />
           <Stack spacing={1}>
             {jobData.recentReports.map((report) => (
               <Card

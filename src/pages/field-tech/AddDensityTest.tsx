@@ -13,6 +13,7 @@ import {
   Autocomplete,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 type FormFields = {
   location: string;
@@ -47,7 +48,7 @@ const AddDensityTest = () => {
     },
   });
   const { register, handleSubmit, control, watch } = form;
-
+  const navigate = useNavigate();
   const [probeDepthUnit, compactionSpecificationUnit] = watch([
     "probeDepthUnit",
     "compactionSpecificationUnit",
@@ -58,7 +59,9 @@ const AddDensityTest = () => {
     console.log(data);
   };
   const sitePlanOptions = ["Site plan 1", "Site plan 2"];
-
+  const handleClickProctor = () => {
+    navigate(`/job/${jobId}/all-proctors`);
+  };
   return (
     <>
       <HeaderWithBackButton
@@ -77,6 +80,7 @@ const AddDensityTest = () => {
                 boxShadow: "1px",
                 border: "1px lightgrey solid",
               }}
+              onClick={handleClickProctor}
             >
               <Stack
                 direction="row"
