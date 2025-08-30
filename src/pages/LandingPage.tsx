@@ -65,7 +65,7 @@ const LandingPage: React.FC = () => {
                 boxShadow: 8,
               },
             }}
-            onClick={() => handleNavigation("/field-tech-dashboard")}
+            onClick={() => handleNavigation("/field-tech")}
           >
             <CardContent
               sx={{

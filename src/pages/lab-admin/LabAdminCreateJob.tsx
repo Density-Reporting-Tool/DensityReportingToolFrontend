@@ -22,7 +22,7 @@ import {
 } from "@mui/icons-material";
 import DistributionListManager, {
   Contact,
-} from "../components/DistributionListManager";
+} from "../../components/DistributionListManager";
 
 const LabAdminCreateJob: React.FC = () => {
   const navigate = useNavigate();

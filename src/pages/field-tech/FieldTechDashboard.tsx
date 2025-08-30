@@ -52,11 +52,11 @@ const FieldTechDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const handleJobClick = (jobNumber: string) => {
-    navigate(`/job/${jobNumber}`);
+    navigate(`job/${jobNumber}`);
   };
 
   const handleReportClick = (jobNumber: string, reportNumber: string) => {
-    navigate(`/job/${jobNumber}/report/${reportNumber}`);
+    navigate(`job/${jobNumber}/report/${reportNumber}`);
   };
 
   return (

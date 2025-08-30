@@ -1,7 +1,11 @@
 import { Card, Typography } from "@mui/material";
 import { grey } from "@mui/material/colors";
 
-const EmptyCard = () => {
+interface CardProps {
+  children: string;
+}
+
+const EmptyCard: React.FC<CardProps> = ({ children }) => {
   return (
     <Card
       sx={{
@@ -14,7 +18,7 @@ const EmptyCard = () => {
       }}
     >
       <Typography variant="body1" color={grey[600]}>
-        No density test yet
+        {children}
       </Typography>
     </Card>
   );

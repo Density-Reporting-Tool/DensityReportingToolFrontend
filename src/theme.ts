@@ -54,6 +54,45 @@ const theme = createTheme({
       fontSize: "0.75rem", // 12px
     },
   },
+  components: {
+    MuiButton: {
+      defaultProps: {
+        disableRipple: true,
+        disableElevation: true,
+      },
+      styleOverrides: {
+        root: {
+          backgroundColor: "primary.main",
+          textTransform: "none",
+          "&.hover": {
+            backgroundColor: "secondary.main",
+          },
+          borderRadius: 5,
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "white",
+          borderRadius: "10px",
+          // "&:hover .MuiOutlinedInput-notchedOutline": {
+          //   borderColor: "secondary.main", // hover border color
+          // },
+          // "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+          //   borderColor: "primary.main", // focused border color
+          // },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        notchedOutline: {
+          borderRadius: "10px", // makes sure outline follows
+        },
+      },
+    },
+  },
 });
 
 export default theme;
