@@ -29,7 +29,7 @@ const BottomNavBar = () => {
     }
   }, [location.pathname]);
 
-  const handleChangePage = (event, newPage: number) => {
+  const handleChangePage = (_event: React.SyntheticEvent, newPage: number) => {
     setCurrentPage(newPage);
     switch (newPage) {
       case 0:
