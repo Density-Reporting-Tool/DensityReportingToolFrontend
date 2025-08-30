@@ -7,6 +7,7 @@ import theme from "./theme";
 import JobDetails from "./pages/field-tech/JobDetails";
 import AllDensityShots from "./pages/field-tech/AllDensityShots";
 import AllReports from "./pages/field-tech/AllReports";
+import AllProctors from "./pages/field-tech/AllProctors";
 import LandingPage from "./pages/LandingPage";
 import LabAdminDashboard from "./pages/lab-admin/LabAdminDashboard";
 import LabAdminCreateJob from "./pages/lab-admin/LabAdminCreateJob";
@@ -57,6 +58,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             element={<AllDensityShots />}
           />
           <Route path="/job/:jobId/all-reports" element={<AllReports />} />
+          <Route path="/job/:jobId/all-proctors" element={<AllProctors />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
