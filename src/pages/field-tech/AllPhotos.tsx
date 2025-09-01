@@ -11,7 +11,9 @@ import {
 import Grid from "@mui/material/Grid";
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
+import OutlineButton from "@/components/button/OutlineButton";
 import { useState } from "react";
+import SolidBackgroundColorButton from "@/components/button/SolidBackgroundColorButton";
 
 const JobDetails: React.FC = () => {
   const { jobId, reportId } = useParams<{ jobId: string; reportId: string }>();
@@ -28,6 +30,13 @@ const JobDetails: React.FC = () => {
   const handleClickPhoto = (image: (typeof images)[0]) => {
     setSelectedImage(image); // save which image was clicked
     setOpen(true); // open the modal
+  };
+
+  const handleDelete = () => {
+    console.log("Delete");
+  };
+  const handleEdit = () => {
+    console.log("Edit");
   };
 
   const images = [
@@ -243,7 +252,19 @@ const JobDetails: React.FC = () => {
                   <Typography sx={{ my: 2 }}>
                     Fig {selectedImage.id}: {selectedImage.title}
                   </Typography>
-                  <Typography>{selectedImage.description}</Typography>
+                  <Typography sx={{ mb: 2 }}>
+                    {selectedImage.description}
+                  </Typography>
+                  <Stack
+                    direction="row"
+                    sx={{ justifyContent: "flex-end" }}
+                    gap={1}
+                  >
+                    <OutlineButton handleClick={handleEdit}>Edit</OutlineButton>
+                    <SolidBackgroundColorButton handleClick={handleDelete}>
+                      Delete
+                    </SolidBackgroundColorButton>
+                  </Stack>
                 </Stack>
               )}
             </Box>
