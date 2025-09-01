@@ -99,7 +99,7 @@ const Report: React.FC = () => {
   };
 
   const handleShowAllPhotos = () => {
-    console.log("show all photos");
+    navigate(`/job/${jobId}/report/${reportId}/all-photos`);
   };
   return (
     <>
@@ -109,7 +109,7 @@ const Report: React.FC = () => {
       />
       <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
         {/* Density Test Section */}
-        <Stack gap={3}>
+        <Stack gap={1}>
           <Box id="densityTestSection">
             <HeaderTitle
               title="Density Tests"
@@ -200,7 +200,7 @@ const Report: React.FC = () => {
               </SolidBackgroundColorButton>
             </Box>
           </Box>
-          <Box id="reportMemoSection">
+          <Box id="reportMemoSection" sx={{ my: 2 }}>
             <Typography variant="h5" sx={{ mb: 1 }}>
               Report
             </Typography>
@@ -246,8 +246,12 @@ const Report: React.FC = () => {
               </Box>
             </Stack>
           </Box>
-          <Box id="reportPhotos">
-            <HeaderTitle title="Report Photos" onClick={handleShowAllPhotos} />
+          <Box id="reportPhotos" sx={{ my: 2 }}>
+            <HeaderTitle
+              title="Report Photos"
+              showAll={true}
+              onClick={handleShowAllPhotos}
+            />
             {report.reportPhotos.length > 0 ? (
               <Stack gap={2}>
                 {report.reportPhotos.map((photo) => (
