@@ -10,10 +10,24 @@ import {
   InputAdornment,
   Select,
   MenuItem,
-  Autocomplete,
+  Modal,
+  IconButton,
 } from "@mui/material";
+import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+
+// import { useNavigate } from "react-router-dom";
+
+type SitePlan = {
+  id: number;
+  name: string;
+  src: string;
+  dateCreated: string;
+};
+
 import { useNavigate } from "react-router-dom";
+
 
 type FormFields = {
   location: string;
@@ -44,11 +58,47 @@ const AddDensityTest = () => {
       density: undefined,
       moistureContent: undefined,
       compactionPercentage: undefined,
-      sitePlan: "",
+      sitePlan: "Default site plan",
     },
   });
-  const { register, handleSubmit, control, watch } = form;
-  const navigate = useNavigate();
+
+  const { register, handleSubmit, control, watch, setValue } = form;
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleNewSitePlan = () => {
+    console.log("New site plan");
+  };
+  const handleSelectSitePlan = (sitePlan: SitePlan) => {
+    setOpen(false);
+    setValue("sitePlan", sitePlan.name, { shouldValidate: true });
+    console.log("Site plan selected:", sitePlan);
+  };
+
+  const sitePlans = [
+    {
+      id: 1,
+      name: "Site plan 1",
+      src: "https://placehold.co/125",
+      dateCreated: "Today",
+    },
+    {
+      id: 2,
+      name: "Site plan 2",
+      src: "https://placehold.co/125",
+      dateCreated: "Yesterday",
+    },
+    {
+      id: 3,
+      name: "Site plan 3",
+
+      src: "https://placehold.co/125",
+      dateCreated: "Two weeks ago",
+    },
+  ];
+
   const [probeDepthUnit, compactionSpecificationUnit] = watch([
     "probeDepthUnit",
     "compactionSpecificationUnit",
@@ -58,10 +108,14 @@ const AddDensityTest = () => {
   const onSubmit = (data: FormFields) => {
     console.log(data);
   };
-  const sitePlanOptions = ["Site plan 1", "Site plan 2"];
-  const handleClickProctor = () => {
-    navigate(`/job/${jobId}/all-proctors`);
+
+  // const navigate = useNavigate();
+  // const sitePlanOptions = ["Site plan 1", "Site plan 2"];
+  const handleChangeClick = () => {
+    // navigate(`/job/${jobId}/all-site-plans`);
+    setOpen(true);
   };
+
   return (
     <>
       <HeaderWithBackButton
@@ -212,31 +266,7 @@ const AddDensityTest = () => {
           <Stack id="density-shot-placement" sx={{ mb: 2 }} gap={2}>
             <Typography variant="h5"> Density Shot Location</Typography>
             <Stack gap={1}>
-              {/* <Autocomplete
-                {...register("sitePlan")}
-                options={sitePlanOptions}
-                freeSolo
-                renderInput={(params) => (
-                  label
-                  <TextField
-                    {...params}
-                    size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        // backgroundColor: "white",
-                        // borderRadius: 1,
-                      },
-                    }}
-                  />
-                )}
-                sx={{
-                  flex: 1,
-                  "& .MuiAutocomplete-popupIndicator": {
-                    color: "#666",
-                  },
-                }}
-              /> */}
-              <Controller
+              {/* <Controller
                 name="sitePlan"
                 control={control}
                 render={({ field }) => (
@@ -249,6 +279,34 @@ const AddDensityTest = () => {
                     renderInput={(params) => (
                       <TextField {...params} label="Site Plans" />
                     )}
+                  />
+                )}
+              /> */}
+              <Controller
+                name="sitePlan"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Site Plan"
+                    InputProps={{
+                      readOnly: true,
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Typography
+                            variant="body2"
+                            onClick={handleChangeClick}
+                            style={{
+                              cursor: "pointer",
+                              textDecoration: "underline",
+                              color: "primary",
+                            }}
+                          >
+                            Change
+                          </Typography>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 )}
               />
@@ -295,6 +353,134 @@ const AddDensityTest = () => {
           </Stack>
         </form>
       </Container>
+      <Modal open={open} onClose={handleClose}>
+        {/* Overlay */}
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            bgcolor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            p: 2,
+          }}
+        >
+          {/* Modal content */}
+          <Box
+            sx={{
+              position: "relative",
+              width: "100%",
+              maxHeight: "80vh",
+              maxWidth: "400px",
+              backgroundColor: "white",
+              borderRadius: 2,
+              overflow: "hidden",
+            }}
+          >
+            <IconButton
+              onClick={handleClose}
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                color: "black",
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+            <Box
+              sx={{
+                borderRadius: 2,
+                maxHeight: "80vh",
+                overflowY: "auto",
+                p: 2,
+                pt: 5,
+              }}
+            >
+              {open && (
+                <>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      m: 2,
+                    }}
+                  >
+                    <Typography variant="h6">Site Plans</Typography>
+                    <Button
+                      variant="contained"
+                      disableElevation
+                      sx={{
+                        borderRadius: 10,
+                      }}
+                      onClick={handleNewSitePlan}
+                    >
+                      <AddIcon />
+                    </Button>
+                  </Box>
+                  <Stack spacing={3}>
+                    {sitePlans.map((sitePlan) => (
+                      <Box
+                        onClick={() => handleSelectSitePlan(sitePlan)}
+                        key={sitePlan.id}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          sx={{
+                            borderRadius: 2,
+                            width: "80%",
+                            mb: 1,
+                          }}
+                          alt="Report photos"
+                          src={sitePlan.src}
+                        />
+                        <Box
+                          sx={{
+                            width: "80%",
+                          }}
+                        >
+                          <Typography
+                            variant="body1"
+                            noWrap
+                            sx={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            Fig {sitePlan.id}: {sitePlan.name}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            noWrap
+                            sx={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {sitePlan.dateCreated}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Stack>
+                </>
+              )}
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
     </>
   );
 };
