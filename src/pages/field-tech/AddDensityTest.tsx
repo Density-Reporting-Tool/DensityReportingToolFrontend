@@ -16,6 +16,7 @@ import {
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+
 // import { useNavigate } from "react-router-dom";
 
 type SitePlan = {
@@ -24,6 +25,9 @@ type SitePlan = {
   src: string;
   dateCreated: string;
 };
+
+import { useNavigate } from "react-router-dom";
+
 
 type FormFields = {
   location: string;
@@ -57,6 +61,7 @@ const AddDensityTest = () => {
       sitePlan: "Default site plan",
     },
   });
+
   const { register, handleSubmit, control, watch, setValue } = form;
   const [open, setOpen] = useState(false);
 
@@ -103,6 +108,7 @@ const AddDensityTest = () => {
   const onSubmit = (data: FormFields) => {
     console.log(data);
   };
+
   // const navigate = useNavigate();
   // const sitePlanOptions = ["Site plan 1", "Site plan 2"];
   const handleChangeClick = () => {
@@ -128,6 +134,7 @@ const AddDensityTest = () => {
                 boxShadow: "1px",
                 border: "1px lightgrey solid",
               }}
+              onClick={handleClickProctor}
             >
               <Stack
                 direction="row"
