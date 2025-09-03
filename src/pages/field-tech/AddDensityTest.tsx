@@ -17,17 +17,12 @@ import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-// import { useNavigate } from "react-router-dom";
-
 type SitePlan = {
   id: number;
   name: string;
   src: string;
   dateCreated: string;
 };
-
-import { useNavigate } from "react-router-dom";
-
 
 type FormFields = {
   location: string;
@@ -109,11 +104,12 @@ const AddDensityTest = () => {
     console.log(data);
   };
 
-  // const navigate = useNavigate();
-  // const sitePlanOptions = ["Site plan 1", "Site plan 2"];
   const handleChangeClick = () => {
-    // navigate(`/job/${jobId}/all-site-plans`);
     setOpen(true);
+  };
+
+  const handleClickProctor = () => {
+    console.log("click proctor");
   };
 
   return (
