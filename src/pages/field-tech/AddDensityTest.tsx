@@ -16,6 +16,7 @@ import {
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 type SitePlan = {
   id: number;
@@ -107,9 +108,10 @@ const AddDensityTest = () => {
   const handleChangeClick = () => {
     setOpen(true);
   };
+  const navigate = useNavigate();
 
   const handleClickProctor = () => {
-    console.log("click proctor");
+    navigate(`/job/${jobId}/all-proctors`);
   };
 
   return (
