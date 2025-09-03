@@ -7,6 +7,7 @@ import theme from "./theme";
 import JobDetails from "./pages/field-tech/JobDetails";
 import AllDensityShots from "./pages/field-tech/AllDensityShots";
 import AllReports from "./pages/field-tech/AllReports";
+import AllProctors from "./pages/field-tech/AllProctors";
 import LandingPage from "./pages/LandingPage";
 import LabAdminDashboard from "./pages/lab-admin/LabAdminDashboard";
 import LabAdminCreateJob from "./pages/lab-admin/LabAdminCreateJob";
@@ -16,6 +17,7 @@ import "./index.css";
 import ReportDetails from "./pages/field-tech/ReportDetails";
 import AddDensityTest from "./pages/field-tech/AddDensityTest";
 import ProctorDetails from "./pages/field-tech/ProctorDetails";
+import AllPhotos from "./pages/field-tech/AllPhotos";
 
 // PWA service worker registration is handled automatically by vite-plugin-pwa
 
@@ -59,6 +61,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           />
           <Route path="/job/:jobId/all-reports" element={<AllReports />} />
           <Route path="/proctor" element={<ProctorDetails />} />
+          <Route
+            path="/job/:jobId/report/:reportId/all-photos"
+            element={<AllPhotos />}
+          />
+          <Route path="/job/:jobId/all-proctors" element={<AllProctors />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
