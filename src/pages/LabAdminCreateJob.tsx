@@ -34,6 +34,7 @@ const LabAdminCreateJob: React.FC = () => {
   const [siteAddress, setSiteAddress] = useState("");
   const [jobNotes, setJobNotes] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false);
   const [newPerson, setNewPerson] = useState({
     clientName: "",
@@ -208,12 +209,18 @@ const LabAdminCreateJob: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
     
-    if (!jobNumber.trim()) newErrors.jobNumber = "Job number is required";
-    if (!projectName.trim()) newErrors.projectName = "Project name is required";
-    if (!siteAddress.trim()) newErrors.siteAddress = "Site address is required";
-    if (!startDate) newErrors.startDate = "Start date is required";
-    if (!client.trim()) newErrors.client = "Client is required";
-    if (!projectManager.trim()) newErrors.projectManager = "Project manager is required";
+    if (!jobNumber.trim()) {
+      newErrors.jobNumber = 'Job Number is required';
+    }
+    if (!client.trim()) {
+      newErrors.client = 'Client Name is required';
+    }
+    if (!projectName.trim()) {
+      newErrors.projectName = 'Project Name is required';
+    }
+    if (!siteAddress.trim()) {
+      newErrors.siteAddress = 'Site Address is required';
+    }
     
     setErrors(newErrors);
     
@@ -222,9 +229,7 @@ const LabAdminCreateJob: React.FC = () => {
       jobNumber: true,
       projectName: true,
       siteAddress: true,
-      startDate: true,
       client: true,
-      projectManager: true,
     });
     
     return Object.keys(newErrors).length === 0;
@@ -242,20 +247,28 @@ const LabAdminCreateJob: React.FC = () => {
     try {
       // Prepare job data for API
       const jobData = {
-        jobNumber,
-        projectManager,
-        client,
-        projectName,
-        siteAddress,
-        jobNotes,
-        startDate,
-        contacts
+        JobNumber: jobNumber,
+        client: client,
+        ProjectName: projectName,
+        SiteAddress: siteAddress,
+        StartDate: startDate ? new Date(startDate) : null,
+        EndDate: endDate ? new Date(endDate) : null,
+        JobNotes: jobNotes
       };
 
       // Make API call to create job
       const response = await apiService.createJob(jobData);
       
       console.log("Job created successfully:", response.data);
+      
+      // Handle the new backend response structure
+      if (response.data && response.data.Message) {
+        console.log("Job created with ID:", response.data.Id);
+        console.log("Job Number:", response.data.JobNumber);
+        console.log("Client:", response.data.ClientName);
+        console.log("Project:", response.data.Project);
+      }
+      
       setSubmitSuccess(true);
       
       // Clear the form after successful save
@@ -266,6 +279,7 @@ const LabAdminCreateJob: React.FC = () => {
       setSiteAddress("");
       setJobNotes("");
       setStartDate("");
+      setEndDate("");
       setContacts([]);
       setErrors({});
       setTouched({});
@@ -279,7 +293,23 @@ const LabAdminCreateJob: React.FC = () => {
       // Handle different types of errors
       let errorMessage = 'Failed to save job. Please try again.';
       
-      if (error?.message) {
+      if (error?.response?.data?.message) {
+        // Handle backend-specific error messages
+        const backendMessage = error.response.data.message;
+        if (backendMessage.includes('Job Number is required')) {
+          errorMessage = 'Job Number is required';
+        } else if (backendMessage.includes('Project Name is required')) {
+          errorMessage = 'Project Name is required';
+        } else if (backendMessage.includes('Site Address is required')) {
+          errorMessage = 'Site Address is required';
+        } else if (backendMessage.includes('Client Name is required')) {
+          errorMessage = 'Client Name is required';
+        } else if (backendMessage.includes('already exists')) {
+          errorMessage = `Job with number ${jobNumber} already exists`;
+        } else {
+          errorMessage = backendMessage;
+        }
+      } else if (error?.message) {
         if (error.message.includes('HTTP error! status: 400')) {
           errorMessage = 'Invalid job data. Please check your inputs.';
         } else if (error.message.includes('HTTP error! status: 409')) {
@@ -612,7 +642,7 @@ const LabAdminCreateJob: React.FC = () => {
             </Box>
 
             {/* Start Date */}
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 3 }}>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Start Date <span style={{ color: 'red' }}>*</span>
               </Typography>
@@ -626,6 +656,29 @@ const LabAdminCreateJob: React.FC = () => {
                 onBlur={() => handleFieldBlur('startDate', startDate)}
                 error={touched.startDate && !!errors.startDate}
                 helperText={touched.startDate && errors.startDate}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+            </Box>
+
+            {/* End Date */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                End Date
+              </Typography>
+              <TextField
+                type="date"
+                variant="outlined"
+                size="small"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
                 InputLabelProps={{
                   shrink: true,
                 }}
