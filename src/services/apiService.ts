@@ -97,23 +97,29 @@ class ApiService {
 
   // Job-specific methods
   async createJob(jobData: any): Promise<ApiResponse<any>> {
-    return this.post("/jobs", jobData);
+    return this.post("/api/jobs", jobData);
   }
 
-  async getClients(): Promise<ApiResponse<string[]>> {
-    return this.get("/clients");
+  async getJob(jobNumber: string): Promise<ApiResponse<any>> {
+    return this.get(`/api/jobs/${jobNumber}`);
   }
 
-  async getProjectManagers(): Promise<ApiResponse<string[]>> {
-    return this.get("/project-managers");
+  // People methods (replaces clients and project managers)
+  async getPeople(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/people");
   }
 
-  async createClient(clientData: any): Promise<ApiResponse<any>> {
-    return this.post("/clients", clientData);
+  async getEmployees(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/test/employees");
   }
 
-  async createProjectManager(managerData: any): Promise<ApiResponse<any>> {
-    return this.post("/project-managers", managerData);
+  async getContractors(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/test/contractors");
+  }
+
+  // Health check
+  async getHealth(): Promise<ApiResponse<any>> {
+    return this.get("/api/test/health");
   }
 }
 

@@ -25,6 +25,16 @@ import DistributionListManager, {
 } from "../components/DistributionListManager";
 import { apiService } from "../services/apiService";
 
+// Types for the new API structure
+interface Person {
+  id: number;
+  firstName: string;
+  lastName: string;
+  personType: "GeoPacific Employee" | "Contact";
+  role?: string; // For employees
+  company?: string; // For contractors
+}
+
 const LabAdminCreateJob: React.FC = () => {
   const navigate = useNavigate();
   const [projectManager, setProjectManager] = useState("");
@@ -46,8 +56,7 @@ const LabAdminCreateJob: React.FC = () => {
   
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [contactManagerOpen, setContactManagerOpen] = useState(false);
-  const [clientOptions, setClientOptions] = useState<string[]>([]);
-  const [projectManagerOptions, setProjectManagerOptions] = useState<string[]>([]);
+  const [employees, setEmployees] = useState<Person[]>([]);
 
   // Form validation states
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -59,18 +68,19 @@ const LabAdminCreateJob: React.FC = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        // Fetch clients and project managers in parallel
-        const [clientsResponse, managersResponse] = await Promise.all([
-          apiService.getClients(),
-          apiService.getProjectManagers()
-        ]);
-
-        setClientOptions(clientsResponse.data || []);
-        setProjectManagerOptions(managersResponse.data || []);
+        // Fetch people data (employees and contractors)
+        const peopleResponse = await apiService.getPeople();
+        const allPeople = peopleResponse.data || [];
+        
+        // Filter employees for project manager dropdown
+        const employees = allPeople.filter((person: Person) => person.personType === "GeoPacific Employee");
+        
+        setEmployees(employees);
       } catch (error) {
         console.error('Error fetching initial data:', error);
         // Don't show error to user for initial data fetch
         // Just log it and continue with empty arrays
+        setEmployees([]);
       }
     };
 
@@ -92,33 +102,31 @@ const LabAdminCreateJob: React.FC = () => {
 
   // Client and project manager options will be populated from API or user input
 
-  const handleProjectManagerChange = (_event: any, newValue: string | null) => {
-    const newManager = newValue || "";
-    setProjectManager(newManager);
+  const handleProjectManagerChange = (_event: any, newValue: Person | string | null) => {
+    if (typeof newValue === 'string') {
+      // User typed a new name
+      setProjectManager(newValue);
+    } else if (newValue && typeof newValue === 'object') {
+      // User selected from dropdown
+      const managerName = `${newValue.firstName} ${newValue.lastName}`;
+      setProjectManager(managerName);
+    } else {
+      setProjectManager("");
+    }
     
     // Clear error when user starts typing
     if (errors.projectManager) {
       setErrors(prev => ({ ...prev, projectManager: '' }));
     }
-    
-    // Add new project manager to options if it doesn't exist
-    if (newManager && !projectManagerOptions.includes(newManager)) {
-      setProjectManagerOptions(prev => [...prev, newManager]);
-    }
   };
 
-  const handleClientChange = (_event: any, newValue: string | null) => {
-    const newClient = newValue || "";
+  const handleClientChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newClient = event.target.value;
     setClient(newClient);
     
     // Clear error when user starts typing
     if (errors.client) {
       setErrors(prev => ({ ...prev, client: '' }));
-    }
-    
-    // Add new client to options if it doesn't exist
-    if (newClient && !clientOptions.includes(newClient)) {
-      setClientOptions(prev => [...prev, newClient]);
     }
   };
 
@@ -132,24 +140,8 @@ const LabAdminCreateJob: React.FC = () => {
 
   const handleSavePerson = async () => {
     try {
-      // Prepare manager data for API
-      const managerData = {
-        firstName: newPerson.firstName,
-        lastName: newPerson.lastName,
-        email: newPerson.email,
-        phone: newPerson.phone,
-        clientName: newPerson.clientName
-      };
-
-      // Save to API
-      await apiService.createProjectManager(managerData);
-      
-      // Add the new person to the project manager options
+      // For now, just add the person name to the project manager field
       const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`;
-      if (!projectManagerOptions.includes(newPersonName)) {
-        setProjectManagerOptions(prev => [...prev, newPersonName]);
-      }
-      
       setProjectManager(newPersonName);
       setAddPersonDialogOpen(false);
       
@@ -180,6 +172,8 @@ const LabAdminCreateJob: React.FC = () => {
     switch (field) {
       case 'jobNumber':
         return value.trim() === '' ? 'Job Number is required' : '';
+      case 'client':
+        return value.trim() === '' ? 'Client Name is required' : '';
       case 'projectName':
         return value.trim() === '' ? 'Project Name is required' : '';
       case 'siteAddress':
@@ -215,6 +209,9 @@ const LabAdminCreateJob: React.FC = () => {
     if (!client.trim()) {
       newErrors.client = 'Client Name is required';
     }
+    if (!projectManager.trim()) {
+      newErrors.projectManager = 'Project Manager is required';
+    }
     if (!projectName.trim()) {
       newErrors.projectName = 'Project Name is required';
     }
@@ -230,6 +227,7 @@ const LabAdminCreateJob: React.FC = () => {
       projectName: true,
       siteAddress: true,
       client: true,
+      projectManager: true,
     });
     
     return Object.keys(newErrors).length === 0;
@@ -248,9 +246,10 @@ const LabAdminCreateJob: React.FC = () => {
       // Prepare job data for API
       const jobData = {
         JobNumber: jobNumber,
-        client: client,
+        ClientName: client,
         ProjectName: projectName,
         SiteAddress: siteAddress,
+        ProjectManager: projectManager,
         StartDate: startDate ? new Date(startDate) : null,
         EndDate: endDate ? new Date(endDate) : null,
         JobNotes: jobNotes
@@ -497,7 +496,11 @@ const LabAdminCreateJob: React.FC = () => {
                 <Autocomplete
                   value={projectManager}
                   onChange={handleProjectManagerChange}
-                  options={projectManagerOptions}
+                  options={employees}
+                  getOptionLabel={(option) => {
+                    if (typeof option === 'string') return option;
+                    return `${option.firstName} ${option.lastName}${option.role ? ` - ${option.role}` : ''}`;
+                  }}
                   freeSolo
                   renderInput={(params) => (
                     <TextField
@@ -543,29 +546,21 @@ const LabAdminCreateJob: React.FC = () => {
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Client <span style={{ color: 'red' }}>*</span>
               </Typography>
-              <Autocomplete
+              <TextField
+                fullWidth
+                required
                 value={client}
                 onChange={handleClientChange}
-                options={clientOptions}
-                freeSolo
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    required
-                    size="small"
-                    error={touched.client && !!errors.client}
-                    helperText={touched.client && errors.client}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
-                  />
-                )}
+                onBlur={() => handleFieldBlur('client', client)}
+                error={touched.client && !!errors.client}
+                helperText={touched.client && errors.client}
+                variant="outlined"
+                size="small"
+                placeholder="Enter client name"
                 sx={{
-                  "& .MuiAutocomplete-popupIndicator": {
-                    color: "#666",
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    borderRadius: 1,
                   },
                 }}
               />
