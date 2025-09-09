@@ -134,6 +134,15 @@ class ApiService {
     return this.get(`/api/reports/${reportId}`);
   }
 
+  async getProctorsForJob(jobId: number): Promise<ApiResponse<any[]>> {
+    return this.get(`/api/reports/proctors/job/${jobId}`);
+  }
+
+  // Create density test
+  async createDensityTest(reportId: number, densityTestData: any): Promise<ApiResponse<any>> {
+    return this.post(`/api/reports/${reportId}/density-test`, densityTestData);
+  }
+
   // Health check
   async getHealth(): Promise<ApiResponse<any>> {
     return this.get("/api/test/health");

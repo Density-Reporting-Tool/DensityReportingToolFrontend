@@ -11,6 +11,7 @@ import LabAdminCreateJob from "./pages/LabAdminCreateJob";
 import LabAdminAddProctor from "./pages/LabAdminAddProctor";
 import DistributionListManagerDemo from "./pages/DistributionListManagerDemo";
 import CreateReport from "./pages/CreateReport";
+import AddDensityTest from "./pages/AddDensityTest";
 import "./index.css";
 import ReportDetails from "./pages/ReportDetails";
 import AllDensityShots from "./pages/AllDensityShots";
@@ -44,6 +45,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           />
           <Route path="/job/:jobId" element={<JobDetails />} />
           <Route path="/job/:jobId/create-report" element={<CreateReport />} />
+          <Route path="/job/:jobId/add-density-test" element={<AddDensityTest />} />
+          <Route path="/job/:jobId/report/:reportId/add-density-test" element={<AddDensityTest />} />
           <Route
             path="/job/:jobId/report/:reportId"
             element={<ReportDetails />}

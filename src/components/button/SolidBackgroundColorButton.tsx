@@ -19,7 +19,7 @@ const SolidBackgroundColorButton: React.FC<ButtonProps> = ({
         borderRadius: 10,
       }}
       onClick={() => {
-        handleClick;
+        handleClick();
       }}
     >
       {icon}

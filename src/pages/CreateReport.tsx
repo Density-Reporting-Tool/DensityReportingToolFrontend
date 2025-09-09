@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   Box,
   Card,
@@ -14,12 +14,16 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import {
   Add as AddIcon,
   FileUpload as FileUploadIcon,
   CameraAlt as CameraAltIcon,
   Save as SaveIcon,
+  ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
 import HeaderTitle from "@/components/headers/HeaderTitle";
@@ -47,6 +51,7 @@ interface JobData {
 const CreateReport: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   
   // Form state
   const [jobData, setJobData] = useState<JobData | null>(null);
@@ -56,6 +61,7 @@ const CreateReport: React.FC = () => {
   const [purpose, setPurpose] = useState<string>("");
   const [comments, setComments] = useState<string>("");
   const [conclusion, setConclusion] = useState<string>("");
+  const [densityTests, setDensityTests] = useState<any[]>([]);
   
   // UI state
   const [loading, setLoading] = useState(false);
@@ -63,6 +69,13 @@ const CreateReport: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [showAssignmentForm, setShowAssignmentForm] = useState(true);
+
+  // Check if form was already filled out (from navigation state or existing data)
+  useEffect(() => {
+    if (selectedEmployeeId && selectedReviewerId && selectedEmployeeId !== "" && selectedReviewerId !== "") {
+      setShowAssignmentForm(false);
+    }
+  }, [selectedEmployeeId, selectedReviewerId]);
 
   // Fetch job data and employees on component mount
   useEffect(() => {
@@ -93,6 +106,21 @@ const CreateReport: React.FC = () => {
 
     fetchData();
   }, [jobId]);
+
+  // Handle navigation data from AddDensityTest page
+  useEffect(() => {
+    if (location.state?.densityTest) {
+      const newDensityTest = {
+        ...location.state.densityTest,
+        id: Date.now(), // Temporary ID for display
+        selectedProctor: location.state.selectedProctor
+      };
+      setDensityTests(prev => [...prev, newDensityTest]);
+      
+      // Clear the navigation state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleSaveReport = async () => {
     if (!jobId || !selectedEmployeeId || !selectedReviewerId || !jobData) {
@@ -138,8 +166,9 @@ const CreateReport: React.FC = () => {
   };
 
   const handleNewDensityShot = () => {
-    console.log("Add new density shot");
-    // TODO: Implement density shot creation
+    if (jobId) {
+      navigate(`/job/${jobId}/add-density-test`);
+    }
   };
 
   const handleTakePhoto = () => {
@@ -252,20 +281,78 @@ const CreateReport: React.FC = () => {
                 onClick={() => console.log("Show all density tests")}
               />
 
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
-                  borderRadius: 2,
-                }}
-              >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                borderRadius: 2,
+              }}
+            >
+              {densityTests.length > 0 ? (
+                densityTests.map((test, index) => (
+                  <Accordion key={test.id}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls={`density-test-${test.id}-content`}
+                      id={`density-test-${test.id}-header`}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mr: 2 }}>
+                        <Typography variant="body1" fontWeight="700">
+                          Density Test {index + 1}
+                        </Typography>
+                        <Typography
+                          color={test.densityValue > 0 && test.compactionSpecification ? 
+                            (test.densityValue >= test.compactionSpecification ? "success.main" : "error.main") : 
+                            "text.secondary"
+                          }
+                        >
+                          {test.densityValue > 0 && test.compactionSpecification ? 
+                            (test.densityValue >= test.compactionSpecification ? "PASS" : "FAIL") : 
+                            "PENDING"
+                          }
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Typography variant="body2">
+                          <strong>Location:</strong> {test.location || 'Not specified'}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Test Area:</strong> {test.testArea || 'Not specified'}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Proctor:</strong> {test.selectedProctor?.proctorID || 'Unknown'}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Compaction Spec:</strong> {test.compactionSpecification}% {test.compactionSpecificationUnit}
+                        </Typography>
+                        {test.densityValue > 0 && (
+                          <Typography variant="body2">
+                            <strong>Density:</strong> {test.densityValue}
+                          </Typography>
+                        )}
+                        {test.moistureValue > 0 && (
+                          <Typography variant="body2">
+                            <strong>Moisture:</strong> {test.moistureValue}%
+                          </Typography>
+                        )}
+                        <Typography variant="body2">
+                          <strong>Elevation:</strong> {test.elevationValue ? `${test.elevationValue} ${test.elevationUnit}` : 'Not specified'}
+                        </Typography>
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>
+                ))
+              ) : (
                 <Card sx={{ padding: 2, borderRadius: 2 }}>
                   <Typography variant="body2" color="text.secondary">
-                    No density tests added yet. Add density tests after creating the report.
+                    No density tests added yet. Click "Add Density Test" to add one.
                   </Typography>
                 </Card>
-              </Box>
+              )}
+            </Box>
               <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
                 <SolidBackgroundColorButton
                   icon={<AddIcon sx={{ fontSize: "1.25rem" }} />}

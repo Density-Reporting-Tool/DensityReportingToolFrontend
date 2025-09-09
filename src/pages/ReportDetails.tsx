@@ -10,6 +10,9 @@ import {
   CircularProgress,
   Alert,
   Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -17,6 +20,7 @@ import {
   Add as AddIcon,
   FileUpload as FileUploadIcon,
   CameraAlt as CameraAltIcon,
+  ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import HeaderTitle from "@/components/headers/HeaderTitle";
 import BottomNavBar from "@/components/navbar/BottomNavBar";
@@ -108,7 +112,9 @@ const Report: React.FC = () => {
   };
 
   const handleNewDensityShot = () => {
-    navigate(`/report/${reportId}/densityShot/new`);
+    console.log('ReportDetails - Navigating with reportId:', reportId);
+    console.log('ReportDetails - JobId:', jobId);
+    navigate(`/job/${jobId}/report/${reportId}/add-density-test`);
   };
 
   const handleTakePhoto = () => {
@@ -205,55 +211,56 @@ const Report: React.FC = () => {
             >
               {reportData.densityTests.length > 0 ? (
                 reportData.densityTests.map((test) => (
-                  <Card
-                    key={test.id}
-                    sx={{
-                      padding: 2,
-                      borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="body1" fontWeight="700">
-                        Density Test {test.id}
-                      </Typography>
-                      <Typography variant="body2">
-                        Location: {test.location || 'Not specified'}
-                      </Typography>
-                      <Typography variant="body2">
-                        Elevation: {formatElevation(test)}
-                      </Typography>
-                      <Typography variant="body2">
-                        Test Area: {test.testArea || 'Not specified'}
-                      </Typography>
-                      <Typography variant="body2">
-                        Compaction Spec: {test.compactionSpecification ? `${test.compactionSpecification}% ${test.compactionSpecificationUnit || ''}` : 'Not specified'}
-                      </Typography>
-                      {test.densityValue && (
-                        <Typography variant="body2">
-                          Density: {test.densityValue}
-                        </Typography>
-                      )}
-                      {test.moistureValue && (
-                        <Typography variant="body2">
-                          Moisture: {test.moistureValue}%
-                        </Typography>
-                      )}
-                    </Box>
-                    <Typography
-                      color={test.densityValue && test.compactionSpecification ? 
-                        (test.densityValue >= test.compactionSpecification ? "success.main" : "error.main") : 
-                        "text.secondary"
-                      }
+                  <Accordion key={test.id}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls={`density-test-${test.id}-content`}
+                      id={`density-test-${test.id}-header`}
                     >
-                      {test.densityValue && test.compactionSpecification ? 
-                        (test.densityValue >= test.compactionSpecification ? "PASS" : "FAIL") : 
-                        "PENDING"
-                      }
-                    </Typography>
-                  </Card>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mr: 2 }}>
+                        <Typography variant="body1" fontWeight="700">
+                          Density Test {test.id}
+                        </Typography>
+                        <Typography
+                          color={test.densityValue && test.compactionSpecification ? 
+                            (test.densityValue >= test.compactionSpecification ? "success.main" : "error.main") : 
+                            "text.secondary"
+                          }
+                        >
+                          {test.densityValue && test.compactionSpecification ? 
+                            (test.densityValue >= test.compactionSpecification ? "PASS" : "FAIL") : 
+                            "PENDING"
+                          }
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Typography variant="body2">
+                          <strong>Location:</strong> {test.location || 'Not specified'}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Elevation:</strong> {formatElevation(test)}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Test Area:</strong> {test.testArea || 'Not specified'}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Compaction Spec:</strong> {test.compactionSpecification ? `${test.compactionSpecification}% ${test.compactionSpecificationUnit || ''}` : 'Not specified'}
+                        </Typography>
+                        {test.densityValue && (
+                          <Typography variant="body2">
+                            <strong>Density:</strong> {test.densityValue}
+                          </Typography>
+                        )}
+                        {test.moistureValue && (
+                          <Typography variant="body2">
+                            <strong>Moisture:</strong> {test.moistureValue}%
+                          </Typography>
+                        )}
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>
                 ))
               ) : (
                 <Card sx={{ padding: 2, borderRadius: 2 }}>
