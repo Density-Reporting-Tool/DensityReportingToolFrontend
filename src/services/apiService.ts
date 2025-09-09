@@ -100,6 +100,10 @@ class ApiService {
     return this.post("/api/jobs", jobData);
   }
 
+  async getAllJobs(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/jobs");
+  }
+
   async getJob(jobNumber: string): Promise<ApiResponse<any>> {
     return this.get(`/api/jobs/${jobNumber}`);
   }
