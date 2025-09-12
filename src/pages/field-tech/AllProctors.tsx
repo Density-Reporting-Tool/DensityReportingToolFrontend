@@ -1,11 +1,16 @@
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
 import { Card, Stack, Box, Typography, Container, Button } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const AllProctors = () => {
   const jobId = 1;
   const handleNewProctor = () => {
     console.log("hello");
+  };
+  const navigate = useNavigate();
+  const handleClickProctor = () => {
+    navigate(`/proctor`);
   };
 
   return (
@@ -40,6 +45,7 @@ const AllProctors = () => {
               boxShadow: "1px",
               border: "1px lightgrey solid",
             }}
+            onClick={handleClickProctor}
           >
             <Stack
               direction="row"
@@ -76,6 +82,7 @@ const AllProctors = () => {
               boxShadow: "1px",
               border: "1px lightgrey solid",
             }}
+            onClick={handleClickProctor}
           >
             <Stack
               direction="row"
@@ -95,7 +102,7 @@ const AllProctors = () => {
               />
               <Box>
                 <Typography variant="body1" fontWeight={600}>
-                  Proctor #1 Riversand
+                  Proctor #2 Riversand
                 </Typography>
                 <Typography variant="body2">Density: 1800 kg/m3</Typography>
                 <Typography variant="body2">
