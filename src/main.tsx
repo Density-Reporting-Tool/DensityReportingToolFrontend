@@ -23,7 +23,12 @@ import AllPhotos from "./pages/field-tech/AllPhotos";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Routes>
           {/* Field tech pages */}
           <Route path="/" element={<LandingPage />} />
@@ -64,7 +69,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             element={<AllPhotos />}
           />
           <Route path="/job/:jobId/all-proctors" element={<AllProctors />} />
-
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
