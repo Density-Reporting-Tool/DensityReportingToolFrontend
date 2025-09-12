@@ -24,7 +24,7 @@ import {
   Business as BusinessIcon,
   CalendarToday as CalendarIcon,
 } from "@mui/icons-material";
-import { apiService } from "../services/apiService";
+import { apiService } from "../../services/apiService";
 
 // Types for job data
 interface Job {
