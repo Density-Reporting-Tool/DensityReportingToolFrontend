@@ -2,6 +2,7 @@
 console.log("Environment Variables:", {
   VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
   NODE_ENV: import.meta.env.NODE_ENV,
+  MODE: import.meta.env.MODE,
   PROD: import.meta.env.PROD,
   DEV: import.meta.env.DEV,
 });

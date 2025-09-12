@@ -94,6 +94,33 @@ class ApiService {
       body: data ? JSON.stringify(data) : undefined,
     });
   }
+
+  // Job-specific methods
+  async createJob(jobData: any): Promise<ApiResponse<any>> {
+    return this.post("/api/jobs", jobData);
+  }
+
+  async getJob(jobNumber: string): Promise<ApiResponse<any>> {
+    return this.get(`/api/jobs/${jobNumber}`);
+  }
+
+  // People methods (replaces clients and project managers)
+  async getPeople(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/people");
+  }
+
+  async getEmployees(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/test/employees");
+  }
+
+  async getContractors(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/test/contractors");
+  }
+
+  // Health check
+  async getHealth(): Promise<ApiResponse<any>> {
+    return this.get("/api/test/health");
+  }
 }
 
 export const apiService = new ApiService();
