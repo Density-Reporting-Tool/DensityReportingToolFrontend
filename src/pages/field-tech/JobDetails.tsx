@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Alert,
   Grid,
+  Stack,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -21,7 +22,7 @@ import {
   Email as EmailIcon,
 } from "@mui/icons-material";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
-import { apiService } from "../services/apiService";
+import { apiService } from "../../services/apiService";
 
 // Types for job data - matching the actual API response structure
 interface JobDetailsData {
@@ -56,18 +57,31 @@ interface JobDetailsData {
   }>;
 }
 
+// Types for report data
+interface ReportData {
+  id: number;
+  reportNumber: string;
+  startDate: string | null;
+  submitDate: string | null;
+  distributeDate: string | null;
+  employee: {
+    firstName: string;
+    lastName: string;
+  };
+  reviewer: {
+    firstName: string;
+    lastName: string;
+  };
+}
+
 const JobDetails: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
   const [jobData, setJobData] = useState<JobDetailsData | null>(null);
+  const [reports, setReports] = useState<ReportData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reportsLoading, setReportsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (jobId) {
-      fetchJobDetails();
-    }
-  }, [jobId, fetchJobDetails]);
 
   const fetchJobDetails = useCallback(async () => {
     if (!jobId) return;
@@ -85,8 +99,37 @@ const JobDetails: React.FC = () => {
     }
   }, [jobId]);
 
+  const fetchReports = useCallback(async () => {
+    if (!jobData?.id) return;
+
+    setReportsLoading(true);
+    try {
+      const response = await apiService.getReportsByJob(jobData.id);
+      setReports(response.data || []);
+    } catch (err: any) {
+      console.error("Error fetching reports:", err);
+      // Don't set error state for reports - it's not critical
+    } finally {
+      setReportsLoading(false);
+    }
+  }, [jobData?.id]);
+
+  useEffect(() => {
+    if (jobId) {
+      fetchJobDetails();
+    }
+  }, [jobId, fetchJobDetails]);
+
+  useEffect(() => {
+    if (jobData?.id) {
+      fetchReports();
+    }
+  }, [jobData?.id, fetchReports]);
+
   const handleNewReport = () => {
-    console.log("Create new report for job:", jobId);
+    if (jobId) {
+      navigate(`/job/${jobId}/create-report`);
+    }
   };
 
   const handleAddressClick = () => {
@@ -360,19 +403,95 @@ const JobDetails: React.FC = () => {
           </Box>
         )}
 
-        {/* Recent Reports - Placeholder for future implementation */}
+        {/* Reports Section */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            Recent Reports
+            Reports ({reports.length})
           </Typography>
-          <Card sx={{ p: 3, textAlign: "center" }}>
-            <Typography variant="body1" color="text.secondary">
-              No reports available yet
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Reports will appear here once they are created for this job
-            </Typography>
-          </Card>
+          {reportsLoading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : reports.length > 0 ? (
+            <Stack spacing={2}>
+              {reports.map((report) => (
+                <Card
+                  key={report.id}
+                  sx={{
+                    p: 2,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease-in-out",
+                    "&:hover": {
+                      boxShadow: 3,
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                  onClick={() => navigate(`/job/${jobId}/report/${report.id}`)}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        Report #{report.reportNumber}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 1 }}
+                      >
+                        Reporter: {report.employee.firstName}{" "}
+                        {report.employee.lastName}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 1 }}
+                      >
+                        Reviewer: {report.reviewer.firstName}{" "}
+                        {report.reviewer.lastName}
+                      </Typography>
+                      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                        {report.startDate && (
+                          <Typography variant="caption" color="text.secondary">
+                            Started: {formatDate(report.startDate)}
+                          </Typography>
+                        )}
+                        {report.submitDate && (
+                          <Typography variant="caption" color="success.main">
+                            Submitted: {formatDate(report.submitDate)}
+                          </Typography>
+                        )}
+                        {report.distributeDate && (
+                          <Typography variant="caption" color="info.main">
+                            Distributed: {formatDate(report.distributeDate)}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Click to view →
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Card>
+              ))}
+            </Stack>
+          ) : (
+            <Card sx={{ p: 3, textAlign: "center" }}>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                No reports created yet for this job.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Click &quot;New Report&quot; below to create the first report.
+              </Typography>
+            </Card>
+          )}
         </Box>
 
         {/* New Report Button */}

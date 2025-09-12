@@ -13,9 +13,10 @@ import LabAdminDashboard from "./pages/lab-admin/LabAdminDashboard";
 import LabAdminCreateJob from "./pages/lab-admin/LabAdminCreateJob";
 import LabAdminAddProctor from "./pages/lab-admin/LabAdminAddProctor";
 import DistributionListManagerDemo from "./pages/lab-admin/DistributionListManagerDemo";
+import CreateReport from "./pages/CreateReport";
+import AddDensityTest from "./pages/AddDensityTest";
 import "./index.css";
 import ReportDetails from "./pages/field-tech/ReportDetails";
-import AddDensityTest from "./pages/field-tech/AddDensityTest";
 import AllPhotos from "./pages/field-tech/AllPhotos";
 
 // PWA service worker registration is handled automatically by vite-plugin-pwa
@@ -55,6 +56,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             element={<DistributionListManagerDemo />}
           />
           <Route path="/job/:jobId" element={<JobDetails />} />
+          <Route path="/job/:jobId/create-report" element={<CreateReport />} />
+          <Route
+            path="/job/:jobId/add-density-test"
+            element={<AddDensityTest />}
+          />
+          <Route
+            path="/job/:jobId/report/:reportId/add-density-test"
+            element={<AddDensityTest />}
+          />
           <Route
             path="/job/:jobId/report/:reportId"
             element={<ReportDetails />}

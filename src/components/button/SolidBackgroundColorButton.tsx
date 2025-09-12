@@ -16,7 +16,7 @@ const SolidBackgroundColorButton: React.FC<ButtonProps> = ({
       size="medium"
       variant="contained"
       sx={{
-        borderRadius: 5,
+        borderRadius: 10,
       }}
       onClick={handleClick}
     >
