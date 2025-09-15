@@ -1,4 +1,5 @@
 import { buildApiUrl, getAuthHeaders, getRequestTimeout } from "../config/api";
+import { ENDPOINTS } from "@/config/endpoints";
 
 interface ApiResponse<T> {
   data: T;
@@ -93,6 +94,62 @@ class ApiService {
       method: "PATCH",
       body: data ? JSON.stringify(data) : undefined,
     });
+  }
+
+  // Job-specific methods
+  async createJob(jobData: any): Promise<ApiResponse<any>> {
+    return this.post(ENDPOINTS.JOBS.CREATE, jobData);
+  }
+
+  async getAllJobs(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/jobs");
+  }
+
+  async getJob(jobNumber: string): Promise<ApiResponse<any>> {
+    return this.get(`/api/jobs/${jobNumber}`);
+  }
+
+  // People methods (replaces clients and project managers)
+  async getPeople(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/people");
+  }
+
+  async getEmployees(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/test/employees");
+  }
+
+  async getContractors(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/test/contractors");
+  }
+
+  // Report methods
+  async createReport(reportData: any): Promise<ApiResponse<any>> {
+    return this.post(ENDPOINTS.REPORTS.CREATE, reportData);
+  }
+
+  async getReportsByJob(jobId: number): Promise<ApiResponse<any[]>> {
+    return this.get(`/api/reports/job/${jobId}`);
+  }
+
+  async getReport(reportId: number): Promise<ApiResponse<any>> {
+    return this.get(`/api/reports/${reportId}`);
+  }
+
+  async getProctorsForJob(jobId: number): Promise<ApiResponse<any[]>> {
+    return this.get(`/api/reports/proctors/job/${jobId}`);
+  }
+
+  // Create density test
+  async createDensityTest(
+    reportId: number,
+    densityTestData: any,
+  ): Promise<ApiResponse<any>> {
+    return this.post(`/api/reports/${reportId}/density-test`, densityTestData);
+  }
+
+  // Health check
+  async getHealth(): Promise<ApiResponse<any>> {
+    return this.get("/api/test/health");
   }
 }
 
