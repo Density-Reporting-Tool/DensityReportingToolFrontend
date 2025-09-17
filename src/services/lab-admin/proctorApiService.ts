@@ -6,7 +6,7 @@ export interface ProctorData {
   proctorTestNumber: string;
   materialType: string;
   dateSampled: string;
-  proctorType: "MPDD" | "Standard" | "Modified";
+  proctorType: "SPDD" | "MPDD";
   maxDryDensity: string;
   correctedDensity: string;
   labLocation: string;
@@ -31,7 +31,7 @@ export interface ProctorListResponse {
 
 // Main ProctorApiService class
 class ProctorApiService {
-  private readonly baseEndpoint = "/api/lab-admin/proctors";
+  private readonly baseEndpoint = "/api/proctors/lab-admin";
 
   // Create a new proctor
   async createProctor(
