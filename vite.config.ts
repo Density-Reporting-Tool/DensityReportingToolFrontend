@@ -9,6 +9,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      strategies: "generateSW",
+      includeAssets: ["icons/*"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         runtimeCaching: [
@@ -60,13 +62,13 @@ export default defineConfig({
         categories: ["productivity", "business"],
         icons: [
           {
-            src: "pwa-192x192.png",
+            src: "web-app-manifest-192x192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any maskable",
           },
           {
-            src: "pwa-512x512.png",
+            src: "web-app-manifest-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",
