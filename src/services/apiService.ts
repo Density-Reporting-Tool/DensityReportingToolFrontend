@@ -13,7 +13,7 @@ interface ApiError {
   details?: any;
 }
 
-class ApiService {
+class BaseApiService {
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {},
@@ -95,18 +95,28 @@ class ApiService {
       body: data ? JSON.stringify(data) : undefined,
     });
   }
+}
 
+class JobsAPIService extends BaseApiService {
   // Job-specific methods
   async createJob(jobData: any): Promise<ApiResponse<any>> {
     return this.post(ENDPOINTS.JOBS.CREATE, jobData);
   }
 
-  async getAllJobs(): Promise<ApiResponse<any[]>> {
-    return this.get("/api/jobs");
+  async getJob(jobNumber: string): Promise<ApiResponse<any>> {
+    return this.get(ENDPOINTS.JOBS.GET(jobNumber));
   }
 
-  async getJob(jobNumber: string): Promise<ApiResponse<any>> {
-    return this.get(`/api/jobs/${jobNumber}`);
+  async updateJob(jobNumber: string): Promise<ApiResponse<any>> {
+    return this.put(ENDPOINTS.JOBS.UPDATE(jobNumber));
+  }
+
+  async deleteJob(jobNumber: string): Promise<ApiResponse<any>> {
+    return this.delete(ENDPOINTS.JOBS.DELETE(jobNumber));
+  }
+
+  async getAllJobs(): Promise<ApiResponse<any[]>> {
+    return this.get(ENDPOINTS.JOBS.LIST);
   }
 
   // People methods (replaces clients and project managers)
@@ -146,6 +156,8 @@ class ApiService {
   ): Promise<ApiResponse<any>> {
     return this.post(`/api/reports/${reportId}/density-test`, densityTestData);
   }
+}
+class TestAPIService extends BaseApiService {
 
   // Health check
   async getHealth(): Promise<ApiResponse<any>> {
@@ -153,5 +165,7 @@ class ApiService {
   }
 }
 
-export const apiService = new ApiService();
+export const apiService = new BaseApiService();
+export const jobsAPIService = new JobsAPIService();
+export const testAPIService = new TestAPIService();
 export type { ApiResponse, ApiError };

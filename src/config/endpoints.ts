@@ -24,10 +24,10 @@ export const ENDPOINTS = {
   },
   JOBS: {
     LIST: "/api/jobs/",
-    CREATE: "/api/jobs/0/",
+    CREATE: "/api/jobs/",
     GET: (id: string) => `/api/jobs/${id}/`,
-    UPDATE: (id: string) => `/api/jobs/${id}/update/`,
-    DELETE: (id: string) => `/api/jobs/${id}/delete/`,
+    UPDATE: (id: string) => `/api/jobs/${id}/`,
+    DELETE: (id: string) => `/api/jobs/${id}/`,
   },
   PROCTOR: {
     LIST: `/api/proctors/`,
@@ -36,4 +36,9 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/api/proctors/${id}/update/`,
     DELETE: (id: string) => `/api/proctors/${id}/delete/`,
   },
+  HEALTH: {
+    HEALTH: "/health",
+    HOME: "/home",
+    API_HEALTH: "/api/health"
+  }
 };

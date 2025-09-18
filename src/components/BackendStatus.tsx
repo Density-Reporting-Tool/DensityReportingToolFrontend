@@ -1,3 +1,5 @@
+import { ENDPOINTS } from "@/config/endpoints";
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -21,50 +23,30 @@ const BackendStatus: React.FC = () => {
   }, []);
 
   const testConnection = async () => {
-    setStatus("loading");
-    setMessage("");
+  setStatus("loading");
+  setMessage("");
 
+  const candidates = [
+    { url: ENDPOINTS.HEALTH.HEALTH, name: `health (${ENDPOINTS.HEALTH.HEALTH})` },
+    { url: ENDPOINTS.HEALTH.HOME, name: `home (${ENDPOINTS.HEALTH.HOME})` },
+    { url: ENDPOINTS.HEALTH.API_HEALTH, name: `api health (${ENDPOINTS.HEALTH.API_HEALTH})` },
+  ];
+
+  for (const candidate of candidates) {
     try {
-      // Try multiple endpoints to test connectivity
-      let response;
-      let endpoint = "";
-
-      // First try health endpoint (most reliable)
-      try {
-        response = await apiService.get("/health");
-        endpoint = "health (/health)";
-      } catch (healthError) {
-        // Try home endpoint
-        try {
-          response = await apiService.get("/home");
-          endpoint = "home (/home)";
-        } catch (homeError) {
-          // Try API health endpoint
-          try {
-            response = await apiService.get("/api/health");
-            endpoint = "api health (/api/health)";
-          } catch (apiHealthError) {
-            throw new Error(
-              "All endpoints failed. Backend might be down or endpoints are different.",
-            );
-          }
-        }
-      }
-
+      const response = await apiService.get(candidate.url);
       setStatus("success");
-      setMessage(
-        `Backend connected successfully via ${endpoint}! Status: ${response.status}`,
-      );
-    } catch (error: unknown) {
-      setStatus("error");
-      if (error instanceof Error) {
-        setMessage(`Connection failed: ${error.message}`);
-      } else {
-        setMessage("Detailed test failed: Unknown error");
-      }
-      console.error("Backend connection error:", error);
+      setMessage(`Connected via ${candidate.name}`);
+      return response;
+    } catch {
+      // keep trying next
     }
-  };
+  }
+
+  setStatus("error");
+  setMessage("All endpoints failed. Backend might be down or endpoints are different.");
+  throw new Error("Connection test failed");
+};
 
   return (
     <Box sx={{ p: 2, border: 1, borderColor: "grey.300", borderRadius: 1 }}>
