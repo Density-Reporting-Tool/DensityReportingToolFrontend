@@ -118,7 +118,9 @@ class JobsAPIService extends BaseApiService {
   async getAllJobs(): Promise<ApiResponse<any[]>> {
     return this.get(ENDPOINTS.JOBS.LIST);
   }
+}
 
+class RefactorMeAPIService extends BaseApiService {
   // People methods (replaces clients and project managers)
   async getPeople(): Promise<ApiResponse<any[]>> {
     return this.get("/api/people");
