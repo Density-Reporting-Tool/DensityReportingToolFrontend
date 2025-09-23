@@ -8,15 +8,10 @@ const UploadWidget = () => {
   const widgetRef = useRef();
   useEffect(() => {
     cloudinaryRef.current = window.cloudinary;
-    widgetRef.current = cloudinaryRef.current.createUploadWidget(
-      {
-        cloudName: cloudName,
-        uploadPreset: uploadPreset,
-      },
-      function (error, result) {
-        console.log(result);
-      },
-    );
+    widgetRef.current = cloudinaryRef.current.createUploadWidget({
+      cloudName: cloudName,
+      uploadPreset: uploadPreset,
+    });
   }, []);
   return (
     <SolidBackgroundColorButton
