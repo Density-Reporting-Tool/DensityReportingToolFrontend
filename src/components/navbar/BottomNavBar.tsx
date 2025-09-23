@@ -4,60 +4,57 @@ import HomeIcon from "@mui/icons-material/Home";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import AddIcon from "@mui/icons-material/Add";
 import React, { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 const BottomNavBar = () => {
-  const [currentPage, setCurrentPage] = React.useState(0);
+  const { jobId, reportId } = useParams<{ jobId: string; reportId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    switch (location.pathname) {
-      case "/field-tech-dashboard":
-        setCurrentPage(0);
-        break;
-      case "/all-reports":
-        setCurrentPage(1);
-        break;
-      case "/take-photo":
-        setCurrentPage(2);
-        break;
-      case "/add-density-tests":
-        setCurrentPage(3);
-        break;
-      default:
-        setCurrentPage(0); // Default to home if path doesn't match
-    }
-  }, [location.pathname]);
+  const getCurrentPage = () => {
+    if (location.pathname.startsWith("/field-tech/job") && jobId && reportId)
+      return 1;
+    if (location.pathname === "/field-tech") return 0;
+    if (location.pathname === "/field-tech/add-density-test") return 3;
+    if (location.pathname === "/take-photo") return 2;
+    return 0;
+  };
 
-  const handleChangePage = (_event: React.SyntheticEvent, newPage: number) => {
-    setCurrentPage(newPage);
-    switch (newPage) {
+  const [currentPage, setCurrentPage] = React.useState(getCurrentPage());
+
+  // Keep currentPage in sync when URL changes
+  useEffect(() => {
+    setCurrentPage(getCurrentPage());
+  }, [location.pathname, jobId, reportId]);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setCurrentPage(newValue);
+    switch (newValue) {
       case 0:
-        navigate("/field-tech-dashboard");
+        navigate("/field-tech");
         break;
       case 1:
-        navigate("/all-reports");
+        if (jobId && reportId)
+          navigate(`/field-tech/job/${jobId}/report/${reportId}`);
         break;
       case 2:
-        navigate("/take-photo");
+        // TODO
+        // navigate("/take-photo");
+        console.log("Take photo page");
         break;
       case 3:
-        navigate("/add-density-tests");
+        navigate("/field-tech/add-density-test");
         break;
       default:
-        navigate("/field-tech-dashboard");
+        navigate("/field-tech");
     }
   };
+
   return (
     <Paper
       sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
       elevation={3}
     >
-      <BottomNavigation
-        showLabels
-        value={currentPage}
-        onChange={handleChangePage}
-      >
+      <BottomNavigation showLabels value={currentPage} onChange={handleChange}>
         <BottomNavigationAction label="Home" icon={<HomeIcon />} />
         <BottomNavigationAction
           label="Reports"
