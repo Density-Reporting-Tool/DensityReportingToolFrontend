@@ -1,3 +1,5 @@
+import { ENDPOINTS } from "./endpoints";
+
 // Debug environment variables
 console.log("Environment Variables:", {
   VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
@@ -12,31 +14,7 @@ export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5013",
 
   // API endpoints
-  ENDPOINTS: {
-    AUTH: {
-      LOGIN: "/api/auth/login",
-      LOGOUT: "/api/auth/logout",
-      REFRESH: "/api/auth/refresh",
-      REGISTER: "/api/auth/register",
-    },
-    REPORTS: {
-      LIST: "/api/reports",
-      CREATE: "/api/reports",
-      GET: (id: string) => `/api/reports/${id}`,
-      UPDATE: (id: string) => `/api/reports/${id}`,
-      DELETE: (id: string) => `/api/reports/${id}`,
-    },
-    DENSITY: {
-      CALCULATE: "/api/density/calculate",
-      ANALYZE: "/api/density/analyze",
-      EXPORT: "/api/density/export",
-    },
-    USERS: {
-      PROFILE: "/api/users/profile",
-      UPDATE: "/api/users/profile",
-      PREFERENCES: "/api/users/preferences",
-    },
-  },
+  ENDPOINTS: ENDPOINTS,
 
   // Request timeout in milliseconds (longer for Render's cold starts)
   TIMEOUT: import.meta.env.PROD ? 60000 : 30000,
