@@ -14,12 +14,13 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Add as AddIcon,
-  FileUpload as FileUploadIcon,
   CameraAlt as CameraAltIcon,
   ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import HeaderTitle from "@/components/headers/HeaderTitle";
 import BottomNavBar from "@/components/navbar/BottomNavBar";
+
+import UploadWidget from "@/components/UploadWidget";
 
 const report = {
   id: 4,
@@ -89,10 +90,6 @@ const Report: React.FC = () => {
     console.log("Take photo");
   };
 
-  const handleUploadImage = () => {
-    console.log("Upload image");
-  };
-
   const handleShowAllDensity = () => {
     console.log("show all density shot");
     navigate(`/job/${jobId}/report/${reportId}/all-density-shots`);
@@ -101,6 +98,7 @@ const Report: React.FC = () => {
   const handleShowAllPhotos = () => {
     navigate(`/job/${jobId}/report/${reportId}/all-photos`);
   };
+
   return (
     <>
       <HeaderWithBackButton
@@ -298,12 +296,7 @@ const Report: React.FC = () => {
               <Box
                 sx={{ display: "flex", justifyContent: "space-around", mb: 1 }}
               >
-                <SolidBackgroundColorButton
-                  icon={<FileUploadIcon sx={{ fontSize: "1.25rem" }} />}
-                  handleClick={() => handleUploadImage}
-                >
-                  Upload Image
-                </SolidBackgroundColorButton>
+                <UploadWidget />
                 <SolidBackgroundColorButton
                   icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
                   handleClick={() => handleTakePhoto}
