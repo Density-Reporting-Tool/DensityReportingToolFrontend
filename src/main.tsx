@@ -15,7 +15,7 @@ import LabAdminAddProctor from "./pages/lab-admin/LabAdminAddProctor";
 import DistributionListManagerDemo from "./pages/lab-admin/DistributionListManagerDemo";
 import "./index.css";
 import ReportDetails from "./pages/field-tech/ReportDetails";
-import AddDensityTest from "./pages/field-tech/AddDensityTest";
+import DensityShotDetails from "./pages/field-tech/DensityShotDetails";
 import ProctorDetails from "./pages/field-tech/ProctorDetails";
 import AllPhotos from "./pages/field-tech/AllPhotos";
 
@@ -36,7 +36,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           />
           <Route
             path="/field-tech/add-density-test"
-            element={<AddDensityTest />}
+            element={<DensityShotDetails />}
           />
 
           {/* Lab admin pages */}
