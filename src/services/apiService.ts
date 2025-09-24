@@ -1,3 +1,4 @@
+import { JobCreateDTO, JobReadDTO, JobUpdateDTO } from "@/dtos/Job/job";
 import { buildApiUrl, getAuthHeaders, getRequestTimeout } from "../config/api";
 import { ENDPOINTS } from "@/config/endpoints";
 
@@ -99,7 +100,7 @@ class BaseApiService {
 
 class JobsAPIService extends BaseApiService {
   // Job-specific methods
-  async createJob(jobData: any): Promise<ApiResponse<any>> {
+  async createJob(jobData: JobCreateDTO): Promise<ApiResponse<any>> {
     return this.post(ENDPOINTS.JOBS.CREATE, jobData);
   }
 
@@ -107,16 +108,22 @@ class JobsAPIService extends BaseApiService {
     return this.get(ENDPOINTS.JOBS.GET(jobNumber));
   }
 
-  async updateJob(jobNumber: string): Promise<ApiResponse<any>> {
-    return this.put(ENDPOINTS.JOBS.UPDATE(jobNumber));
+  async updateJob(
+    job: JobUpdateDTO
+  ): Promise<ApiResponse<any>> {
+    return this.put(ENDPOINTS.JOBS.UPDATE(`${job.id}`), job);
   }
 
   async deleteJob(jobNumber: string): Promise<ApiResponse<any>> {
     return this.delete(ENDPOINTS.JOBS.DELETE(jobNumber));
   }
 
-  async getAllJobs(): Promise<ApiResponse<any[]>> {
+  async getAllJobs(): Promise<ApiResponse<JobReadDTO[]>> {
     return this.get(ENDPOINTS.JOBS.LIST);
+  }
+
+  async searchJobsByJobNumber(jobNumber: string): Promise<ApiResponse<JobReadDTO[]>> {
+    return this.get(ENDPOINTS.JOBS.SEARCH(jobNumber));
   }
 }
 
@@ -160,7 +167,6 @@ class RefactorMeAPIService extends BaseApiService {
   }
 }
 class TestAPIService extends BaseApiService {
-
   // Health check
   async getHealth(): Promise<ApiResponse<any>> {
     return this.get("/api/test/health");

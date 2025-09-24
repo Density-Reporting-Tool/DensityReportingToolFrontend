@@ -28,6 +28,7 @@ export const ENDPOINTS = {
     GET: (id: string) => `/api/jobs/${id}/`,
     UPDATE: (id: string) => `/api/jobs/${id}/`,
     DELETE: (id: string) => `/api/jobs/${id}/`,
+    SEARCH: (jobNumber: string) => `/api/jobs/search?jobNumber=${jobNumber}/`,
   },
   PROCTOR: {
     LIST: `/api/proctors/`,
