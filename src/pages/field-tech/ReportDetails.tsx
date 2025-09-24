@@ -19,7 +19,6 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Add as AddIcon,
-  FileUpload as FileUploadIcon,
   CameraAlt as CameraAltIcon,
   ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
@@ -27,6 +26,8 @@ import HeaderTitle from "@/components/headers/HeaderTitle";
 import BottomNavBar from "@/components/navbar/BottomNavBar";
 import Webcam from "react-webcam";
 import { useRef, useState } from "react";
+
+import UploadWidget from "@/components/UploadWidget";
 
 const report = {
   id: 4,
@@ -100,6 +101,7 @@ const Report: React.FC = () => {
       }
     }
   };
+
 
   const handleKeepPhoto = async () => {
     if (capturedPhoto) {
@@ -186,6 +188,7 @@ const Report: React.FC = () => {
   const handleAddDensityShot = () => {
     navigate(`/field-tech/add-density-test`);
   };
+
 
   const handleShowAllDensity = () => {
     navigate(`/job/${jobId}/report/${reportId}/all-density-shots`);
@@ -392,12 +395,14 @@ const Report: React.FC = () => {
               <Box
                 sx={{ display: "flex", justifyContent: "space-around", mb: 1 }}
               >
+
                 <SolidBackgroundColorButton
                   icon={<FileUploadIcon sx={{ fontSize: "1.25rem" }} />}
                   handleClick={() => console.log("Upload Image")}
                 >
                   Upload Image
                 </SolidBackgroundColorButton>
+
 
                 <SolidBackgroundColorButton
                   icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}

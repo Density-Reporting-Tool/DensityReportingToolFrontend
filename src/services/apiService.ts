@@ -1,4 +1,5 @@
 import { buildApiUrl, getAuthHeaders, getRequestTimeout } from "../config/api";
+import { ENDPOINTS } from "@/config/endpoints";
 
 interface ApiResponse<T> {
   data: T;
@@ -12,7 +13,7 @@ interface ApiError {
   details?: any;
 }
 
-class ApiService {
+class BaseApiService {
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {},
@@ -96,5 +97,77 @@ class ApiService {
   }
 }
 
-export const apiService = new ApiService();
+class JobsAPIService extends BaseApiService {
+  // Job-specific methods
+  async createJob(jobData: any): Promise<ApiResponse<any>> {
+    return this.post(ENDPOINTS.JOBS.CREATE, jobData);
+  }
+
+  async getJob(jobNumber: string): Promise<ApiResponse<any>> {
+    return this.get(ENDPOINTS.JOBS.GET(jobNumber));
+  }
+
+  async updateJob(jobNumber: string): Promise<ApiResponse<any>> {
+    return this.put(ENDPOINTS.JOBS.UPDATE(jobNumber));
+  }
+
+  async deleteJob(jobNumber: string): Promise<ApiResponse<any>> {
+    return this.delete(ENDPOINTS.JOBS.DELETE(jobNumber));
+  }
+
+  async getAllJobs(): Promise<ApiResponse<any[]>> {
+    return this.get(ENDPOINTS.JOBS.LIST);
+  }
+}
+
+class RefactorMeAPIService extends BaseApiService {
+  // People methods (replaces clients and project managers)
+  async getPeople(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/people");
+  }
+
+  async getEmployees(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/test/employees");
+  }
+
+  async getContractors(): Promise<ApiResponse<any[]>> {
+    return this.get("/api/test/contractors");
+  }
+
+  // Report methods
+  async createReport(reportData: any): Promise<ApiResponse<any>> {
+    return this.post(ENDPOINTS.REPORTS.CREATE, reportData);
+  }
+
+  async getReportsByJob(jobId: number): Promise<ApiResponse<any[]>> {
+    return this.get(`/api/reports/job/${jobId}`);
+  }
+
+  async getReport(reportId: number): Promise<ApiResponse<any>> {
+    return this.get(`/api/reports/${reportId}`);
+  }
+
+  async getProctorsForJob(jobId: number): Promise<ApiResponse<any[]>> {
+    return this.get(`/api/reports/proctors/job/${jobId}`);
+  }
+
+  // Create density test
+  async createDensityTest(
+    reportId: number,
+    densityTestData: any,
+  ): Promise<ApiResponse<any>> {
+    return this.post(`/api/reports/${reportId}/density-test`, densityTestData);
+  }
+}
+class TestAPIService extends BaseApiService {
+
+  // Health check
+  async getHealth(): Promise<ApiResponse<any>> {
+    return this.get("/api/test/health");
+  }
+}
+
+export const apiService = new BaseApiService();
+export const jobsAPIService = new JobsAPIService();
+export const testAPIService = new TestAPIService();
 export type { ApiResponse, ApiError };
