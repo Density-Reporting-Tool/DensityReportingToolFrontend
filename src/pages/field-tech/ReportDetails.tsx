@@ -5,8 +5,13 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Card,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Stack,
   TextField,
   Typography,
@@ -19,6 +24,8 @@ import {
 } from "@mui/icons-material";
 import HeaderTitle from "@/components/headers/HeaderTitle";
 import BottomNavBar from "@/components/navbar/BottomNavBar";
+import Webcam from "react-webcam";
+import { useRef, useState } from "react";
 
 import UploadWidget from "@/components/UploadWidget";
 
@@ -80,18 +87,110 @@ const report = {
 const Report: React.FC = () => {
   const { jobId, reportId } = useParams<{ jobId: string; reportId: string }>();
   const navigate = useNavigate();
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [reportPhotos, setReportPhotos] = useState(report.reportPhotos);
+
+  const webcamRef = useRef<Webcam>(null);
+
+  const handleTakePhoto = () => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      if (imageSrc) {
+        setCapturedPhoto(imageSrc);
+      }
+    }
+  };
+
+
+  const handleKeepPhoto = async () => {
+    if (capturedPhoto) {
+      try {
+        const uploadedUrl = await uploadImageToCloudinary(capturedPhoto);
+
+        if (uploadedUrl) {
+          const newPhoto = {
+            id: reportPhotos.length + 1,
+            src: uploadedUrl,
+            title: `Photo ${reportPhotos.length + 1}`,
+            elevation: "New photo",
+          };
+          setReportPhotos([...reportPhotos, newPhoto]);
+        } else {
+          const newPhoto = {
+            id: reportPhotos.length + 1,
+            src: capturedPhoto,
+            title: `Photo ${reportPhotos.length + 1}`,
+            elevation: "New photo",
+          };
+          setReportPhotos([...reportPhotos, newPhoto]);
+        }
+      } catch (error) {
+        console.error("Error handling photo:", error);
+        const newPhoto = {
+          id: reportPhotos.length + 1,
+          src: capturedPhoto,
+          title: `Photo ${reportPhotos.length + 1}`,
+          elevation: "New photo",
+        };
+        setReportPhotos([...reportPhotos, newPhoto]);
+      }
+    }
+
+    setShowPhotoModal(false);
+    setCapturedPhoto(null);
+  };
+
+  const uploadImageToCloudinary = async (base64Photo: string) => {
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+    if (!cloudName || !uploadPreset) {
+      console.error(
+        "Cloudinary credentials not found in environment variables",
+      );
+      return null;
+    }
+
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+
+    try {
+      const response = await fetch(base64Photo);
+      const blob = await response.blob();
+
+      const formData = new FormData();
+      formData.append("file", blob);
+      formData.append("upload_preset", uploadPreset);
+
+      const uploadResponse = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed: ${uploadResponse.statusText}`);
+      }
+
+      const data = await uploadResponse.json();
+      console.log("Cloudinary uploaded URL:", data.secure_url);
+      return data.secure_url;
+    } catch (error) {
+      console.error("Upload to Cloudinary failed:", error);
+      return null;
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowPhotoModal(false);
+    setCapturedPhoto(null);
+  };
 
   const handleAddDensityShot = () => {
-    console.log("new density shot");
     navigate(`/field-tech/add-density-test`);
   };
 
-  const handleTakePhoto = () => {
-    console.log("Take photo");
-  };
 
   const handleShowAllDensity = () => {
-    console.log("show all density shot");
     navigate(`/job/${jobId}/report/${reportId}/all-density-shots`);
   };
 
@@ -139,12 +238,12 @@ const Report: React.FC = () => {
                       aria-controls="panel1-content"
                       id="panel1-header"
                       sx={{
-                        minHeight: 40, // reduce overall height
+                        minHeight: 40,
                         "&.Mui-expanded": {
                           minHeight: 40,
                         },
                         "& .MuiAccordionSummary-content": {
-                          margin: 0, // remove default margin
+                          margin: 0,
                         },
                       }}
                     >
@@ -250,9 +349,9 @@ const Report: React.FC = () => {
               showAll={true}
               onClick={handleShowAllPhotos}
             />
-            {report.reportPhotos.length > 0 ? (
+            {reportPhotos.length > 0 ? (
               <Stack gap={2}>
-                {report.reportPhotos.map((photo) => (
+                {reportPhotos.map((photo) => (
                   <Card
                     key={photo.id}
                     sx={{
@@ -296,17 +395,25 @@ const Report: React.FC = () => {
               <Box
                 sx={{ display: "flex", justifyContent: "space-around", mb: 1 }}
               >
-                <UploadWidget />
+
+                <SolidBackgroundColorButton
+                  icon={<FileUploadIcon sx={{ fontSize: "1.25rem" }} />}
+                  handleClick={() => console.log("Upload Image")}
+                >
+                  Upload Image
+                </SolidBackgroundColorButton>
+
+
                 <SolidBackgroundColorButton
                   icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
-                  handleClick={() => handleTakePhoto}
+                  handleClick={() => setShowPhotoModal(true)}
                 >
                   Take Photo
                 </SolidBackgroundColorButton>
               </Box>
               <SolidBackgroundColorButton
                 icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
-                handleClick={() => handleTakePhoto}
+                handleClick={() => console.log("See Overview")}
               >
                 See Overview
               </SolidBackgroundColorButton>
@@ -315,6 +422,83 @@ const Report: React.FC = () => {
         </Stack>
       </Container>
       <BottomNavBar />
+
+      <Dialog
+        open={showPhotoModal}
+        onClose={handleCloseModal}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {capturedPhoto ? "Review Photo" : "Take Photo"}
+        </DialogTitle>
+        <DialogContent>
+          {capturedPhoto ? (
+            <Box>
+              <Box
+                component="img"
+                src={capturedPhoto}
+                alt="Captured photo"
+                sx={{
+                  width: "100%",
+                  height: "auto",
+                  borderRadius: 2,
+                  mb: 2,
+                }}
+              />
+            </Box>
+          ) : (
+            <Box>
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/png"
+                videoConstraints={{ facingMode: "environment" }}
+                width="100%"
+                style={{ borderRadius: 8 }}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          {capturedPhoto ? (
+            <>
+              <Button
+                onClick={() => {
+                  setCapturedPhoto(null);
+                }}
+                variant="outlined"
+                color="secondary"
+              >
+                Retake Photo
+              </Button>
+              <Button
+                onClick={handleKeepPhoto}
+                variant="contained"
+                color="success"
+              >
+                Keep Photo
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                onClick={handleCloseModal}
+                variant="outlined"
+                color="secondary"
+              >
+                Cancel
+              </Button>
+              <SolidBackgroundColorButton
+                icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
+                handleClick={handleTakePhoto}
+              >
+                Take Photo
+              </SolidBackgroundColorButton>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
