@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Container,
@@ -7,6 +7,8 @@ import {
   Modal,
   IconButton,
   Stack,
+  MenuItem,
+  Menu,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
@@ -15,21 +17,136 @@ import OutlineButton from "@/components/button/OutlineButton";
 import { useState } from "react";
 import SolidBackgroundColorButton from "@/components/button/SolidBackgroundColorButton";
 
+type Photo = {
+  id: number;
+  title: string;
+  updated: string;
+  src: string;
+  description: string;
+};
+
+const images = [
+  {
+    id: 1,
+    title: "Description",
+    updated: "Today",
+    src: "https://placehold.co/125",
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  },
+  {
+    id: 2,
+    title: "Another photo",
+    updated: "Yesterday",
+    src: "https://placehold.co/125",
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  },
+  {
+    id: 3,
+    title: "Another photo",
+    updated: "Yesterday",
+    src: "https://placehold.co/125",
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  },
+  {
+    id: 4,
+    title: "City view",
+    updated: "2 days ago",
+    src: "https://placehold.co/125",
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  },
+  {
+    id: 5,
+    title: "A really long title for testing",
+    updated: "Last week",
+    src: "https://placehold.co/125",
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  },
+  {
+    id: 6,
+    title: "Sunset",
+    updated: "Last month",
+    src: "https://placehold.co/125",
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  },
+  {
+    id: 7,
+    title: "Ocean waves",
+    updated: "Today",
+    src: "https://placehold.co/125",
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  },
+  {
+    id: 8,
+    title: "Forest trail",
+    updated: "3 days ago",
+    src: "https://placehold.co/125",
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  },
+  {
+    id: 9,
+    title: "Snowy field",
+    updated: "Yesterday",
+    src: "https://placehold.co/125",
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  },
+];
+
 const JobDetails: React.FC = () => {
+  const navigate = useNavigate();
   const { jobId, reportId } = useParams<{ jobId: string; reportId: string }>();
   const [selectedImage, setSelectedImage] = useState<(typeof images)[0] | null>(
     null,
   );
+  const [openSelectedImageModal, setOpenSelectedImageModal] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedPhotos, setSelectedPhotos] = useState<Photo[]>([]);
 
-  const [open, setOpen] = useState(false);
-  const handleNewPhoto = () => {
-    console.log("Create new photo");
+  const [addImageMenu, setAddImageMenu] = useState<null | HTMLElement>(null);
+  const openMenu = Boolean(addImageMenu);
+
+  const handleClickSelect = () => {
+    if (!selectMode) {
+      setSelectedPhotos([]);
+    }
+    setSelectMode(!selectMode);
   };
-  const handleClose = () => setOpen(false);
 
-  const handleClickPhoto = (image: (typeof images)[0]) => {
-    setSelectedImage(image); // save which image was clicked
-    setOpen(true); // open the modal
+  const handleClickPhoto = (image: Photo) => {
+    if (selectMode) {
+      setSelectedPhotos((prev) => {
+        const isSelected = prev.some((photo) => photo.id === image.id);
+        if (isSelected) {
+          return prev.filter((photo) => photo.id !== image.id);
+        } else {
+          return [...prev, image];
+        }
+      });
+    } else {
+      setSelectedImage(image);
+      setOpenSelectedImageModal(true);
+    }
+  };
+
+  const handleOpenAddPhotoMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAddImageMenu(event.currentTarget);
+  };
+
+  const handleCloseAddPhotoMenu = () => {
+    setAddImageMenu(null);
+  };
+
+  const handleFinalizeSelect = () => {
+    console.log(selectedPhotos);
+    navigate(-1);
   };
 
   const handleDelete = () => {
@@ -39,80 +156,14 @@ const JobDetails: React.FC = () => {
     console.log("Edit");
   };
 
-  const images = [
-    {
-      id: 1,
-      title: "Description",
-      updated: "Today",
-      src: "https://placehold.co/125",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: 2,
-      title: "Another photo",
-      updated: "Yesterday",
-      src: "https://placehold.co/125",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: 3,
-      title: "Another photo",
-      updated: "Yesterday",
-      src: "https://placehold.co/125",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: 4,
-      title: "City view",
-      updated: "2 days ago",
-      src: "https://placehold.co/125",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: 5,
-      title: "A really long title for testing",
-      updated: "Last week",
-      src: "https://placehold.co/125",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: 6,
-      title: "Sunset",
-      updated: "Last month",
-      src: "https://placehold.co/125",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: 7,
-      title: "Ocean waves",
-      updated: "Today",
-      src: "https://placehold.co/125",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: 8,
-      title: "Forest trail",
-      updated: "3 days ago",
-      src: "https://placehold.co/125",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: 9,
-      title: "Snowy field",
-      updated: "Yesterday",
-      src: "https://placehold.co/125",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-  ];
+  const handleClickUpload = () => {
+    handleCloseAddPhotoMenu();
+    console.log("upload photo");
+  };
+  const handleClickTakePhoto = () => {
+    handleCloseAddPhotoMenu();
+    console.log("take photo");
+  };
 
   return (
     <>
@@ -132,21 +183,65 @@ const JobDetails: React.FC = () => {
           }}
         >
           <Typography variant="h6">Report Photos</Typography>
+          <Box display="flex" gap={1}>
+            <Button
+              variant="outlined"
+              sx={{ borderRadius: 10 }}
+              onClick={handleClickSelect}
+            >
+              {selectMode ? "Cancel" : "Select"}
+            </Button>
 
-          <Button
-            variant="contained"
-            disableElevation
-            sx={{
-              borderRadius: 10,
-            }}
-            onClick={handleNewPhoto}
-          >
-            <AddIcon />
-          </Button>
+            <Button
+              variant="contained"
+              disableElevation
+              aria-controls={openMenu ? "demo-positioned-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={openMenu ? "true" : undefined}
+              sx={{
+                borderRadius: 10,
+              }}
+              onClick={handleOpenAddPhotoMenu}
+            >
+              <AddIcon />
+            </Button>
+            <Menu
+              id="demo-positioned-menu"
+              aria-labelledby="demo-positioned-button"
+              anchorEl={addImageMenu}
+              open={openMenu}
+              onClose={handleCloseAddPhotoMenu}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <MenuItem onClick={handleClickUpload}>Upload</MenuItem>
+              <MenuItem onClick={handleClickTakePhoto}>Take photo</MenuItem>
+            </Menu>
+          </Box>
         </Box>
         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
           {images.map((image) => (
-            <Grid item xs={4} key={image.id}>
+            <Grid
+              item
+              xs={4}
+              key={image.id}
+              className="photos"
+              sx={{
+                border:
+                  selectedPhotos.some((photo) => photo.id === image.id) &&
+                  selectMode
+                    ? "2px solid green "
+                    : "none",
+                borderRadius: "10px",
+                overflow: "hidden",
+              }}
+            >
               <Box onClick={() => handleClickPhoto(image)}>
                 <Box
                   component="img"
@@ -184,7 +279,10 @@ const JobDetails: React.FC = () => {
       </Container>
 
       {/* Overlay */}
-      <Modal open={open} onClose={handleClose}>
+      <Modal
+        open={openSelectedImageModal}
+        onClose={() => setOpenSelectedImageModal(false)}
+      >
         <Box
           sx={{
             position: "fixed",
@@ -212,7 +310,7 @@ const JobDetails: React.FC = () => {
             }}
           >
             <IconButton
-              onClick={handleClose}
+              onClick={() => setOpenSelectedImageModal(false)}
               sx={{
                 position: "absolute",
                 top: 8,
@@ -271,6 +369,22 @@ const JobDetails: React.FC = () => {
           </Box>
         </Box>
       </Modal>
+      {selectMode && (
+        <Box sx={{ position: "fixed", bottom: 20, left: 20, right: 20 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={handleFinalizeSelect}
+            sx={{
+              py: 1.5,
+              borderRadius: 3,
+              boxShadow: 3,
+            }}
+          >
+            Select {selectedPhotos.length} photos
+          </Button>
+        </Box>
+      )}
     </>
   );
 };
