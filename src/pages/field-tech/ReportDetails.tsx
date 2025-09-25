@@ -102,7 +102,6 @@ const Report: React.FC = () => {
     }
   };
 
-
   const handleKeepPhoto = async () => {
     if (capturedPhoto) {
       try {
@@ -188,7 +187,6 @@ const Report: React.FC = () => {
   const handleAddDensityShot = () => {
     navigate(`/field-tech/add-density-test`);
   };
-
 
   const handleShowAllDensity = () => {
     navigate(`/job/${jobId}/report/${reportId}/all-density-shots`);
@@ -395,14 +393,7 @@ const Report: React.FC = () => {
               <Box
                 sx={{ display: "flex", justifyContent: "space-around", mb: 1 }}
               >
-
-                <SolidBackgroundColorButton
-                  icon={<FileUploadIcon sx={{ fontSize: "1.25rem" }} />}
-                  handleClick={() => console.log("Upload Image")}
-                >
-                  Upload Image
-                </SolidBackgroundColorButton>
-
+                <UploadWidget />
 
                 <SolidBackgroundColorButton
                   icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
