@@ -16,6 +16,10 @@ import {
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import {
+  proctorApiService,
+  ProctorData,
+} from "../../services/lab-admin/proctorApiService";
 
 type SitePlan = {
   id: number;
@@ -24,20 +28,20 @@ type SitePlan = {
   dateCreated: string;
 };
 
-type Proctor = {
-  id: number;
-  testNo: number;
-  name: string;
-  type: "Modified" | "Standard";
-  density: number;
-  correctedDensity: number;
-  optimumMoisture: number;
-  oversizePercentage: number;
-  src: "https://placehold.co/100";
-};
+// type Proctor = {
+//   id: number;
+//   testNo: number;
+//   name: string;
+//   type: "Modified" | "Standard";
+//   density: number;
+//   correctedDensity: number;
+//   optimumMoisture: number;
+//   oversizePercentage: number;
+//   src: "https://placehold.co/100";
+// };
 
 type FormFields = {
-  proctor: Proctor;
+  proctor: ProctorData;
   location: string;
   elevation: string;
   testArea: string;
@@ -76,46 +80,46 @@ const mockSitePlans: SitePlan[] = [
     dateCreated: "Two weeks ago",
   },
 ];
-const mockProctors: Proctor[] = [
-  {
-    id: 1,
-    testNo: 101,
-    name: "John Doe",
-    type: "Standard",
-    density: 1.85,
-    correctedDensity: 1.88,
-    optimumMoisture: 12.5,
-    oversizePercentage: 5.2,
-    src: "https://placehold.co/100",
-  },
-  {
-    id: 2,
-    testNo: 102,
-    name: "Jane Smith",
-    type: "Modified",
-    density: 1.92,
-    correctedDensity: 1.95,
-    optimumMoisture: 11.8,
-    oversizePercentage: 4.7,
-    src: "https://placehold.co/100",
-  },
-  {
-    id: 3,
-    testNo: 103,
-    name: "Mike Johnson",
-    type: "Standard",
-    density: 1.78,
-    correctedDensity: 1.8,
-    optimumMoisture: 13.2,
-    oversizePercentage: 6.1,
-    src: "https://placehold.co/100",
-  },
-];
+// const mockProctors: Proctor[] = [
+//   {
+//     id: 1,
+//     testNo: 101,
+//     name: "John Doe",
+//     type: "Standard",
+//     density: 1.85,
+//     correctedDensity: 1.88,
+//     optimumMoisture: 12.5,
+//     oversizePercentage: 5.2,
+//     src: "https://placehold.co/100",
+//   },
+//   {
+//     id: 2,
+//     testNo: 102,
+//     name: "Jane Smith",
+//     type: "Modified",
+//     density: 1.92,
+//     correctedDensity: 1.95,
+//     optimumMoisture: 11.8,
+//     oversizePercentage: 4.7,
+//     src: "https://placehold.co/100",
+//   },
+//   {
+//     id: 3,
+//     testNo: 103,
+//     name: "Mike Johnson",
+//     type: "Standard",
+//     density: 1.78,
+//     correctedDensity: 1.8,
+//     optimumMoisture: 13.2,
+//     oversizePercentage: 6.1,
+//     src: "https://placehold.co/100",
+//   },
+// ];
 
 const DensityShotDetails = () => {
   const form = useForm<FormFields>({
     defaultValues: {
-      proctor: mockProctors[0],
+      proctor: undefined,
       location: "Garage Bay",
       elevation: "1.5m below final grade",
       testArea: "",
@@ -132,9 +136,14 @@ const DensityShotDetails = () => {
   });
 
   const { register, handleSubmit, control, watch, setValue } = form;
-
+  const [proctors, setProctors] = useState<ProctorData[]>();
   const [openSitePlanModal, setOpenSitePlanModal] = useState(false);
   const [openProctorModal, setOpenProctorModal] = useState(false);
+
+  const handleClickProctorField = () => {
+    setOpenProctorModal(true);
+    handleGetAllProctors();
+  };
 
   const [probeDepthUnit, compactionSpecificationUnit, selectedProctor] = watch([
     "probeDepthUnit",
@@ -152,7 +161,7 @@ const DensityShotDetails = () => {
     console.log("Site plan selected:", sitePlan);
   };
 
-  const handleSelectProctor = (proctor: Proctor) => {
+  const handleSelectProctor = (proctor: ProctorData) => {
     setOpenProctorModal(false);
     setValue("proctor", proctor, { shouldValidate: true });
     console.log("proctor selected", proctor);
@@ -160,6 +169,16 @@ const DensityShotDetails = () => {
 
   const onSubmit = (data: FormFields) => {
     console.log(data);
+  };
+
+  const handleGetAllProctors = async () => {
+    try {
+      const response = await proctorApiService.getAllProctors(jobId);
+      console.log(response);
+      setProctors(response.data);
+    } catch (error) {
+      console.error("Error fetching all proctors", error);
+    }
   };
 
   return (
@@ -181,7 +200,7 @@ const DensityShotDetails = () => {
                 boxShadow: "1px",
                 border: "1px lightgrey solid",
               }}
-              onClick={() => setOpenProctorModal(true)}
+              onClick={handleClickProctorField}
             >
               <Stack
                 direction="row"
@@ -201,16 +220,16 @@ const DensityShotDetails = () => {
                 />
                 <Box>
                   <Typography variant="body1" fontWeight={600}>
-                    {selectedProctor.name}
+                    {selectedProctor?.materialType}
                   </Typography>
                   <Typography variant="body2">
-                    Density: {selectedProctor.density}
+                    Density: {selectedProctor?.maxDryDensity}
                   </Typography>
                   <Typography variant="body2">
-                    Corrected Density: {selectedProctor.correctedDensity} kg/m3
+                    Corrected Density: {selectedProctor?.correctedDensity} kg/m3
                   </Typography>
                   <Typography variant="body2">
-                    Optimum Moisture: {selectedProctor.optimumMoisture}{" "}
+                    Optimum Moisture: {selectedProctor?.optimumMoisture}{" "}
                   </Typography>
                 </Box>
               </Stack>
@@ -582,11 +601,11 @@ const DensityShotDetails = () => {
                 <Typography variant="h6">Proctors</Typography>
               </Box>{" "}
               <Stack spacing={1}>
-                {mockProctors.map((proctor) => {
+                {proctors?.map((proctor) => {
                   return (
                     <Card
                       elevation={0}
-                      key={proctor.id}
+                      key={proctor?.proctorId}
                       sx={{
                         borderRadius: "10px",
                         boxShadow: "1px",
@@ -612,16 +631,16 @@ const DensityShotDetails = () => {
                         />
                         <Box>
                           <Typography variant="body1" fontWeight={600}>
-                            {proctor.name}
+                            {proctor?.materialType}
                           </Typography>
                           <Typography variant="body2">
-                            {proctor.density}
+                            {proctor?.maxDryDensity}
                           </Typography>
                           <Typography variant="body2">
-                            {proctor.correctedDensity}
+                            {proctor?.correctedDensity}
                           </Typography>
                           <Typography variant="body2">
-                            {proctor.optimumMoisture}
+                            {proctor?.optimumMoisture}
                           </Typography>
                         </Box>
                       </Stack>
