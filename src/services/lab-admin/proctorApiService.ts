@@ -33,6 +33,18 @@ export interface ProctorListResponse {
 class ProctorApiService {
   private readonly baseEndpoint = "/api/proctors/lab-admin";
 
+  // Get all proctors for a job
+  async getAllProctors(jobId: number): Promise<ApiResponse<ProctorData[]>> {
+    try {
+      console.log("Getting all proctors for the job id: ", jobId);
+      return await apiService.get<ProctorData[]>(`/api/proctors/job/${jobId}`);
+    } catch (error) {
+      console.error("Error fetching proctors for a job id", error);
+
+      throw error;
+    }
+  }
+
   // Create a new proctor
   async createProctor(
     proctorData: ProctorData,
