@@ -1,5 +1,5 @@
 export const UNITS = {
-  density: "kg/cm³",
+  density: "kg/m³",
   moisture: "%",
   specificGravity: "gs",
 };
