@@ -20,6 +20,7 @@ import { Controller, useForm } from "react-hook-form";
 import { proctorApiService } from "@/services/lab-admin/proctorApiService";
 import { ProctorData } from "@/types/proctors";
 import { SitePlan } from "@/types/sitePlan";
+import { useProctorStore } from "@/stores/proctorStore";
 
 type FormFields = {
   proctor: ProctorData;
@@ -67,9 +68,8 @@ const DensityShotDetails = () => {
   const [proctors, setProctors] = useState<ProctorData[]>();
   const [openSitePlanModal, setOpenSitePlanModal] = useState(false);
   const [openProctorModal, setOpenProctorModal] = useState(false);
-  const [selectedProctorIndex, setSelectedProctorIndex] = useState<
-    number | undefined
-  >(undefined);
+  const { selectedProctor, selectedProctorIndex, setSelectedProctor } =
+    useProctorStore();
 
   const form = useForm<FormFields>({
     defaultValues: {
@@ -89,7 +89,7 @@ const DensityShotDetails = () => {
     },
   });
   const { register, handleSubmit, control, watch, setValue } = form;
-  const [probeDepthUnit, compactionSpecificationUnit, selectedProctor] = watch([
+  const [probeDepthUnit, compactionSpecificationUnit] = watch([
     "probeDepthUnit",
     "compactionSpecificationUnit",
     "proctor",
@@ -113,7 +113,7 @@ const DensityShotDetails = () => {
   const handleSelectProctor = (proctor: ProctorData, index: number) => {
     setOpenProctorModal(false);
     setValue("proctor", proctor, { shouldValidate: true });
-    setSelectedProctorIndex(index);
+    setSelectedProctor(proctor, index);
     console.log("proctor selected", proctor);
   };
 
@@ -525,8 +525,10 @@ const DensityShotDetails = () => {
               <Stack spacing={1}>
                 {proctors?.map((proctor, index) => (
                   <ProctorCard
+                    // TODO: change to proctor.id
                     key={proctor?.id}
                     index={index}
+                    selectedIndex={selectedProctorIndex}
                     proctor={proctor}
                     handleClick={() => handleSelectProctor(proctor, index)}
                   />
