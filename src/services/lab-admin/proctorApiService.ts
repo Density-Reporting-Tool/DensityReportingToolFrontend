@@ -1,4 +1,5 @@
 import { apiService, ApiResponse } from "../apiService";
+import { ENDPOINTS } from "../../config/endpoints";
 
 // Proctor data interface - represents all the form fields
 export interface ProctorData {
@@ -31,8 +32,6 @@ export interface ProctorListResponse {
 
 // Main ProctorApiService class
 class ProctorApiService {
-  private readonly baseEndpoint = "/api/proctors/lab-admin";
-
   // Create a new proctor
   async createProctor(
     proctorData: ProctorData,
@@ -40,7 +39,7 @@ class ProctorApiService {
     try {
       console.log("Creating proctor with data:", proctorData);
       return await apiService.post<ProctorCreateResponse>(
-        this.baseEndpoint,
+        ENDPOINTS.PROCTOR.LAB_ADMIN.CREATE,
         proctorData,
       );
     } catch (error) {
