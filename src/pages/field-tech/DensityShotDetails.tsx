@@ -15,32 +15,12 @@ import {
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  proctorApiService,
-  ProctorData,
-} from "../../services/lab-admin/proctorApiService";
+import { proctorApiService } from "../../services/lab-admin/proctorApiService";
 
 import ProctorCard from "../../components/card/ProctorCard";
 import EmptyCard from "@/components/card/EmptyCard";
-
-type SitePlan = {
-  id: number;
-  name: string;
-  src: string;
-  dateCreated: string;
-};
-
-// type Proctor = {
-//   id: number;
-//   testNo: number;
-//   name: string;
-//   type: "Modified" | "Standard";
-//   density: number;
-//   correctedDensity: number;
-//   optimumMoisture: number;
-//   oversizePercentage: number;
-//   src: "https://placehold.co/100";
-// };
+import { ProctorData } from "@/types/proctors";
+import { SitePlan } from "@/types/sitePlan";
 
 type FormFields = {
   proctor: ProctorData;
@@ -541,7 +521,7 @@ const DensityShotDetails = () => {
               <Stack spacing={1}>
                 {proctors?.map((proctor) => (
                   <ProctorCard
-                    key={proctors?.id}
+                    key={proctor?.id}
                     proctor={proctor}
                     handleClick={() => handleSelectProctor(proctor)}
                   />

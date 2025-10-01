@@ -17,16 +17,15 @@ import {
   Schedule as ScheduleIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
-import {
-  proctorApiService,
-  ProctorData,
-} from "../../services/lab-admin/proctorApiService";
+import { proctorApiService } from "../../services/lab-admin/proctorApiService";
+import { ProctorData } from "@/types/proctors";
 
 const LabAdminAddProctor: React.FC = () => {
   const navigate = useNavigate();
 
   // Form state management
   const [formData, setFormData] = useState<ProctorData>({
+    id: null,
     jobNumber: "",
     proctorTestNumber: "",
     materialType: "",
@@ -40,6 +39,7 @@ const LabAdminAddProctor: React.FC = () => {
     oversizePercentage: 0,
     optimumMoisture: 0,
     specificGravity: "",
+    image_src: "",
   });
 
   // UI state management
@@ -100,6 +100,7 @@ const LabAdminAddProctor: React.FC = () => {
   // Clear form
   const handleClearForm = () => {
     setFormData({
+      id: null,
       jobNumber: "",
       proctorTestNumber: "",
       materialType: "",
@@ -113,6 +114,7 @@ const LabAdminAddProctor: React.FC = () => {
       oversizePercentage: 0,
       optimumMoisture: 0,
       specificGravity: "",
+      image_src: "",
     });
 
     console.log("Form cleared successfully");
