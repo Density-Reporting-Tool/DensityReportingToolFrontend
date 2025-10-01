@@ -15,6 +15,7 @@ const EmptyCard: React.FC<CardProps> = ({ text, handleClick }) => (
       display: "flex",
       justifyContent: "center",
       boxShadow: "none",
+      minHeight: "115px",
     }}
     onClick={handleClick}
   >
