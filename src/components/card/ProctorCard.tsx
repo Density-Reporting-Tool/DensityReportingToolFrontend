@@ -1,6 +1,6 @@
 import { Box, Card, Stack, Typography } from "@mui/material";
-import { ProctorData } from "../../services/lab-admin/proctorApiService";
 import { UNITS } from "@/utils/constants";
+import { ProctorData } from "@/types/proctors";
 
 interface ProctorCardType {
   proctor: ProctorData;
@@ -43,7 +43,8 @@ const ProctorCard: React.FC<ProctorCardType> = ({ proctor, handleClick }) => {
               Corrected Density: {proctor?.correctedDensity} {UNITS.density}
             </Typography>
             <Typography variant="body2">
-              Optimum Moisture: {proctor?.optimumMoisture} {UNITS.moisture}
+              Optimum Moisture: {proctor?.optimumMoisture}
+              {UNITS.moisture}
             </Typography>
           </Box>
         </Stack>
