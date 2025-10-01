@@ -4,7 +4,6 @@ import {
   Container,
   Stack,
   Typography,
-  Card,
   TextField,
   Button,
   InputAdornment,
@@ -20,6 +19,9 @@ import {
   proctorApiService,
   ProctorData,
 } from "../../services/lab-admin/proctorApiService";
+
+import ProctorCard from "../../components/card/ProctorCard";
+import EmptyCard from "@/components/card/EmptyCard";
 
 type SitePlan = {
   id: number;
@@ -59,6 +61,7 @@ type FormFields = {
 // Mock data
 const jobId = 1;
 const reportId = 2;
+const jobNumber = "24852";
 const mockSitePlans: SitePlan[] = [
   {
     id: 1,
@@ -80,41 +83,6 @@ const mockSitePlans: SitePlan[] = [
     dateCreated: "Two weeks ago",
   },
 ];
-// const mockProctors: Proctor[] = [
-//   {
-//     id: 1,
-//     testNo: 101,
-//     name: "John Doe",
-//     type: "Standard",
-//     density: 1.85,
-//     correctedDensity: 1.88,
-//     optimumMoisture: 12.5,
-//     oversizePercentage: 5.2,
-//     src: "https://placehold.co/100",
-//   },
-//   {
-//     id: 2,
-//     testNo: 102,
-//     name: "Jane Smith",
-//     type: "Modified",
-//     density: 1.92,
-//     correctedDensity: 1.95,
-//     optimumMoisture: 11.8,
-//     oversizePercentage: 4.7,
-//     src: "https://placehold.co/100",
-//   },
-//   {
-//     id: 3,
-//     testNo: 103,
-//     name: "Mike Johnson",
-//     type: "Standard",
-//     density: 1.78,
-//     correctedDensity: 1.8,
-//     optimumMoisture: 13.2,
-//     oversizePercentage: 6.1,
-//     src: "https://placehold.co/100",
-//   },
-// ];
 
 const DensityShotDetails = () => {
   const form = useForm<FormFields>({
@@ -173,7 +141,7 @@ const DensityShotDetails = () => {
 
   const handleGetAllProctors = async () => {
     try {
-      const response = await proctorApiService.getAllProctors(jobId);
+      const response = await proctorApiService.getAllProctors(jobNumber);
       console.log(response);
       setProctors(response.data);
     } catch (error) {
@@ -193,47 +161,17 @@ const DensityShotDetails = () => {
           <Stack id="density-info" sx={{ mb: 2 }} gap={2}>
             <Typography variant="h5">Shot #102</Typography>
 
-            <Card
-              elevation={0}
-              sx={{
-                borderRadius: "10px",
-                boxShadow: "1px",
-                border: "1px lightgrey solid",
-              }}
-              onClick={handleClickProctorField}
-            >
-              <Stack
-                direction="row"
-                sx={{ display: "flex", alignItems: "center" }}
-              >
-                <Box
-                  component="img"
-                  sx={{
-                    width: "100%",
-                    height: "auto",
-                    maxWidth: "100px",
-                    borderRadius: 2,
-                    mr: 2,
-                  }}
-                  alt="Report photos"
-                  src={"https://placehold.co/100"}
-                />
-                <Box>
-                  <Typography variant="body1" fontWeight={600}>
-                    {selectedProctor?.materialType}
-                  </Typography>
-                  <Typography variant="body2">
-                    Density: {selectedProctor?.maxDryDensity}
-                  </Typography>
-                  <Typography variant="body2">
-                    Corrected Density: {selectedProctor?.correctedDensity} kg/m3
-                  </Typography>
-                  <Typography variant="body2">
-                    Optimum Moisture: {selectedProctor?.optimumMoisture}{" "}
-                  </Typography>
-                </Box>
-              </Stack>
-            </Card>
+            {selectedProctor ? (
+              <ProctorCard
+                proctor={selectedProctor}
+                handleClick={handleClickProctorField}
+              />
+            ) : (
+              <EmptyCard
+                text={"Click to select proctor"}
+                handleClick={handleClickProctorField}
+              />
+            )}
 
             <Stack gap={1} sx={{ mb: 2 }}>
               <Stack gap={1} sx={{ mb: 4 }}>
@@ -601,52 +539,13 @@ const DensityShotDetails = () => {
                 <Typography variant="h6">Proctors</Typography>
               </Box>{" "}
               <Stack spacing={1}>
-                {proctors?.map((proctor) => {
-                  return (
-                    <Card
-                      elevation={0}
-                      key={proctor?.proctorId}
-                      sx={{
-                        borderRadius: "10px",
-                        boxShadow: "1px",
-                        border: "1px lightgrey solid",
-                      }}
-                      onClick={() => handleSelectProctor(proctor)}
-                    >
-                      <Stack
-                        direction="row"
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
-                        <Box
-                          component="img"
-                          sx={{
-                            width: "100%",
-                            height: "auto",
-                            maxWidth: "100px",
-                            borderRadius: 2,
-                            mr: 2,
-                          }}
-                          alt="Report photos"
-                          src={proctor.src}
-                        />
-                        <Box>
-                          <Typography variant="body1" fontWeight={600}>
-                            {proctor?.materialType}
-                          </Typography>
-                          <Typography variant="body2">
-                            {proctor?.maxDryDensity}
-                          </Typography>
-                          <Typography variant="body2">
-                            {proctor?.correctedDensity}
-                          </Typography>
-                          <Typography variant="body2">
-                            {proctor?.optimumMoisture}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </Card>
-                  );
-                })}
+                {proctors?.map((proctor) => (
+                  <ProctorCard
+                    key={proctors?.id}
+                    proctor={proctor}
+                    handleClick={() => handleSelectProctor(proctor)}
+                  />
+                ))}
               </Stack>
             </Box>
           </Box>
