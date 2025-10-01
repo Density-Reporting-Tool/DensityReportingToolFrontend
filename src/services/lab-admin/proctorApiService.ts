@@ -5,7 +5,6 @@ import { apiService, ApiResponse } from "../apiService";
 class ProctorApiService {
   private readonly baseEndpoint = "/api/proctors/lab-admin";
 
-  // Get all proctors for a job
   async getAllProctors(jobNumber: string): Promise<ApiResponse<ProctorData[]>> {
     try {
       console.log("Getting all proctors for the job id: ", jobNumber);
@@ -15,6 +14,16 @@ class ProctorApiService {
     } catch (error) {
       console.error("Error fetching proctors for a job id", error);
 
+      throw error;
+    }
+  }
+
+  async getProctorById(proctorId: string): Promise<ApiResponse<ProctorData>> {
+    try {
+      console.log("Getting proctor details for proctor id: ", proctorId);
+      return await apiService.get<ProctorData>(`/api/proctors/${proctorId}`);
+    } catch (error) {
+      console.error("Error fetching proctors for a job id", error);
       throw error;
     }
   }
