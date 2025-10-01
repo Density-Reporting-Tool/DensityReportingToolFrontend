@@ -1,4 +1,6 @@
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
+import ProctorCard from "@/components/card/ProctorCard";
+import EmptyCard from "@/components/card/EmptyCard";
 import {
   Box,
   Container,
@@ -15,10 +17,7 @@ import {
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { proctorApiService } from "../../services/lab-admin/proctorApiService";
-
-import ProctorCard from "../../components/card/ProctorCard";
-import EmptyCard from "@/components/card/EmptyCard";
+import { proctorApiService } from "@/services/lab-admin/proctorApiService";
 import { ProctorData } from "@/types/proctors";
 import { SitePlan } from "@/types/sitePlan";
 
@@ -65,6 +64,13 @@ const mockSitePlans: SitePlan[] = [
 ];
 
 const DensityShotDetails = () => {
+  const [proctors, setProctors] = useState<ProctorData[]>();
+  const [openSitePlanModal, setOpenSitePlanModal] = useState(false);
+  const [openProctorModal, setOpenProctorModal] = useState(false);
+  const [selectedProctorIndex, setSelectedProctorIndex] = useState<
+    number | undefined
+  >(undefined);
+
   const form = useForm<FormFields>({
     defaultValues: {
       proctor: undefined,
@@ -82,22 +88,17 @@ const DensityShotDetails = () => {
       sitePlan: mockSitePlans[0],
     },
   });
-
   const { register, handleSubmit, control, watch, setValue } = form;
-  const [proctors, setProctors] = useState<ProctorData[]>();
-  const [openSitePlanModal, setOpenSitePlanModal] = useState(false);
-  const [openProctorModal, setOpenProctorModal] = useState(false);
-
-  const handleClickProctorField = () => {
-    setOpenProctorModal(true);
-    handleGetAllProctors();
-  };
-
   const [probeDepthUnit, compactionSpecificationUnit, selectedProctor] = watch([
     "probeDepthUnit",
     "compactionSpecificationUnit",
     "proctor",
   ]);
+
+  const handleClickProctorField = () => {
+    setOpenProctorModal(true);
+    handleGetAllProctors();
+  };
 
   const handleNewSitePlan = () => {
     console.log("New site plan");
@@ -109,9 +110,10 @@ const DensityShotDetails = () => {
     console.log("Site plan selected:", sitePlan);
   };
 
-  const handleSelectProctor = (proctor: ProctorData) => {
+  const handleSelectProctor = (proctor: ProctorData, index: number) => {
     setOpenProctorModal(false);
     setValue("proctor", proctor, { shouldValidate: true });
+    setSelectedProctorIndex(index);
     console.log("proctor selected", proctor);
   };
 
@@ -141,8 +143,10 @@ const DensityShotDetails = () => {
           <Stack id="density-info" sx={{ mb: 2 }} gap={2}>
             <Typography variant="h5">Shot #102</Typography>
 
+            {/* Proctor Section */}
             {selectedProctor ? (
               <ProctorCard
+                index={selectedProctorIndex}
                 proctor={selectedProctor}
                 handleClick={handleClickProctorField}
               />
@@ -172,8 +176,8 @@ const DensityShotDetails = () => {
                           <Select
                             {...register("compactionSpecificationUnit")}
                             value={compactionSpecificationUnit}
-                            disableUnderline // Optional: To remove underline from Select
-                            variant="standard" // Optional: To match TextField's variant if needed
+                            disableUnderline
+                            variant="standard"
                           >
                             <MenuItem value="MPDD">MPDD</MenuItem>
                             <MenuItem value="SPDD">SPDD</MenuItem>
@@ -519,11 +523,12 @@ const DensityShotDetails = () => {
                 <Typography variant="h6">Proctors</Typography>
               </Box>{" "}
               <Stack spacing={1}>
-                {proctors?.map((proctor) => (
+                {proctors?.map((proctor, index) => (
                   <ProctorCard
                     key={proctor?.id}
+                    index={index}
                     proctor={proctor}
-                    handleClick={() => handleSelectProctor(proctor)}
+                    handleClick={() => handleSelectProctor(proctor, index)}
                   />
                 ))}
               </Stack>
