@@ -42,7 +42,7 @@ const ProctorCard: React.FC<ProctorCardType> = ({
           ) : (
             <NoPhoto width={100} height={100} />
           )}
-          <Box>
+          <Box sx={{ ml: 1 }}>
             <Typography variant="body1" fontWeight={600}>
               Proctor #{(index ?? 0) + 1}: {proctor?.materialType}
             </Typography>
