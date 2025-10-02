@@ -27,6 +27,8 @@ In this project:
 
 # Setup
 
+## Local
+
 ### 1. clone the repository
 
 ```bash
@@ -56,3 +58,7 @@ npx husky install
 ```bash
 npm run dev
 ```
+
+## Docker
+
+### 1. TODO
