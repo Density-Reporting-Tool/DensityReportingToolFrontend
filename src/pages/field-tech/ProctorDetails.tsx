@@ -18,10 +18,11 @@ type FormFields = {
   proctorIdNo: number;
   name: string;
   proctorType: "Standard" | "Modified";
+  dateTested: string;
   density: number;
   correctedDensity: number;
   optimumMoistureContent: number;
-  // oversizePercentage: number;
+  oversizePercentage: number;
 };
 
 const ProctorDetails = () => {
@@ -33,10 +34,11 @@ const ProctorDetails = () => {
       proctorIdNo: proctor.proctorId ?? "",
       name: proctor.materialType ?? "",
       proctorType: proctor.proctorType ?? "",
+      dateTested: proctor.dateTested ?? "",
       density: proctor.maxDryDensity ?? 0.0,
       correctedDensity: proctor.correctedDensity ?? 0.0,
       optimumMoistureContent: proctor.optimumMoisture ?? 0,
-      // oversizePercentage: proctor.oversizePercentage,
+      oversizePercentage: proctor.oversizePercentage,
     },
   });
 
@@ -90,7 +92,15 @@ const ProctorDetails = () => {
                 </FormControl>
               )}
             />
-
+            <TextField
+              label="Date Tested"
+              {...register("dateTested")}
+              disabled
+              InputLabelProps={{ shrink: true }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end"> </InputAdornment>,
+              }}
+            />
             <TextField
               label="Density"
               {...register("density")}
@@ -108,6 +118,7 @@ const ProctorDetails = () => {
               label="Corrected Density"
               {...register("correctedDensity")}
               disabled
+              InputLabelProps={{ shrink: true }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -121,6 +132,7 @@ const ProctorDetails = () => {
               label="Optimum Moisture Content"
               {...register("optimumMoistureContent")}
               disabled
+              InputLabelProps={{ shrink: true }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -129,15 +141,15 @@ const ProctorDetails = () => {
                 ),
               }}
             />
-            {/* <TextField
+            <TextField
               label="Oversize Percentage"
               {...register("oversizePercentage")}
-              fullWidth={false}
+              disabled
+              InputLabelProps={{ shrink: true }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
-              InputLabelProps={{ shrink: true }}
-            /> */}
+            />
           </Stack>
 
           {/* Buttons */}
