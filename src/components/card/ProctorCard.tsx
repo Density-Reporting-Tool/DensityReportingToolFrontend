@@ -24,6 +24,33 @@ const ProctorCard: React.FC<ProctorCardType> = ({
     // TODO: ensure id is defined
     navigate(`/proctors/${proctor.id}`, { state: { proctor } });
   };
+
+  interface ProctorCardField {
+    field: string;
+    variant: "body1" | "body2" | "h1" | "h2" | "subtitle1" | "subtitle2";
+    fontWeight?: number;
+  }
+
+  const proctorCardFields: ProctorCardField[] = [
+    {
+      field: `Proctor #${(index ?? 0) + 1}: ${proctor?.materialType}`,
+      variant: "body1",
+      fontWeight: 600,
+    },
+    {
+      field: `Density: ${proctor?.maxDryDensity} ${UNITS.density}`,
+      variant: "body2",
+    },
+    {
+      field: `Corrected Density: ${proctor?.correctedDensity} ${UNITS.density}`,
+      variant: "body2",
+    },
+    {
+      field: `Optimum Moisture: ${proctor?.optimumMoisture} ${UNITS.moisture}`,
+      variant: "body2",
+    },
+  ];
+
   return (
     <>
       <Card
@@ -40,13 +67,17 @@ const ProctorCard: React.FC<ProctorCardType> = ({
         <Stack
           direction="row"
           sx={{
+            display: "flex",
+            alignItems: "center",
             justifyContent: "space-between",
+            width: "100%",
           }}
         >
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
+              maxWidth: "85%",
             }}
           >
             {/* Image */}
@@ -54,33 +85,34 @@ const ProctorCard: React.FC<ProctorCardType> = ({
               <Box
                 component="img"
                 sx={{
-                  width: "100%",
                   height: "auto",
-                  maxWidth: "100px",
+                  maxWidth: 100,
                   borderRadius: 2,
                   mr: 2,
+                  flexShrink: 0,
                 }}
                 alt="Report photos"
-                src={proctor?.image_src || "https://placehold.co/100"}
+                src={proctor.image_src}
               />
             ) : (
               <NoPhoto width={100} height={100} />
             )}
+
             {/* Proctor Details */}
-            <Box sx={{ ml: 1 }}>
-              <Typography variant="body1" fontWeight={600}>
-                Proctor #{(index ?? 0) + 1}: {proctor?.materialType}
-              </Typography>
-              <Typography variant="body2">
-                Density: {proctor?.maxDryDensity} {UNITS.density}
-              </Typography>
-              <Typography variant="body2">
-                Corrected Density: {proctor?.correctedDensity} {UNITS.density}
-              </Typography>
-              <Typography variant="body2">
-                Optimum Moisture: {proctor?.optimumMoisture}
-                {UNITS.moisture}
-              </Typography>
+            <Box sx={{ ml: 1, maxWidth: "80%", overflow: "hidden" }}>
+              {proctorCardFields.map((proctorField) => (
+                <Typography
+                  key={proctorField.field}
+                  variant={proctorField.variant}
+                  noWrap
+                  sx={{
+                    textOverflow: "ellipsis",
+                    fontWeight: proctorField.fontWeight,
+                  }}
+                >
+                  {proctorField.field}
+                </Typography>
+              ))}
             </Box>
           </Box>
           <IconButton
