@@ -44,9 +44,10 @@ npm ci
 
 ### 3. Verify linters and Commit Hooks
 
-run
+get the latest version of husky
 
 ```bash
+npm install husky@latest --save-dev
 npx husky install
 ```
 
