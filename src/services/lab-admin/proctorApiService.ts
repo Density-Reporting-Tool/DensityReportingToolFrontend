@@ -21,7 +21,11 @@ class ProctorApiService {
   async getProctorById(proctorId: string): Promise<ApiResponse<ProctorData>> {
     try {
       console.log("Getting proctor details for proctor id: ", proctorId);
-      return await apiService.get<ProctorData>(`/api/proctors/${proctorId}`);
+      const response = await apiService.get<ProctorData>(
+        `/api/proctors/${proctorId}`,
+      );
+      console.log(response);
+      return response;
     } catch (error) {
       console.error("Error fetching proctors for a job id", error);
       throw error;
