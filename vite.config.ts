@@ -92,6 +92,10 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    watch: {
+      usePolling: true, // Check docker mounted files for changes
+      interval: 500, // Check every 500ms
+    },
     proxy:
       process.env.NODE_ENV === "development"
         ? {
