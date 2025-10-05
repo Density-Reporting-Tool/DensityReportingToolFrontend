@@ -1,22 +1,24 @@
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
+import { UNITS } from "@/utils/constants";
+
 import {
-  Box,
   Container,
   Stack,
   Typography,
   TextField,
-  Button,
   InputAdornment,
   MenuItem,
   FormControl,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
+import { useLocation } from "react-router-dom";
 
 type FormFields = {
   proctorTestNo: number;
   proctorIdNo: number;
   name: string;
   proctorType: "Standard" | "Modified";
+  dateTested: string;
   density: number;
   correctedDensity: number;
   optimumMoistureContent: number;
@@ -24,18 +26,22 @@ type FormFields = {
 };
 
 const ProctorDetails = () => {
+  const { state } = useLocation();
+  const proctor = state?.proctor;
   const form = useForm<FormFields>({
     defaultValues: {
-      proctorTestNo: 101,
-      proctorIdNo: 123,
-      name: "",
-      proctorType: "Modified",
-      density: undefined,
-      correctedDensity: undefined,
-      optimumMoistureContent: undefined,
-      oversizePercentage: undefined,
+      proctorTestNo: proctor.proctorTestNumber ?? "",
+      proctorIdNo: proctor.proctorId ?? "",
+      name: proctor.materialType ?? "",
+      proctorType: proctor.proctorType ?? "",
+      dateTested: proctor.dateTested ?? "",
+      density: proctor.maxDryDensity ?? 0.0,
+      correctedDensity: proctor.correctedDensity ?? 0.0,
+      optimumMoistureContent: proctor.optimumMoisture ?? 0,
+      oversizePercentage: proctor.oversizePercentage,
     },
   });
+
   const { register, handleSubmit } = form;
 
   const jobId = 1;
@@ -44,35 +50,39 @@ const ProctorDetails = () => {
     console.log(data);
   };
 
-  const handleCancel = () => {
-    console.log("Cancel");
-  };
-
   return (
     <>
       <HeaderWithBackButton
         title={`Job #${jobId}`}
-        subtitle={`Switch Proctor`}
+        subtitle={`Proctor Details`}
       />
       <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack id="proctor-info" sx={{ mb: 10 }} gap={2}>
             <Typography variant="h5">Proctor Details</Typography>
 
-            {/* <Stack gap={1} sx={{ mb: 2 }}> */}
             <Stack gap={1} direction="row">
               <TextField
                 {...register("proctorTestNo")}
                 label="Proctor Test No."
+                InputLabelProps={{ shrink: true }}
+                disabled
+                sx={{ width: "50%" }}
               />
-              <TextField {...register("proctorIdNo")} label="Proctor ID" />
+              <TextField
+                {...register("proctorIdNo")}
+                label="Proctor ID"
+                disabled
+                sx={{ width: "50%" }}
+              />
             </Stack>
 
-            <TextField {...register("name")} label="Name" />
+            <TextField label="Name" {...register("name")} disabled />
 
             <Controller
               name="proctorType"
               control={form.control}
+              disabled
               render={({ field }) => (
                 <FormControl>
                   <TextField {...field} select label="Proctor Type">
@@ -82,37 +92,60 @@ const ProctorDetails = () => {
                 </FormControl>
               )}
             />
-
+            <TextField
+              label="Date Tested"
+              {...register("dateTested")}
+              disabled
+              InputLabelProps={{ shrink: true }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end"> </InputAdornment>,
+              }}
+            />
             <TextField
               label="Density"
               {...register("density")}
+              disabled
               InputProps={{
                 endAdornment: (
-                  <InputAdornment position="end">kg/m³</InputAdornment>
+                  <InputAdornment position="end">
+                    {" "}
+                    {UNITS.density}
+                  </InputAdornment>
                 ),
               }}
             />
             <TextField
               label="Corrected Density"
               {...register("correctedDensity")}
+              disabled
+              InputLabelProps={{ shrink: true }}
               InputProps={{
                 endAdornment: (
-                  <InputAdornment position="end">kg/m³</InputAdornment>
+                  <InputAdornment position="end">
+                    {" "}
+                    {UNITS.density}
+                  </InputAdornment>
                 ),
               }}
             />
             <TextField
               label="Optimum Moisture Content"
-              fullWidth={false}
               {...register("optimumMoistureContent")}
+              disabled
+              InputLabelProps={{ shrink: true }}
               InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {UNITS.moisture}
+                  </InputAdornment>
+                ),
               }}
             />
             <TextField
               label="Oversize Percentage"
               {...register("oversizePercentage")}
-              fullWidth={false}
+              disabled
+              InputLabelProps={{ shrink: true }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
@@ -120,7 +153,7 @@ const ProctorDetails = () => {
           </Stack>
 
           {/* Buttons */}
-          <Stack
+          {/* <Stack
             sx={{
               justifyContent: "center",
             }}
@@ -134,7 +167,7 @@ const ProctorDetails = () => {
                 Cancel
               </Button>
             </Box>
-          </Stack>
+          </Stack> */}
         </form>
       </Container>
     </>

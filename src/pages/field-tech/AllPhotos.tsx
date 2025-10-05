@@ -16,14 +16,7 @@ import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
 import OutlineButton from "@/components/button/OutlineButton";
 import { useState } from "react";
 import SolidBackgroundColorButton from "@/components/button/SolidBackgroundColorButton";
-
-type Photo = {
-  id: number;
-  title: string;
-  updated: string;
-  src: string;
-  description: string;
-};
+import { Photo } from "@/types/photos";
 
 const images = [
   {

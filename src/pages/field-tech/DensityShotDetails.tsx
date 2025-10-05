@@ -1,10 +1,11 @@
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
+import ProctorCard from "@/components/card/ProctorCard";
+import EmptyCard from "@/components/card/EmptyCard";
 import {
   Box,
   Container,
   Stack,
   Typography,
-  Card,
   TextField,
   Button,
   InputAdornment,
@@ -16,28 +17,13 @@ import {
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-
-type SitePlan = {
-  id: number;
-  name: string;
-  src: string;
-  dateCreated: string;
-};
-
-type Proctor = {
-  id: number;
-  testNo: number;
-  name: string;
-  type: "Modified" | "Standard";
-  density: number;
-  correctedDensity: number;
-  optimumMoisture: number;
-  oversizePercentage: number;
-  src: "https://placehold.co/100";
-};
+import { proctorApiService } from "@/services/lab-admin/proctorApiService";
+import { ProctorData } from "@/types/proctors";
+import { SitePlan } from "@/types/sitePlan";
+import { useProctorStore } from "@/stores/proctorStore";
 
 type FormFields = {
-  proctor: Proctor;
+  proctor: ProctorData;
   location: string;
   elevation: string;
   testArea: string;
@@ -55,6 +41,7 @@ type FormFields = {
 // Mock data
 const jobId = 1;
 const reportId = 2;
+const jobNumber = "24852";
 const mockSitePlans: SitePlan[] = [
   {
     id: 1,
@@ -76,46 +63,17 @@ const mockSitePlans: SitePlan[] = [
     dateCreated: "Two weeks ago",
   },
 ];
-const mockProctors: Proctor[] = [
-  {
-    id: 1,
-    testNo: 101,
-    name: "John Doe",
-    type: "Standard",
-    density: 1.85,
-    correctedDensity: 1.88,
-    optimumMoisture: 12.5,
-    oversizePercentage: 5.2,
-    src: "https://placehold.co/100",
-  },
-  {
-    id: 2,
-    testNo: 102,
-    name: "Jane Smith",
-    type: "Modified",
-    density: 1.92,
-    correctedDensity: 1.95,
-    optimumMoisture: 11.8,
-    oversizePercentage: 4.7,
-    src: "https://placehold.co/100",
-  },
-  {
-    id: 3,
-    testNo: 103,
-    name: "Mike Johnson",
-    type: "Standard",
-    density: 1.78,
-    correctedDensity: 1.8,
-    optimumMoisture: 13.2,
-    oversizePercentage: 6.1,
-    src: "https://placehold.co/100",
-  },
-];
 
 const DensityShotDetails = () => {
+  const [proctors, setProctors] = useState<ProctorData[]>();
+  const [openSitePlanModal, setOpenSitePlanModal] = useState(false);
+  const [openProctorModal, setOpenProctorModal] = useState(false);
+  const { selectedProctor, selectedProctorIndex, setSelectedProctor } =
+    useProctorStore();
+
   const form = useForm<FormFields>({
     defaultValues: {
-      proctor: mockProctors[0],
+      proctor: undefined,
       location: "Garage Bay",
       elevation: "1.5m below final grade",
       testArea: "",
@@ -130,17 +88,17 @@ const DensityShotDetails = () => {
       sitePlan: mockSitePlans[0],
     },
   });
-
   const { register, handleSubmit, control, watch, setValue } = form;
-
-  const [openSitePlanModal, setOpenSitePlanModal] = useState(false);
-  const [openProctorModal, setOpenProctorModal] = useState(false);
-
-  const [probeDepthUnit, compactionSpecificationUnit, selectedProctor] = watch([
+  const [probeDepthUnit, compactionSpecificationUnit] = watch([
     "probeDepthUnit",
     "compactionSpecificationUnit",
     "proctor",
   ]);
+
+  const handleClickProctorField = () => {
+    setOpenProctorModal(true);
+    handleGetAllProctors();
+  };
 
   const handleNewSitePlan = () => {
     console.log("New site plan");
@@ -152,14 +110,25 @@ const DensityShotDetails = () => {
     console.log("Site plan selected:", sitePlan);
   };
 
-  const handleSelectProctor = (proctor: Proctor) => {
+  const handleSelectProctor = (proctor: ProctorData, index: number) => {
     setOpenProctorModal(false);
     setValue("proctor", proctor, { shouldValidate: true });
+    setSelectedProctor(proctor, index);
     console.log("proctor selected", proctor);
   };
 
   const onSubmit = (data: FormFields) => {
     console.log(data);
+  };
+
+  const handleGetAllProctors = async () => {
+    try {
+      const response = await proctorApiService.getAllProctors(jobNumber);
+      console.log(response);
+      setProctors(response.data);
+    } catch (error) {
+      console.error("Error fetching all proctors", error);
+    }
   };
 
   return (
@@ -174,47 +143,19 @@ const DensityShotDetails = () => {
           <Stack id="density-info" sx={{ mb: 2 }} gap={2}>
             <Typography variant="h5">Shot #102</Typography>
 
-            <Card
-              elevation={0}
-              sx={{
-                borderRadius: "10px",
-                boxShadow: "1px",
-                border: "1px lightgrey solid",
-              }}
-              onClick={() => setOpenProctorModal(true)}
-            >
-              <Stack
-                direction="row"
-                sx={{ display: "flex", alignItems: "center" }}
-              >
-                <Box
-                  component="img"
-                  sx={{
-                    width: "100%",
-                    height: "auto",
-                    maxWidth: "100px",
-                    borderRadius: 2,
-                    mr: 2,
-                  }}
-                  alt="Report photos"
-                  src={"https://placehold.co/100"}
-                />
-                <Box>
-                  <Typography variant="body1" fontWeight={600}>
-                    {selectedProctor.name}
-                  </Typography>
-                  <Typography variant="body2">
-                    Density: {selectedProctor.density}
-                  </Typography>
-                  <Typography variant="body2">
-                    Corrected Density: {selectedProctor.correctedDensity} kg/m3
-                  </Typography>
-                  <Typography variant="body2">
-                    Optimum Moisture: {selectedProctor.optimumMoisture}{" "}
-                  </Typography>
-                </Box>
-              </Stack>
-            </Card>
+            {/* Proctor Section */}
+            {selectedProctor ? (
+              <ProctorCard
+                index={selectedProctorIndex}
+                proctor={selectedProctor}
+                handleClick={handleClickProctorField}
+              />
+            ) : (
+              <EmptyCard
+                text={"Click to select proctor"}
+                handleClick={handleClickProctorField}
+              />
+            )}
 
             <Stack gap={1} sx={{ mb: 2 }}>
               <Stack gap={1} sx={{ mb: 4 }}>
@@ -235,8 +176,8 @@ const DensityShotDetails = () => {
                           <Select
                             {...register("compactionSpecificationUnit")}
                             value={compactionSpecificationUnit}
-                            disableUnderline // Optional: To remove underline from Select
-                            variant="standard" // Optional: To match TextField's variant if needed
+                            disableUnderline
+                            variant="standard"
                           >
                             <MenuItem value="MPDD">MPDD</MenuItem>
                             <MenuItem value="SPDD">SPDD</MenuItem>
@@ -582,52 +523,16 @@ const DensityShotDetails = () => {
                 <Typography variant="h6">Proctors</Typography>
               </Box>{" "}
               <Stack spacing={1}>
-                {mockProctors.map((proctor) => {
-                  return (
-                    <Card
-                      elevation={0}
-                      key={proctor.id}
-                      sx={{
-                        borderRadius: "10px",
-                        boxShadow: "1px",
-                        border: "1px lightgrey solid",
-                      }}
-                      onClick={() => handleSelectProctor(proctor)}
-                    >
-                      <Stack
-                        direction="row"
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
-                        <Box
-                          component="img"
-                          sx={{
-                            width: "100%",
-                            height: "auto",
-                            maxWidth: "100px",
-                            borderRadius: 2,
-                            mr: 2,
-                          }}
-                          alt="Report photos"
-                          src={proctor.src}
-                        />
-                        <Box>
-                          <Typography variant="body1" fontWeight={600}>
-                            {proctor.name}
-                          </Typography>
-                          <Typography variant="body2">
-                            {proctor.density}
-                          </Typography>
-                          <Typography variant="body2">
-                            {proctor.correctedDensity}
-                          </Typography>
-                          <Typography variant="body2">
-                            {proctor.optimumMoisture}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </Card>
-                  );
-                })}
+                {proctors?.map((proctor, index) => (
+                  <ProctorCard
+                    // TODO: change to proctor.id
+                    key={proctor?.id}
+                    index={index}
+                    selectedIndex={selectedProctorIndex}
+                    proctor={proctor}
+                    handleClick={() => handleSelectProctor(proctor, index)}
+                  />
+                ))}
               </Stack>
             </Box>
           </Box>
