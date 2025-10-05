@@ -12,6 +12,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Stack,
   TextField,
   Typography,
@@ -28,6 +29,7 @@ import Webcam from "react-webcam";
 import { useRef, useState } from "react";
 
 import UploadWidget from "@/components/UploadWidget";
+import EditIcon from "@mui/icons-material/Edit";
 
 const report = {
   id: 4,
@@ -93,6 +95,9 @@ const Report: React.FC = () => {
 
   const webcamRef = useRef<Webcam>(null);
 
+  const handleClickEdit = () => {
+    navigate(`/field-tech/add-density-test`);
+  };
   const handleTakePhoto = () => {
     if (webcamRef.current) {
       const imageSrc = webcamRef.current.getScreenshot();
@@ -260,23 +265,30 @@ const Report: React.FC = () => {
                         </Typography>
                       </Box>
                     </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography variant="body2">
-                        Location: {test.location}
-                      </Typography>
-                      <Typography variant="body2">
-                        Elevation: {test.elevation}
-                      </Typography>
-                      <Typography variant="body2">
-                        Material: {test.material}
-                      </Typography>
-                      <Typography variant="body2">
-                        Density: {test.density}
-                      </Typography>
-                      <Typography variant="body2">
-                        Compaction Specification:
-                        {test.compactionSpecification}
-                      </Typography>
+                    <AccordionDetails
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Box>
+                        <Typography variant="body2">
+                          Location: {test.location}
+                        </Typography>
+                        <Typography variant="body2">
+                          Elevation: {test.elevation}
+                        </Typography>
+                        <Typography variant="body2">
+                          Material: {test.material}
+                        </Typography>
+                        <Typography variant="body2">
+                          Density: {test.density}
+                        </Typography>
+                        <Typography variant="body2">
+                          Compaction Specification:
+                          {test.compactionSpecification}
+                        </Typography>
+                      </Box>
+                      <IconButton sx={{ height: "100px" }}>
+                        <EditIcon onClick={handleClickEdit}></EditIcon>
+                      </IconButton>
                     </AccordionDetails>
                   </Accordion>
                 ))
