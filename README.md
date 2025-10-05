@@ -60,5 +60,3 @@ npm run dev
 ```
 
 ## Docker
-
-### 1. TODO
