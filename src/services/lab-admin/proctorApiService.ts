@@ -1,37 +1,38 @@
+import { ProctorData, ProctorCreateResponse } from "@/types/proctors";
 import { apiService, ApiResponse } from "../apiService";
 import { ENDPOINTS } from "../../config/endpoints";
 
-// Proctor data interface - represents all the form fields
-export interface ProctorData {
-  jobNumber: string;
-  proctorTestNumber: string;
-  materialType: string;
-  dateSampled: string;
-  proctorType: "SPDD" | "MPDD";
-  maxDryDensity: string;
-  correctedDensity: string;
-  labLocation: string;
-  proctorId: string;
-  dateTested: string;
-  oversizePercentage: number;
-  optimumMoisture: number;
-  specificGravity: string;
-}
-
-// API response interfaces
-export interface ProctorCreateResponse {
-  id: string;
-  message: string;
-  proctor: ProctorData;
-}
-
-export interface ProctorListResponse {
-  proctors: ProctorData[];
-  total: number;
-}
-
 // Main ProctorApiService class
 class ProctorApiService {
+  private readonly baseEndpoint = "/api/proctors/lab-admin";
+
+  async getAllProctors(jobNumber: string): Promise<ApiResponse<ProctorData[]>> {
+    try {
+      console.log("Getting all proctors for the job id: ", jobNumber);
+      return await apiService.get<ProctorData[]>(
+        `/api/proctors/job/${jobNumber}`,
+      );
+    } catch (error) {
+      console.error("Error fetching proctors for a job id", error);
+
+      throw error;
+    }
+  }
+
+  async getProctorById(proctorId: string): Promise<ApiResponse<ProctorData>> {
+    try {
+      console.log("Getting proctor details for proctor id: ", proctorId);
+      const response = await apiService.get<ProctorData>(
+        `/api/proctors/${proctorId}`,
+      );
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.error("Error fetching proctors for a job id", error);
+      throw error;
+    }
+  }
+
   // Create a new proctor
   async createProctor(
     proctorData: ProctorData,

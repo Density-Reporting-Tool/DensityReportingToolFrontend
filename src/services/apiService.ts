@@ -127,6 +127,11 @@ class JobsAPIService extends BaseApiService {
   }
 }
 
+// class ProctorsAPIService extends BaseApiService {
+//   async getProctorsForJob(jobNumber: string): Promise<ApiResponse<any[]>> {
+//     return this.get(ENDPOINTS.REPORTS.PROCTORS_FOR_JOB(jobNumber));
+//   }
+// }
 // class RefactorMeAPIService extends BaseApiService {
 //   // People methods (replaces clients and project managers)
 //   async getPeople(): Promise<ApiResponse<any[]>> {
@@ -136,7 +141,13 @@ class JobsAPIService extends BaseApiService {
 //   async getEmployees(): Promise<ApiResponse<any[]>> {
 //     return this.get("/api/test/employees");
 //   }
+//   async getEmployees(): Promise<ApiResponse<any[]>> {
+//     return this.get("/api/test/employees");
+//   }
 
+//   async getContractors(): Promise<ApiResponse<any[]>> {
+//     return this.get("/api/test/contractors");
+//   }
 //   async getContractors(): Promise<ApiResponse<any[]>> {
 //     return this.get("/api/test/contractors");
 //   }
@@ -152,10 +163,6 @@ class JobsAPIService extends BaseApiService {
 
 //   async getReport(reportId: number): Promise<ApiResponse<any>> {
 //     return this.get(ENDPOINTS.REPORTS.GET(reportId));
-//   }
-
-//   async getProctorsForJob(jobId: number): Promise<ApiResponse<any[]>> {
-//     return this.get(ENDPOINTS.REPORTS.PROCTORS_FOR_JOB(jobId));
 //   }
 
 //   // Create density test
@@ -176,4 +183,5 @@ class TestAPIService extends BaseApiService {
 export const apiService = new BaseApiService();
 export const jobsAPIService = new JobsAPIService();
 export const testAPIService = new TestAPIService();
+
 export type { ApiResponse, ApiError };
