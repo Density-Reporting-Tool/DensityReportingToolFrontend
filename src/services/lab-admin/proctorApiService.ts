@@ -1,5 +1,6 @@
 import { ProctorData, ProctorCreateResponse } from "@/types/proctors";
 import { apiService, ApiResponse } from "../apiService";
+import { ENDPOINTS } from "../../config/endpoints";
 
 // Main ProctorApiService class
 class ProctorApiService {
@@ -39,7 +40,7 @@ class ProctorApiService {
     try {
       console.log("Creating proctor with data:", proctorData);
       return await apiService.post<ProctorCreateResponse>(
-        this.baseEndpoint,
+        ENDPOINTS.PROCTOR.LAB_ADMIN.CREATE,
         proctorData,
       );
     } catch (error) {

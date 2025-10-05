@@ -24,3 +24,41 @@ In this project:
 
 - pre-commit: runs lint-staged to format staged files with Prettier and check code with ESLint.
 - commit-msg: validates commit messages to ensure they follow Conventional Commit standards.
+
+# Setup
+
+## Local
+
+### 1. clone the repository
+
+```bash
+git clone https://github.com/Density-Reporting-Tool/DensityReportingToolFrontend.git
+```
+
+### 2. Install Dependencies
+
+Use npm ci for consistency based on package-lock.json
+
+```bash
+cd DensityReportingToolFrontend
+npm ci
+```
+
+### 3. Verify linters and Commit Hooks
+
+get the latest version of husky
+
+```bash
+npm install husky@latest --save-dev
+npx husky install
+```
+
+### 4. Run the development server
+
+```bash
+npm run dev
+```
+
+## Docker
+
+### 1. TODO

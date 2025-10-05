@@ -26,7 +26,7 @@ const BottomNavBar = () => {
     setCurrentPage(getCurrentPage());
   }, [location.pathname, jobId, reportId]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentPage(newValue);
     switch (newValue) {
       case 0:
