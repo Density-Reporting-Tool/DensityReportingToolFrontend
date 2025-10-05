@@ -27,7 +27,7 @@ In this project:
 
 # Setup
 
-## Local
+## Docker Dev (recommended)
 
 ### 1. clone the repository
 
@@ -35,14 +35,9 @@ In this project:
 git clone https://github.com/Density-Reporting-Tool/DensityReportingToolFrontend.git
 ```
 
-### 2. Install Dependencies
+### 2. Add your secret .env file
 
-Use npm ci for consistency based on package-lock.json
-
-```bash
-cd DensityReportingToolFrontend
-npm ci
-```
+Refer to .env.example for a template
 
 ### 3. Verify linters and Commit Hooks
 
@@ -53,10 +48,44 @@ npm install husky@latest --save-dev
 npx husky install
 ```
 
-### 4. Run the development server
+### 4. build and run the container
+
+```bash
+docker compose up --build
+```
+
+## Local Dev
+
+### 1. clone the repository
+
+```bash
+git clone https://github.com/Density-Reporting-Tool/DensityReportingToolFrontend.git
+```
+
+### 2. Add your secret .env file
+
+look at env.example for formatting
+
+### 3. Install Dependencies
+
+Use npm ci for consistency based on package-lock.json
+
+```bash
+cd DensityReportingToolFrontend
+npm ci
+```
+
+### 4. Verify linters and Commit Hooks
+
+get the latest version of husky
+
+```bash
+npm install husky@latest --save-dev
+npx husky install
+```
+
+### 5. Run the development server
 
 ```bash
 npm run dev
 ```
-
-## Docker
