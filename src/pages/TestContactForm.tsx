@@ -136,7 +136,6 @@ const TestContactForm: React.FC = () => {
         open={contactDialogOpen}
         onClose={() => setContactDialogOpen(false)}
         onSave={handleContactSave}
-        contactType="Contact"
         title="Create New Contact"
         mode="dialog"
       />
@@ -145,7 +144,6 @@ const TestContactForm: React.FC = () => {
         open={employeeDialogOpen}
         onClose={() => setEmployeeDialogOpen(false)}
         onSave={handleContactSave}
-        contactType="GeoPacific Employee"
         title="Create GeoPacific Employee Contact"
         mode="dialog"
       />
@@ -154,7 +152,6 @@ const TestContactForm: React.FC = () => {
         open={appUserDialogOpen}
         onClose={() => setAppUserDialogOpen(false)}
         onSave={handleContactSave}
-        contactType="GeoPacific App User"
         title="Create GeoPacific App User"
         mode="dialog"
       />

@@ -1,14 +1,12 @@
 import { 
   ContactData, 
-  ContactCreateResponse, 
-  ContactListResponse,
+  ContactCreateResponse,
   ContactSearchResult,
   ContactValidationResult,
   GeoPacificEmployeeContactData,
   GeoPacificAppUserData
 } from "@/types/contacts";
 import { apiService, ApiResponse } from "./apiService";
-import { ENDPOINTS } from "../config/endpoints";
 
 // Main ContactApiService class following the same pattern as ProctorApiService
 class ContactApiService {

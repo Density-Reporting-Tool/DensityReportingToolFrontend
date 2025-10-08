@@ -4,7 +4,6 @@ import { ENDPOINTS } from "../../config/endpoints";
 
 // Main ProctorApiService class
 class ProctorApiService {
-  private readonly baseEndpoint = "/api/proctors/lab-admin";
 
   async getAllProctors(jobNumber: string): Promise<ApiResponse<ProctorData[]>> {
     try {
