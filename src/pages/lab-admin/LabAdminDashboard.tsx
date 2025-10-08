@@ -5,11 +5,18 @@ import {
   Schedule as ScheduleIcon,
   Add as AddIcon,
   Person as PersonIcon,
+  Contacts as ContactsIcon,
+  Work as WorkIcon,
 } from "@mui/icons-material";
+import ContactForm from "@/components/ContactForm";
+import JobListing from "@/components/JobListing";
+import { ContactData } from "@/types/contacts";
+import { JobReadDTO } from "@/dtos/Job/job";
 
 const LabAdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [selectedSection, setSelectedSection] = useState<string>("");
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
 
   const handleNavigation = (section: string) => {
     setSelectedSection(section);
@@ -21,6 +28,20 @@ const LabAdminDashboard: React.FC = () => {
 
   const handleEnterProctor = () => {
     navigate("/lab-admin/add-proctor");
+  };
+
+  const handleAddContact = () => {
+    setContactDialogOpen(true);
+  };
+
+  const handleContactSave = (contact: ContactData) => {
+    console.log("Contact saved:", contact);
+    // You can add additional logic here like refreshing a contact list
+  };
+
+  const handleJobClick = (job: JobReadDTO) => {
+    // Navigate to field tech dashboard job details page
+    navigate(`/field-tech/job/${job.jobNumber}`);
   };
 
   const renderContent = () => {
@@ -58,6 +79,8 @@ const LabAdminDashboard: React.FC = () => {
             </Typography>
           </Box>
         );
+      case "jobs":
+        return <JobListing onJobClick={handleJobClick} />;
       default:
         return (
           <Box
@@ -197,6 +220,44 @@ const LabAdminDashboard: React.FC = () => {
             >
               Enter Proctor
             </Button>
+
+            {/* Jobs Button */}
+            <Button
+              variant="contained"
+              onClick={() => handleNavigation("jobs")}
+              sx={{
+                backgroundColor: "primary.main",
+                color: "white",
+                fontWeight: "bold",
+                py: 1.5,
+                borderRadius: 2,
+                "&:hover": {
+                  backgroundColor: "primary.dark",
+                },
+              }}
+              startIcon={<WorkIcon />}
+            >
+              Jobs
+            </Button>
+
+            {/* Add Contact Button */}
+            <Button
+              variant="contained"
+              onClick={handleAddContact}
+              sx={{
+                backgroundColor: "secondary.main",
+                color: "white",
+                fontWeight: "bold",
+                py: 1.5,
+                borderRadius: 2,
+                "&:hover": {
+                  backgroundColor: "secondary.dark",
+                },
+              }}
+              startIcon={<ContactsIcon />}
+            >
+              Add Contact
+            </Button>
           </Stack>
         </Box>
 
@@ -211,6 +272,15 @@ const LabAdminDashboard: React.FC = () => {
           {renderContent()}
         </Box>
       </Box>
+
+      {/* Contact Form Dialog */}
+      <ContactForm
+        open={contactDialogOpen}
+        onClose={() => setContactDialogOpen(false)}
+        onSave={handleContactSave}
+        title="Add Contact"
+        mode="dialog"
+      />
     </Box>
   );
 };

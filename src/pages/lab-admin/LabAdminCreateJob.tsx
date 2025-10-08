@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -7,10 +7,6 @@ import {
   Button,
   Avatar,
   Autocomplete,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   IconButton,
   Stack,
 } from "@mui/material";
@@ -23,30 +19,39 @@ import {
 import DistributionListManager, {
   Contact,
 } from "../../components/DistributionListManager";
+import ContactForm from "../../components/ContactForm";
+import { ContactData } from "@/types/contacts";
+import { contactApiService } from "@/services/contactApiService";
+import { jobsAPIService } from "@/services/apiService";
+import { JobCreateDTO } from "@/dtos/Job/job";
 
 const LabAdminCreateJob: React.FC = () => {
   const navigate = useNavigate();
-  const [projectManager, setProjectManager] = useState("Jakub Szary");
-  const [client, setClient] = useState("GeoPacific");
-  const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false);
-  const [newPerson, setNewPerson] = useState({
-    clientName: "GeoPacific",
-    firstName: "Peter",
-    lastName: "Senyk",
-    email: "Peter.Senyk@DRT.ca",
-    phone: "1-604-329-9559",
-  });
-  const [contacts, setContacts] = useState<Contact[]>([
-    {
-      id: "1",
-      lastName: "Senyk",
-      firstName: "Peter",
-      email: "Peter.Senyk@DRT.ca",
-      phone: "1-604-329-9559",
-      company: "GeoPacific",
-    },
-  ]);
+  const [projectManager, setProjectManager] = useState("");
+  const [siteContact, setSiteContact] = useState("");
+  const [client, setClient] = useState("");
+  const [jobNumber, setJobNumber] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [siteAddress, setSiteAddress] = useState("");
+  const [jobNotes, setJobNotes] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [projectManagerContactDialogOpen, setProjectManagerContactDialogOpen] = useState(false);
+  const [siteContactDialogOpen, setSiteContactDialogOpen] = useState(false);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [contactManagerOpen, setContactManagerOpen] = useState(false);
+  
+  // Dynamic contact options for autocomplete
+  const [allContacts, setAllContacts] = useState<ContactData[]>([]);
+  const [projectManagerOptions, setProjectManagerOptions] = useState<ContactData[]>([]);
+  const [siteContactOptions, setSiteContactOptions] = useState<ContactData[]>([]);
+  const [isLoadingContacts, setIsLoadingContacts] = useState(false);
+  const [isSavingJob, setIsSavingJob] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Load initial contacts when component mounts
+  useEffect(() => {
+    loadInitialContacts();
+  }, []);
 
   const handleNavigation = (section: string) => {
     switch (section) {
@@ -71,47 +76,215 @@ const LabAdminCreateJob: React.FC = () => {
     "Private Developer B",
   ];
 
-  // Sample project manager options
-  const projectManagerOptions = [
-    "Jakub Szary",
-    "John Doe",
-    "Jane Smith",
-    "Mike Johnson",
-    "Sarah Wilson",
-    "David Brown",
-  ];
+  // Load initial contacts
+  const loadInitialContacts = async () => {
+    try {
+      setIsLoadingContacts(true);
+      const response = await contactApiService.getAllContacts();
+      if (response.data) {
+        setAllContacts(response.data);
+        setProjectManagerOptions(response.data);
+        setSiteContactOptions(response.data);
+      }
+    } catch (error) {
+      console.error("Error loading contacts:", error);
+    } finally {
+      setIsLoadingContacts(false);
+    }
+  };
 
-  const handleProjectManagerChange = (_event: any, newValue: string | null) => {
-    setProjectManager(newValue || "");
+  // Filter contacts based on search term
+  const filterContacts = (searchTerm: string, contacts: ContactData[]) => {
+    if (!searchTerm || searchTerm.length < 2) {
+      return contacts;
+    }
+    
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return contacts.filter(contact => 
+      contact.firstName.toLowerCase().includes(lowerSearchTerm) ||
+      contact.lastName.toLowerCase().includes(lowerSearchTerm) ||
+      contact.email.toLowerCase().includes(lowerSearchTerm) ||
+      `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(lowerSearchTerm)
+    );
+  };
+
+  // Search contacts function
+  const searchContacts = async (searchTerm: string, setOptions: (contacts: ContactData[]) => void) => {
+    if (searchTerm.length < 2) {
+      // Don't clear options, just return without searching
+      return;
+    }
+
+    try {
+      setIsLoadingContacts(true);
+      const response = await contactApiService.searchContacts(searchTerm, 10);
+      if (response.data) {
+        setOptions(response.data);
+      }
+    } catch (error) {
+      console.error("Error searching contacts:", error);
+      // Don't clear options on error, keep existing ones
+    } finally {
+      setIsLoadingContacts(false);
+    }
+  };
+
+  const handleProjectManagerChange = (_event: any, newValue: string | ContactData | null) => {
+    if (typeof newValue === 'string') {
+      setProjectManager(newValue);
+    } else if (newValue && typeof newValue === 'object') {
+      setProjectManager(`${newValue.firstName} ${newValue.lastName}`);
+    } else {
+      setProjectManager("");
+    }
+  };
+
+  const handleProjectManagerInputChange = (_event: any, inputValue: string) => {
+    // Filter the existing contacts based on input
+    const filteredContacts = filterContacts(inputValue, allContacts);
+    setProjectManagerOptions(filteredContacts);
+    
+    // Also do API search for more comprehensive results
+    if (inputValue.length >= 2) {
+      searchContacts(inputValue, setProjectManagerOptions);
+    }
   };
 
   const handleClientChange = (_event: any, newValue: string | null) => {
     setClient(newValue || "");
   };
 
-  const handleAddPerson = () => {
-    setAddPersonDialogOpen(true);
+  const handleClientInputChange = (_event: any, inputValue: string) => {
+    setClient(inputValue);
   };
 
-  const handleCloseDialog = () => {
-    setAddPersonDialogOpen(false);
-  };
-
-  const handleSavePerson = () => {
-    // Add the new person to the project manager options
-    const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`;
-    if (!projectManagerOptions.includes(newPersonName)) {
-      projectManagerOptions.push(newPersonName);
+  const handleSiteContactChange = (_event: any, newValue: string | ContactData | null) => {
+    if (typeof newValue === 'string') {
+      setSiteContact(newValue);
+    } else if (newValue && typeof newValue === 'object') {
+      setSiteContact(`${newValue.firstName} ${newValue.lastName}`);
+    } else {
+      setSiteContact("");
     }
-    setProjectManager(newPersonName);
-    setAddPersonDialogOpen(false);
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setNewPerson((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const handleSiteContactInputChange = (_event: any, inputValue: string) => {
+    // Filter the existing contacts based on input
+    const filteredContacts = filterContacts(inputValue, allContacts);
+    setSiteContactOptions(filteredContacts);
+    
+    // Also do API search for more comprehensive results
+    if (inputValue.length >= 2) {
+      searchContacts(inputValue, setSiteContactOptions);
+    }
+  };
+
+  const handleAddProjectManagerContact = () => {
+    setProjectManagerContactDialogOpen(true);
+  };
+
+  const handleAddSiteContact = () => {
+    setSiteContactDialogOpen(true);
+  };
+
+  const handleProjectManagerContactSave = (contact: ContactData) => {
+    const contactName = `${contact.firstName} ${contact.lastName}`;
+    setProjectManager(contactName);
+    setProjectManagerContactDialogOpen(false);
+    // Add the new contact to all contacts and options
+    setAllContacts(prev => [contact, ...prev]);
+    setProjectManagerOptions(prev => [contact, ...prev]);
+    console.log("Project Manager contact saved:", contact);
+  };
+
+  const handleSiteContactSave = (contact: ContactData) => {
+    const contactName = `${contact.firstName} ${contact.lastName}`;
+    setSiteContact(contactName);
+    setSiteContactDialogOpen(false);
+    // Add the new contact to all contacts and options
+    setAllContacts(prev => [contact, ...prev]);
+    setSiteContactOptions(prev => [contact, ...prev]);
+    console.log("Site contact saved:", contact);
+  };
+
+  const handleSaveJob = async () => {
+    // Validate required fields
+    if (!jobNumber.trim()) {
+      setSaveError("Job Number is required");
+      return;
+    }
+    if (!projectName.trim()) {
+      setSaveError("Project Name is required");
+      return;
+    }
+    if (!client.trim()) {
+      setSaveError("Client is required");
+      return;
+    }
+    if (!siteAddress.trim()) {
+      setSaveError("Site Address is required");
+      return;
+    }
+
+    try {
+      setIsSavingJob(true);
+      setSaveError(null);
+
+      // Transform form data to JobCreateDTO format
+      const jobData: JobCreateDTO = {
+        jobNumber: jobNumber.trim(),
+        clientName: client.trim(),
+        projectName: projectName.trim(),
+        siteAddress: siteAddress.trim(),
+        startDate: startDate ? new Date(startDate).toISOString() : undefined,
+        endDate: undefined, // No end date for new jobs
+      };
+
+      console.log("Saving job with data:", jobData);
+
+      // Make API call to create job
+      const response = await jobsAPIService.createJob(jobData);
+      
+      if (response.data) {
+        console.log("Job created successfully:", response.data);
+        alert(`Job "${jobData.jobNumber}" saved successfully!`);
+        
+        // Reset form
+        setJobNumber("");
+        setProjectManager("");
+        setSiteContact("");
+        setClient("");
+        setProjectName("");
+        setSiteAddress("");
+        setJobNotes("");
+        setStartDate("");
+        setContacts([]);
+      } else {
+        throw new Error("No data returned from server");
+      }
+    } catch (error: any) {
+      console.error("Error saving job:", error);
+      
+      // Handle different types of errors
+      if (error.status === 400) {
+        // Bad request - validation errors
+        if (error.details?.errors) {
+          const errorMessages = Object.values(error.details.errors).flat();
+          setSaveError(`Validation errors: ${errorMessages.join(", ")}`);
+        } else if (error.details?.message) {
+          setSaveError(error.details.message);
+        } else {
+          setSaveError("Please check all required fields and try again.");
+        }
+      } else if (error.status === 409) {
+        // Conflict - job number already exists
+        setSaveError("A job with this number already exists. Please use a different job number.");
+      } else {
+        setSaveError(error.message || "Failed to save job. Please try again.");
+      }
+    } finally {
+      setIsSavingJob(false);
+    }
   };
 
   return (
@@ -256,7 +429,8 @@ const LabAdminCreateJob: React.FC = () => {
               </Typography>
               <TextField
                 fullWidth
-                value="25900"
+                value={jobNumber}
+                onChange={(e) => setJobNumber(e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -277,12 +451,28 @@ const LabAdminCreateJob: React.FC = () => {
                 <Autocomplete
                   value={projectManager}
                   onChange={handleProjectManagerChange}
+                  onInputChange={handleProjectManagerInputChange}
                   options={projectManagerOptions}
+                  getOptionLabel={(option) => {
+                    if (typeof option === 'string') return option;
+                    return `${option.firstName} ${option.lastName}`;
+                  }}
+                  isOptionEqualToValue={(option, value) => {
+                    if (typeof option === 'string' && typeof value === 'string') {
+                      return option === value;
+                    }
+                    if (typeof option === 'object' && typeof value === 'object') {
+                      return option.id === value.id;
+                    }
+                    return false;
+                  }}
                   freeSolo
+                  loading={isLoadingContacts}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       size="small"
+                      placeholder="Type to search contacts..."
                       sx={{
                         "& .MuiOutlinedInput-root": {
                           backgroundColor: "white",
@@ -291,6 +481,25 @@ const LabAdminCreateJob: React.FC = () => {
                       }}
                     />
                   )}
+                  renderOption={(props, option) => {
+                    const { key, ...otherProps } = props;
+                    return (
+                      <li key={key} {...otherProps}>
+                        {typeof option === 'object' ? (
+                          <Box>
+                            <Typography variant="body2">
+                              {option.firstName} {option.lastName}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {option.email} • {option.personType}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          option
+                        )}
+                      </li>
+                    );
+                  }}
                   sx={{
                     flex: 1,
                     "& .MuiAutocomplete-popupIndicator": {
@@ -299,7 +508,89 @@ const LabAdminCreateJob: React.FC = () => {
                   }}
                 />
                 <IconButton
-                  onClick={handleAddPerson}
+                  onClick={handleAddProjectManagerContact}
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "primary.dark",
+                    },
+                    width: 40,
+                    height: 40,
+                  }}
+                >
+                  <PersonAddIcon />
+                </IconButton>
+              </Box>
+            </Box>
+
+            {/* Site Contact */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                Site Contact
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Autocomplete
+                  value={siteContact}
+                  onChange={handleSiteContactChange}
+                  onInputChange={handleSiteContactInputChange}
+                  options={siteContactOptions}
+                  getOptionLabel={(option) => {
+                    if (typeof option === 'string') return option;
+                    return `${option.firstName} ${option.lastName}`;
+                  }}
+                  isOptionEqualToValue={(option, value) => {
+                    if (typeof option === 'string' && typeof value === 'string') {
+                      return option === value;
+                    }
+                    if (typeof option === 'object' && typeof value === 'object') {
+                      return option.id === value.id;
+                    }
+                    return false;
+                  }}
+                  freeSolo
+                  loading={isLoadingContacts}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      size="small"
+                      placeholder="Type to search contacts..."
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "white",
+                          borderRadius: 1,
+                        },
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option) => {
+                    const { key, ...otherProps } = props;
+                    return (
+                      <li key={key} {...otherProps}>
+                        {typeof option === 'object' ? (
+                          <Box>
+                            <Typography variant="body2">
+                              {option.firstName} {option.lastName}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {option.email} • {option.personType}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          option
+                        )}
+                      </li>
+                    );
+                  }}
+                  sx={{
+                    flex: 1,
+                    "& .MuiAutocomplete-popupIndicator": {
+                      color: "#666",
+                    },
+                  }}
+                />
+                <IconButton
+                  onClick={handleAddSiteContact}
                   sx={{
                     backgroundColor: "primary.main",
                     color: "white",
@@ -323,6 +614,7 @@ const LabAdminCreateJob: React.FC = () => {
               <Autocomplete
                 value={client}
                 onChange={handleClientChange}
+                onInputChange={handleClientInputChange}
                 options={clientOptions}
                 freeSolo
                 renderInput={(params) => (
@@ -352,7 +644,8 @@ const LabAdminCreateJob: React.FC = () => {
               </Typography>
               <TextField
                 fullWidth
-                value="West Parking Lot Improvement"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -371,7 +664,8 @@ const LabAdminCreateJob: React.FC = () => {
               </Typography>
               <TextField
                 fullWidth
-                value="1779 W 75th Ave, Vancouver, BC V6P 3T1"
+                value={siteAddress}
+                onChange={(e) => setSiteAddress(e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -392,7 +686,8 @@ const LabAdminCreateJob: React.FC = () => {
                 fullWidth
                 multiline
                 rows={4}
-                value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis ante ut eros venenatis lacinia ut in nisl. Sed malesuada risus in nisi convallis aliquet. Aliquam convallis scelerisque gravida."
+                value={jobNotes}
+                onChange={(e) => setJobNotes(e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -413,7 +708,8 @@ const LabAdminCreateJob: React.FC = () => {
                 type="date"
                 variant="outlined"
                 size="small"
-                defaultValue="2025-08-15"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -425,6 +721,20 @@ const LabAdminCreateJob: React.FC = () => {
                 }}
               />
             </Box>
+
+            {/* Error Display */}
+            {saveError && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="error" sx={{ 
+                  backgroundColor: "error.light", 
+                  p: 1, 
+                  borderRadius: 1,
+                  textAlign: "center"
+                }}>
+                  {saveError}
+                </Typography>
+              </Box>
+            )}
 
             {/* Action Buttons */}
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -448,6 +758,8 @@ const LabAdminCreateJob: React.FC = () => {
               <Button
                 variant="contained"
                 fullWidth
+                onClick={handleSaveJob}
+                disabled={isSavingJob}
                 sx={{
                   backgroundColor: "primary.main",
                   color: "white",
@@ -457,159 +769,36 @@ const LabAdminCreateJob: React.FC = () => {
                   "&:hover": {
                     backgroundColor: "primary.dark",
                   },
+                  "&:disabled": {
+                    backgroundColor: "grey.400",
+                    color: "grey.600",
+                  },
                 }}
               >
-                Save Job
+                {isSavingJob ? "Saving..." : "Save Job"}
               </Button>
             </Box>
           </Box>
         </Box>
       </Box>
 
-      {/* Add Person Dialog */}
-      <Dialog
-        open={addPersonDialogOpen}
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle sx={{ backgroundColor: "grey.50", color: "text.primary" }}>
-          Add New Person
-        </DialogTitle>
-        <DialogContent sx={{ backgroundColor: "grey.50", pt: 2 }}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {/* Client Name */}
-            <Box>
-              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Client Name
-              </Typography>
-              <TextField
-                fullWidth
-                value={newPerson.clientName}
-                onChange={(e) =>
-                  handleInputChange("clientName", e.target.value)
-                }
-                variant="outlined"
-                size="small"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "white",
-                    borderRadius: 1,
-                  },
-                }}
-              />
-            </Box>
+      {/* Project Manager Contact Form Dialog */}
+      <ContactForm
+        open={projectManagerContactDialogOpen}
+        onClose={() => setProjectManagerContactDialogOpen(false)}
+        onSave={handleProjectManagerContactSave}
+        title="Add Project Manager Contact"
+        mode="dialog"
+      />
 
-            {/* Contact First Name */}
-            <Box>
-              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Contact First Name
-              </Typography>
-              <TextField
-                fullWidth
-                value={newPerson.firstName}
-                onChange={(e) => handleInputChange("firstName", e.target.value)}
-                variant="outlined"
-                size="small"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "white",
-                    borderRadius: 1,
-                  },
-                }}
-              />
-            </Box>
-
-            {/* Contact Last Name */}
-            <Box>
-              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Contact Last Name
-              </Typography>
-              <TextField
-                fullWidth
-                value={newPerson.lastName}
-                onChange={(e) => handleInputChange("lastName", e.target.value)}
-                variant="outlined"
-                size="small"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "white",
-                    borderRadius: 1,
-                  },
-                }}
-              />
-            </Box>
-
-            {/* Contact Email */}
-            <Box>
-              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Contact Email
-              </Typography>
-              <TextField
-                fullWidth
-                value={newPerson.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                variant="outlined"
-                size="small"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "white",
-                    borderRadius: 1,
-                  },
-                }}
-              />
-            </Box>
-
-            {/* Contact Phone Number */}
-            <Box>
-              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Contact Phone Number
-              </Typography>
-              <TextField
-                fullWidth
-                value={newPerson.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                variant="outlined"
-                size="small"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "white",
-                    borderRadius: 1,
-                  },
-                }}
-              />
-            </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ backgroundColor: "grey.50", p: 2, gap: 2 }}>
-          <Button
-            variant="contained"
-            onClick={handleSavePerson}
-            sx={{
-              backgroundColor: "primary.main",
-              color: "white",
-              fontWeight: "bold",
-              px: 3,
-              py: 1,
-            }}
-          >
-            Save Client
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleAddPerson}
-            sx={{
-              backgroundColor: "primary.main",
-              color: "white",
-              fontWeight: "bold",
-              px: 3,
-              py: 1,
-            }}
-          >
-            Add Additional Contact
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Site Contact Form Dialog */}
+      <ContactForm
+        open={siteContactDialogOpen}
+        onClose={() => setSiteContactDialogOpen(false)}
+        onSave={handleSiteContactSave}
+        title="Add Site Contact"
+        mode="dialog"
+      />
 
       {/* Distribution List Manager */}
       <DistributionListManager
@@ -618,7 +807,7 @@ const LabAdminCreateJob: React.FC = () => {
         contacts={contacts}
         onContactsChange={setContacts}
         title="Distribution List Manager"
-        jobNumber="25900"
+        jobNumber={jobNumber || "New Job"}
         mode="dialog"
       />
     </Box>

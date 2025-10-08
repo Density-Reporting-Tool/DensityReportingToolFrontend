@@ -34,6 +34,10 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/api/jobs/${id}`,
     DELETE: (id: string) => `/api/jobs/${id}`,
     SEARCH: (jobNumber: string) => `/api/jobs/search?jobNumber=${jobNumber}`,
+    ASSIGN_PROJECT_MANAGER: (jobNumber: string) => `/api/jobs/${jobNumber}/project-manager`,
+    ASSIGN_SITE_CONTACT: (jobNumber: string) => `/api/jobs/${jobNumber}/site-contact`,
+    REMOVE_PROJECT_MANAGER: (jobNumber: string, projectManagerId: number) => `/api/jobs/${jobNumber}/project-manager/remove/${projectManagerId}`,
+    REMOVE_SITE_CONTACT: (jobNumber: string, siteContactId: number) => `/api/jobs/${jobNumber}/site-contact/remove/${siteContactId}`,
   },
   PROCTOR: {
     LIST: "/api/proctors",
@@ -59,5 +63,15 @@ export const ENDPOINTS = {
     HEALTH: "/health",
     HOME: "/home",
     API_HEALTH: "/api/health",
+  },
+  CONTACTS: {
+    LIST: "/api/contacts",
+    CREATE: "/api/contacts",
+    GET: (id: number) => `/api/contacts/${id}`,
+    UPDATE: (id: number) => `/api/contacts/${id}`,
+    DELETE: (id: number) => `/api/contacts/${id}`,
+    SEARCH: (searchTerm: string) => `/api/contacts/search?searchTerm=${searchTerm}`,
+    CREATE_GEOPACIFIC_EMPLOYEE: "/api/contacts/geopacific-employee",
+    CREATE_GEOPACIFIC_APP_USER: "/api/contacts/geopacific-app-user",
   },
 };
