@@ -34,6 +34,7 @@ import { JobReadDTO } from "@/dtos/Job/job";
 import { ReportReadDTO } from "@/dtos/report";
 import { ContactData } from "@/types/contacts";
 import { jobDetailsApiService } from "@/services/jobDetailsApiService";
+import { reportApiService } from "@/services/reportApiService";
 
 const JobDetails: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
@@ -88,8 +89,25 @@ const JobDetails: React.FC = () => {
     navigate(`report/${reportId}`);
   };
 
-  const handleNewReport = () => {
-    navigate(`/job/${jobId}/create-report`);
+  const handleNewReport = async () => {
+    try {
+      // TODO: Get actual employeeId from auth context/user session
+      const employeeId = 1; // Placeholder - replace with actual logged-in user's employeeId
+
+      setLoading(true);
+      const response = await reportApiService.createDraftReport(
+        jobId!,
+        employeeId,
+      );
+
+      // Navigate to the newly created report
+      navigate(`/job/${jobId}/report/${response.data.id}`);
+    } catch (error) {
+      console.error("Error creating draft report:", error);
+      setError("Failed to create new report. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClickShowAll = () => {
