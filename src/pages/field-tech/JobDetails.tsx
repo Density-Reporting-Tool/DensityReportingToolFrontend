@@ -38,18 +38,23 @@ import { jobDetailsApiService } from "@/services/jobDetailsApiService";
 const JobDetails: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
-  
+
   // State management
   const [job, setJob] = useState<JobReadDTO | null>(null);
   const [reports, setReports] = useState<ReportReadDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Contact dialog state
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
-  const [selectedContactType, setSelectedContactType] = useState<'projectManager' | 'siteContact' | null>(null);
-  const [contactSelectionDialogOpen, setContactSelectionDialogOpen] = useState(false);
-  const [contactSelectionType, setContactSelectionType] = useState<'projectManager' | 'siteContact' | null>(null);
+  const [selectedContactType, setSelectedContactType] = useState<
+    "projectManager" | "siteContact" | null
+  >(null);
+  const [contactSelectionDialogOpen, setContactSelectionDialogOpen] =
+    useState(false);
+  const [contactSelectionType, setContactSelectionType] = useState<
+    "projectManager" | "siteContact" | null
+  >(null);
 
   // Load job data and reports
   useEffect(() => {
@@ -62,13 +67,13 @@ const JobDetails: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Load job details and reports in parallel
       const [jobResponse, reportsResponse] = await Promise.all([
         jobDetailsApiService.getJobDetails(jobId!),
-        jobDetailsApiService.getRecentJobReports(jobId!, 5)
+        jobDetailsApiService.getRecentJobReports(jobId!, 5),
       ]);
-      
+
       setJob(jobResponse.data);
       setReports(reportsResponse.data);
     } catch (err) {
@@ -84,7 +89,7 @@ const JobDetails: React.FC = () => {
   };
 
   const handleNewReport = () => {
-    console.log("Create new report for job:", jobId);
+    navigate(`/job/${jobId}/create-report`);
   };
 
   const handleClickShowAll = () => {
@@ -100,7 +105,9 @@ const JobDetails: React.FC = () => {
     }
   };
 
-  const handleContactClick = (contactType: 'projectManager' | 'siteContact') => {
+  const handleContactClick = (
+    contactType: "projectManager" | "siteContact",
+  ) => {
     setSelectedContactType(contactType);
     setContactDialogOpen(true);
   };
@@ -110,7 +117,9 @@ const JobDetails: React.FC = () => {
     setSelectedContactType(null);
   };
 
-  const handleOpenContactSelection = (contactType: 'projectManager' | 'siteContact') => {
+  const handleOpenContactSelection = (
+    contactType: "projectManager" | "siteContact",
+  ) => {
     setContactSelectionType(contactType);
     setContactSelectionDialogOpen(true);
   };
@@ -123,23 +132,23 @@ const JobDetails: React.FC = () => {
   const handleSelectContact = async (contact: ContactData) => {
     try {
       console.log(`Selected ${contactSelectionType}:`, contact);
-      
+
       if (!job?.jobNumber) {
         console.error("No job number available");
         return;
       }
 
-      if (contactSelectionType === 'projectManager') {
+      if (contactSelectionType === "projectManager") {
         await jobDetailsApiService.assignProjectManager(job.jobNumber, contact);
         console.log("Project manager assigned successfully");
-      } else if (contactSelectionType === 'siteContact') {
+      } else if (contactSelectionType === "siteContact") {
         await jobDetailsApiService.assignSiteContact(job.jobNumber, contact);
         console.log("Site contact assigned successfully");
       }
 
       // Refresh job data to show the newly assigned contact
       await loadJobData();
-      
+
       handleCloseContactSelection();
     } catch (error) {
       console.error("Error assigning contact:", error);
@@ -154,9 +163,12 @@ const JobDetails: React.FC = () => {
         return;
       }
 
-      await jobDetailsApiService.removeProjectManager(job.jobNumber, projectManagerId);
+      await jobDetailsApiService.removeProjectManager(
+        job.jobNumber,
+        projectManagerId,
+      );
       console.log("Project manager removed successfully");
-      
+
       // Refresh job data
       await loadJobData();
     } catch (error) {
@@ -172,9 +184,12 @@ const JobDetails: React.FC = () => {
         return;
       }
 
-      await jobDetailsApiService.removeSiteContact(job.jobNumber, siteContactId);
+      await jobDetailsApiService.removeSiteContact(
+        job.jobNumber,
+        siteContactId,
+      );
       console.log("Site contact removed successfully");
-      
+
       // Refresh job data
       await loadJobData();
     } catch (error) {
@@ -186,9 +201,9 @@ const JobDetails: React.FC = () => {
   // Helper functions
   const getInitials = (name: string): string => {
     return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
@@ -199,7 +214,7 @@ const JobDetails: React.FC = () => {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 1) return "Today";
     if (diffDays === 2) return "Yesterday";
     if (diffDays <= 7) return `${diffDays} days ago`;
@@ -208,17 +223,24 @@ const JobDetails: React.FC = () => {
   };
 
   const getActiveProjectManager = () => {
-    return job?.projectManagers?.filter(pm => pm.isActive)?.[0] || null;
+    return job?.projectManagers?.filter((pm) => pm.isActive)?.[0] || null;
   };
 
   const getActiveSiteContact = () => {
-    return job?.siteContacts?.filter(sc => sc.isActive)?.[0] || null;
+    return job?.siteContacts?.filter((sc) => sc.isActive)?.[0] || null;
   };
 
   // Loading state
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "50vh",
+        }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -231,9 +253,7 @@ const JobDetails: React.FC = () => {
         <Alert severity="error" sx={{ mb: 2 }}>
           {error || "Job not found"}
         </Alert>
-        <Button onClick={() => navigate(-1)}>
-          Go Back
-        </Button>
+        <Button onClick={() => navigate(-1)}>Go Back</Button>
       </Container>
     );
   }
@@ -266,7 +286,7 @@ const JobDetails: React.FC = () => {
                 opacity: 0.8,
               },
             }}
-            onClick={() => handleContactClick('projectManager')}
+            onClick={() => handleContactClick("projectManager")}
           >
             <Avatar
               sx={{
@@ -284,7 +304,9 @@ const JobDetails: React.FC = () => {
               <Typography variant="body1" sx={{ fontWeight: 500 }}>
                 {(() => {
                   const activePM = getActiveProjectManager();
-                  return activePM ? activePM.fullName : "No project manager assigned";
+                  return activePM
+                    ? activePM.fullName
+                    : "No project manager assigned";
                 })()}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -304,7 +326,7 @@ const JobDetails: React.FC = () => {
                 opacity: 0.8,
               },
             }}
-            onClick={() => handleContactClick('siteContact')}
+            onClick={() => handleContactClick("siteContact")}
           >
             <Avatar
               sx={{
@@ -315,14 +337,18 @@ const JobDetails: React.FC = () => {
             >
               {(() => {
                 const activeSC = getActiveSiteContact();
-                return activeSC ? getInitials(activeSC.contactName || "Unknown") : "?";
+                return activeSC
+                  ? getInitials(activeSC.contactName || "Unknown")
+                  : "?";
               })()}
             </Avatar>
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 500 }}>
                 {(() => {
                   const activeSC = getActiveSiteContact();
-                  return activeSC ? (activeSC.contactName || "Unknown Contact") : "No site contact assigned";
+                  return activeSC
+                    ? activeSC.contactName || "Unknown Contact"
+                    : "No site contact assigned";
                 })()}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -346,14 +372,24 @@ const JobDetails: React.FC = () => {
                   <Typography variant="body1" color="text.secondary">
                     {note.note}
                   </Typography>
-                  <Typography variant="caption" color="text.disabled" sx={{ mt: 1, display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    color="text.disabled"
+                    sx={{ mt: 1, display: "block" }}
+                  >
                     {new Date(note.createdDate).toLocaleDateString()}
                   </Typography>
-                  {index < job.jobNotes!.length - 1 && <Divider sx={{ mt: 2 }} />}
+                  {index < job.jobNotes!.length - 1 && (
+                    <Divider sx={{ mt: 2 }} />
+                  )}
                 </Box>
               ))
             ) : (
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontStyle: "italic" }}
+              >
                 No notes available for this job
               </Typography>
             )}
@@ -426,7 +462,11 @@ const JobDetails: React.FC = () => {
               ))}
             </Stack>
           ) : (
-            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic", py: 2 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontStyle: "italic", py: 2 }}
+            >
               No reports available for this job
             </Typography>
           )}
@@ -457,22 +497,30 @@ const JobDetails: React.FC = () => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <DialogTitle
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6">
-            {selectedContactType === 'projectManager' ? 'Project Managers' : 'Site Contacts'}
+            {selectedContactType === "projectManager"
+              ? "Project Managers"
+              : "Site Contacts"}
           </Typography>
           <IconButton onClick={handleCloseContactDialog}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        
+
         <DialogContent>
-          {selectedContactType === 'projectManager' ? (
+          {selectedContactType === "projectManager" ? (
             <Box>
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
                 Project Managers for Job #{job?.jobNumber}
               </Typography>
-              
+
               {job?.projectManagers && job.projectManagers.length > 0 ? (
                 <List>
                   {job.projectManagers.map((manager) => (
@@ -487,7 +535,13 @@ const JobDetails: React.FC = () => {
                       }}
                     >
                       <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: manager.isActive ? "primary.main" : "grey.400" }}>
+                        <Avatar
+                          sx={{
+                            bgcolor: manager.isActive
+                              ? "primary.main"
+                              : "grey.400",
+                          }}
+                        >
                           {getInitials(manager.fullName)}
                         </Avatar>
                       </ListItemAvatar>
@@ -496,8 +550,10 @@ const JobDetails: React.FC = () => {
                         secondary={
                           <Box>
                             <Typography variant="body2" color="text.secondary">
-                              Start Date: {new Date(manager.startDate).toLocaleDateString()}
-                              {manager.endDate && ` • End Date: ${new Date(manager.endDate).toLocaleDateString()}`}
+                              Start Date:{" "}
+                              {new Date(manager.startDate).toLocaleDateString()}
+                              {manager.endDate &&
+                                ` • End Date: ${new Date(manager.endDate).toLocaleDateString()}`}
                             </Typography>
                             <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                               <Chip
@@ -518,9 +574,11 @@ const JobDetails: React.FC = () => {
                       />
                       <Box sx={{ display: "flex", gap: 1 }}>
                         {manager.isActive && (
-                          <IconButton 
-                            size="small" 
-                            onClick={() => handleRemoveProjectManager(manager.id)}
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              handleRemoveProjectManager(manager.id)
+                            }
                             sx={{ color: "error.main" }}
                           >
                             <CloseIcon />
@@ -532,7 +590,11 @@ const JobDetails: React.FC = () => {
                 </List>
               ) : (
                 <Box sx={{ textAlign: "center", py: 4 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
                     No project managers assigned to this job
                   </Typography>
                   <Button variant="outlined" startIcon={<AddIcon />}>
@@ -546,7 +608,7 @@ const JobDetails: React.FC = () => {
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
                 Site Contacts for Job #{job?.jobNumber}
               </Typography>
-              
+
               {job?.siteContacts && job.siteContacts.length > 0 ? (
                 <List>
                   {job.siteContacts.map((contact) => (
@@ -561,7 +623,13 @@ const JobDetails: React.FC = () => {
                       }}
                     >
                       <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: contact.isActive ? "secondary.main" : "grey.400" }}>
+                        <Avatar
+                          sx={{
+                            bgcolor: contact.isActive
+                              ? "secondary.main"
+                              : "grey.400",
+                          }}
+                        >
                           {getInitials(contact.contactName || "Unknown")}
                         </Avatar>
                       </ListItemAvatar>
@@ -576,8 +644,12 @@ const JobDetails: React.FC = () => {
                             </Typography>
                             <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                               <Chip
-                                label={contact.isPrimary ? "Primary" : "Secondary"}
-                                color={contact.isPrimary ? "primary" : "default"}
+                                label={
+                                  contact.isPrimary ? "Primary" : "Secondary"
+                                }
+                                color={
+                                  contact.isPrimary ? "primary" : "default"
+                                }
                                 size="small"
                               />
                               <Chip
@@ -598,8 +670,8 @@ const JobDetails: React.FC = () => {
                       />
                       <Box sx={{ display: "flex", gap: 1 }}>
                         {contact.isActive && (
-                          <IconButton 
-                            size="small" 
+                          <IconButton
+                            size="small"
                             onClick={() => handleRemoveSiteContact(contact.id)}
                             sx={{ color: "error.main" }}
                           >
@@ -612,7 +684,11 @@ const JobDetails: React.FC = () => {
                 </List>
               ) : (
                 <Box sx={{ textAlign: "center", py: 4 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
                     No site contacts assigned to this job
                   </Typography>
                   <Button variant="outlined" startIcon={<AddIcon />}>
@@ -623,13 +699,11 @@ const JobDetails: React.FC = () => {
             </Box>
           )}
         </DialogContent>
-        
+
         <DialogActions>
-          <Button onClick={handleCloseContactDialog}>
-            Close
-          </Button>
-          <Button 
-            variant="contained" 
+          <Button onClick={handleCloseContactDialog}>Close</Button>
+          <Button
+            variant="contained"
             startIcon={<AddIcon />}
             onClick={() => {
               handleCloseContactDialog();
@@ -638,7 +712,10 @@ const JobDetails: React.FC = () => {
               }
             }}
           >
-            Add {selectedContactType === 'projectManager' ? 'Project Manager' : 'Site Contact'}
+            Add{" "}
+            {selectedContactType === "projectManager"
+              ? "Project Manager"
+              : "Site Contact"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -649,7 +726,7 @@ const JobDetails: React.FC = () => {
           open={contactSelectionDialogOpen}
           onClose={handleCloseContactSelection}
           onSelectContact={handleSelectContact}
-          title={`Select ${contactSelectionType === 'projectManager' ? 'Project Manager' : 'Site Contact'}`}
+          title={`Select ${contactSelectionType === "projectManager" ? "Project Manager" : "Site Contact"}`}
           jobNumber={job?.jobNumber || ""}
         />
       )}
