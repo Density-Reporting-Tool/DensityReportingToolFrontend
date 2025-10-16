@@ -1,35 +1,80 @@
-# DensityReportingToolFrontend
+# Density Reporting Tool — Frontend
 
-# Dependencies
+## Table of Contents
 
-## Commitlint
+1. [Summary](#summary)
+2. [Motivation](#motivation)
+3. [Tech Stack](#tech-stack)
+4. [Features](#features)
+5. [Contributors](#contributors)
+6. [Gallery](#gallery)
+7. [Development Setup](#development-setup)
 
-- Ensures commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format.
+## Summary
 
-## lint-staged
+This is an early-stage tool: a React + TypeScript Progressive Web Application (PWA) designed for civil engineering teams to manage density testing workflows. The app streamlines field technician data entry and lab admin reporting, addressing real-world pain points. We are in active collaboration with a practicing civil engineer to validate workflows and ensure the app meets real-world needs.
 
-- Runs linters and formatters on staged files only (files added but not yet committed).
-- Works with ESLint (enforces code correctness and quality) and Prettier (code style) before committing.
+## Motivation
 
-## ESLint
+The project arose from a team member’s firsthand pain points as a field technician, aiming to digitize previously paper-based data entry workflows to reduce errors during data transfer. It streamlines real-world workflows by enabling fast, clear, and low-effort data capture while providing admin tools for managing proctors, jobs, and distribution lists.
 
-- A static code checker for JavaScript and TypeScript.
-- Detects errors, bad practices, and enforces consistent coding standards.
+## Features
 
-## Husky
+### Field Tech Workflows
 
-Automates scripts using Git hooks.
+- Density shots listing and details
+- Photo capture and review (`react-webcam` integration)
+- Job, report, and proctor reference views
 
-In this project:
+### Lab Admin Tools
 
-- pre-commit: runs lint-staged to format staged files with Prettier and check code with ESLint.
-- commit-msg: validates commit messages to ensure they follow Conventional Commit standards.
+- Proctor management (add/update/list)
+- Job creation and dashboard views
+- Distribution list manager (email distribution config)
 
-# Setup
+### Mobile and Offline support
 
-## Docker Dev (recommended)
+- Basic PWA setup using Workbox, enabling mobile access and offline capabilities
 
-### 1. clone the repository
+## Tech Stack
+
+-**Frontend**: React, TypeScript, Vite
+
+- **UI**: Material UI (`@mui/material`, `@mui/icons-material`)
+- **State & Data**: Zustand, React Hook Form, TanStack React Query
+- **Routing**: React Router v6
+- **PWA/Offline**: Workbox (precaching, routing, strategies)
+- **Media**: Cloudinary SDK (`@cloudinary/react`, `@cloudinary/url-gen`), `react-webcam`
+- **Code Quality**: ESLint, Prettier, Husky, lint-staged, Commitlint
+
+## Contributors
+
+- Peter Senyk
+- Irene Cheung
+
+## Gallery
+
+_Screenshots and demo images showcasing key workflows will be added here._
+
+## Development Setup
+
+### Dependencies
+
+-**Commitlint**: Ensures commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format.
+
+-**lint-staged**: Runs linters and formatters on staged files before committing (works with ESLint and Prettier).
+
+-**ESLint**: Static code checker for JavaScript/TypeScript that enforces code quality and standards.
+
+-**Husky**: Automates Git hooks:
+
+1. **pre-commit** runs lint-staged to format and check code
+
+2. **commit-msg** validates commit messages
+
+## Docker Development (recommended)
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Density-Reporting-Tool/DensityReportingToolFrontend.git
@@ -41,22 +86,20 @@ Refer to .env.example for a template
 
 ### 3. Verify linters and Commit Hooks
 
-get the latest version of husky
-
 ```bash
 npm install husky@latest --save-dev
 npx husky install
 ```
 
-### 4. build and run the container
+### 4. Build and run the container
 
 ```bash
 docker compose up --build
 ```
 
-## Local Dev
+## Local Development
 
-### 1. clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Density-Reporting-Tool/DensityReportingToolFrontend.git
@@ -64,7 +107,7 @@ git clone https://github.com/Density-Reporting-Tool/DensityReportingToolFrontend
 
 ### 2. Add your secret .env file
 
-look at env.example for formatting
+Refer to .env.example for a template
 
 ### 3. Install Dependencies
 
@@ -76,8 +119,6 @@ npm ci
 ```
 
 ### 4. Verify linters and Commit Hooks
-
-get the latest version of husky
 
 ```bash
 npm install husky@latest --save-dev
