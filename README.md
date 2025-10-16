@@ -38,14 +38,14 @@ The project arose from a team member’s firsthand pain points as a field techni
 
 ## Tech Stack
 
--**Frontend**: React, TypeScript, Vite
-
-- **UI**: Material UI (`@mui/material`, `@mui/icons-material`)
+- **Frontend**: React, TypeScript, Vite
 - **State & Data**: Zustand, React Hook Form, TanStack React Query
 - **Routing**: React Router v6
 - **PWA/Offline**: Workbox (precaching, routing, strategies)
 - **Media**: Cloudinary SDK (`@cloudinary/react`, `@cloudinary/url-gen`), `react-webcam`
 - **Code Quality**: ESLint, Prettier, Husky, lint-staged, Commitlint
+- **UI**: Material UI (`@mui/material`, `@mui/icons-material`)
+- **Containerization**: Docker, Docker Compose
 
 ## Contributors
 
