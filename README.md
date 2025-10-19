@@ -1,5 +1,8 @@
 # Density Reporting Tool — Frontend
 
+<img src="./public/assets/report.jpg" width=200>
+<img src="./public/assets/densitytest.jpg" width=200>
+
 ## Table of Contents
 
 1. [Summary](#summary)
@@ -130,3 +133,21 @@ npx husky install
 ```bash
 npm run dev
 ```
+
+## Gallery
+
+### Job page
+
+<img src="./public/assets/drtjobpage.jpg" width=200>
+
+### Report page
+
+<img src="./public/assets/report.jpg" width=200>
+
+### Density Shot Test page
+
+<img src="./public/assets/densitytest.jpg" width=200>
+
+### Photos page
+
+<img src="./public/assets/photos.jpg" width=200>
