@@ -4,13 +4,14 @@ import {
   ContactSearchResult,
   ContactValidationResult,
   GeoPacificEmployeeContactData,
-  GeoPacificAppUserData
+  GeoPacificAppUserData,
 } from "@/types/contacts";
 import { apiService, ApiResponse } from "./apiService";
+import { ENDPOINTS } from "@/config/endpoints";
 
 // Main ContactApiService class following the same pattern as ProctorApiService
 class ContactApiService {
-  private readonly baseEndpoint = "/api/contacts";
+  private readonly baseEndpoint = ENDPOINTS.PEOPLE.LIST;
 
   // Get all contacts
   async getAllContacts(): Promise<ApiResponse<ContactSearchResult[]>> {

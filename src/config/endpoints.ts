@@ -64,14 +64,14 @@ export const ENDPOINTS = {
     HOME: "/home",
     API_HEALTH: "/api/health",
   },
-  CONTACTS: {
-    LIST: "/api/contacts",
-    CREATE: "/api/contacts",
-    GET: (id: number) => `/api/contacts/${id}`,
-    UPDATE: (id: number) => `/api/contacts/${id}`,
-    DELETE: (id: number) => `/api/contacts/${id}`,
-    SEARCH: (searchTerm: string) => `/api/contacts/search?searchTerm=${searchTerm}`,
-    CREATE_GEOPACIFIC_EMPLOYEE: "/api/contacts/geopacific-employee",
-    CREATE_GEOPACIFIC_APP_USER: "/api/contacts/geopacific-app-user",
+  PEOPLE: {
+    LIST: "/api/people",
+    CREATE: "/api/people",
+    GET: (id: number) => `/api/people/${id}`,
+    UPDATE: (id: number) => `/api/people/${id}`,
+    DELETE: (id: number) => `/api/people/${id}`,
+    SEARCH: (searchTerm: string) => `/api/people/search?searchTerm=${searchTerm}`,
+    // CREATE_GEOPACIFIC_EMPLOYEE: "/api/people/geopacific-employee",
+    // CREATE_GEOPACIFIC_APP_USER: "/api/people/geopacific-app-user",
   },
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Avatar, Stack } from "@mui/material";
 import {
@@ -12,11 +12,33 @@ import ContactForm from "@/components/ContactForm";
 import JobListing from "@/components/JobListing";
 import { ContactData } from "@/types/contacts";
 import { JobReadDTO } from "@/dtos/Job/job";
+import { contactApiService } from "@/services/contactApiService";
 
 const LabAdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [selectedSection, setSelectedSection] = useState<string>("");
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
+  const [allContacts, setAllContacts] = useState<ContactData[]>([]);
+  const [isLoadingContacts, setIsLoadingContacts] = useState(false);
+
+  // Load initial contacts when component mounts
+  useEffect(() => {
+    loadInitialContacts();
+  }, []);
+
+  const loadInitialContacts = async () => {
+    try {
+      setIsLoadingContacts(true);
+      const response = await contactApiService.getAllContacts();
+      if (response.data) {
+        setAllContacts(response.data);
+      }
+    } catch (error) {
+      console.error("Error loading contacts:", error);
+    } finally {
+      setIsLoadingContacts(false);
+    }
+  };
 
   const handleNavigation = (section: string) => {
     setSelectedSection(section);
@@ -36,7 +58,10 @@ const LabAdminDashboard: React.FC = () => {
 
   const handleContactSave = (contact: ContactData) => {
     console.log("Contact saved:", contact);
-    // You can add additional logic here like refreshing a contact list
+    // Add the new contact to all contacts state
+    setAllContacts(prev => [contact, ...prev]);
+    // Reload all contacts to ensure consistency with the server
+    loadInitialContacts();
   };
 
   const handleJobClick = (job: JobReadDTO) => {

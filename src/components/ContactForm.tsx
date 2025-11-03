@@ -4,9 +4,6 @@ import {
   Typography,
   TextField,
   Button,
-  FormControl,
-  Select,
-  MenuItem,
   Stack,
   Alert,
   CircularProgress,
@@ -22,9 +19,7 @@ import {
   Clear as ClearIcon,
 } from "@mui/icons-material";
 import { 
-  ContactData, 
-  GeoPacificEmployeeContactData, 
-  ContactValidationResult 
+  ContactData
 } from "@/types/contacts";
 import { contactApiService } from "@/services/contactApiService";
 
@@ -53,9 +48,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
     email: "",
     phoneNumber: "",
     company: "",
-    personType: "Contact",
-    role: "",
-    isAppUser: false
   });
   const [isGeoPacificEmployee, setIsGeoPacificEmployee] = useState(false);
 
@@ -64,23 +56,20 @@ const ContactForm: React.FC<ContactFormProps> = ({
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState<string>("");
 
-  // Sample role options - in a real app, these would come from an API
-  const roleOptions = [
-    "Project Manager",
-    "Site Contact",
-    "Lab Technician",
-    "Field Technician",
-    "Administrator",
-    "Engineer",
-    "Supervisor"
-  ];
-
   // Initialize form data when component opens or initialData changes
   useEffect(() => {
     if (open) {
       if (initialData) {
-        setFormData(initialData);
-        setIsGeoPacificEmployee(initialData.personType === "GeoPacific Employee");
+        const company = initialData.company || "";
+        setFormData({
+          id: initialData.id,
+          firstName: initialData.firstName || "",
+          lastName: initialData.lastName || "",
+          email: initialData.email || "",
+          phoneNumber: initialData.phoneNumber || "",
+          company: company,
+        });
+        setIsGeoPacificEmployee(company === "GeoPacific Consultants");
       } else {
         // Reset form to default values
         setFormData({
@@ -90,9 +79,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
           email: "",
           phoneNumber: "",
           company: "",
-          personType: "Contact",
-          role: "",
-          isAppUser: false
         });
         setIsGeoPacificEmployee(false);
       }
@@ -118,10 +104,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
     
     setFormData((prev) => ({
       ...prev,
-      personType: checked ? "GeoPacific Employee" : "Contact",
       company: checked ? "GeoPacific Consultants" : "",
-      role: checked ? prev.role : "",
-      isAppUser: false // Always false for now, can be extended later
     }));
   };
 
@@ -132,39 +115,16 @@ const ContactForm: React.FC<ContactFormProps> = ({
       setValidationErrors([]);
       setSuccessMessage("");
 
-      // Validate form data based on contact type
-      let validation: ContactValidationResult;
-      
-      if (formData.personType === "GeoPacific Employee") {
-        const employeeData: GeoPacificEmployeeContactData = {
-          ...formData,
-          id: formData.id,
-          roleId: undefined, // RoleId is optional for contact-only employees
-          isAppUser: false
-        };
-        validation = contactApiService.validateGeoPacificEmployeeContactData(employeeData);
-      } else {
-        validation = contactApiService.validateContactData(formData);
-      }
+      // Validate form data
+      const validation = contactApiService.validateContactData(formData);
 
       if (!validation.isValid) {
         setValidationErrors(validation.errors);
         return;
       }
 
-      // Save to database based on contact type
-      let response;
-      if (formData.personType === "GeoPacific Employee") {
-        const employeeData: GeoPacificEmployeeContactData = {
-          ...formData,
-          id: formData.id,
-          roleId: undefined, // RoleId is optional for contact-only employees
-          isAppUser: false
-        };
-        response = await contactApiService.createGeoPacificEmployeeContact(employeeData);
-      } else {
-        response = await contactApiService.createContact(formData);
-      }
+      // Save to database
+      const response = await contactApiService.createContact(formData);
 
       console.log("Contact saved successfully!", response.data);
       setSuccessMessage("Contact saved successfully!");
@@ -179,9 +139,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
           email: formData.email,
           phoneNumber: formData.phoneNumber,
           company: formData.company,
-          personType: formData.personType,
-          role: formData.role,
-          isAppUser: formData.isAppUser
         };
         onSave(contactData);
       }
@@ -208,9 +165,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
       email: "",
       phoneNumber: "",
       company: "",
-      personType: "Contact",
-      role: "",
-      isAppUser: false
     });
     setIsGeoPacificEmployee(false);
     setValidationErrors([]);
@@ -377,31 +331,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
           }}
         />
       </Box>
-
-      {/* Role (for GeoPacific employees) */}
-      {isGeoPacificEmployee && (
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-            Role *
-          </Typography>
-          <FormControl fullWidth size="small">
-            <Select
-              value={formData.role || ""}
-              onChange={(e) => handleInputChange("role", e.target.value)}
-              sx={{
-                backgroundColor: "white",
-                borderRadius: 1,
-              }}
-            >
-              {roleOptions.map((role) => (
-                <MenuItem key={role} value={role}>
-                  {role}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-      )}
 
       {/* Action Buttons */}
       <Stack direction="row" spacing={2} sx={{ mt: 4 }}>
