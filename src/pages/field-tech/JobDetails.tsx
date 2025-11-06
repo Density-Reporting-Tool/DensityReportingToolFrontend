@@ -19,7 +19,7 @@ import HeaderTitle from "@/components/headers/HeaderTitle";
 // Mock data
 const jobData = {
   id: 1,
-  jobNumber: "000001",
+  jobId: "000001",
   address: "123 Main St, Vancouver, BC",
   contacts: [
     { id: 1, initials: "JS", name: "Jakub Szary", role: "Project Manager" },
@@ -57,7 +57,14 @@ const JobDetails: React.FC = () => {
   };
 
   const handleNewReport = () => {
-    console.log("Create new report for job:", jobId);
+    const maxId = jobData.recentReports.reduce(
+      (acc, report) => Math.max(acc, report.id),
+      0,
+    );
+
+    const newReportId = maxId + 1;
+
+    navigate(`/job/${jobId}/report/${newReportId}`);
   };
 
   const handleClickShowAll = () => {
