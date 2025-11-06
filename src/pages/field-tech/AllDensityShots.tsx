@@ -45,7 +45,7 @@ const AllDensityShots = () => {
         subtitle={`Report ${reportId}`}
       />
 
-      <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
+      <Container maxWidth="md" sx={{ my: 3, mb: 12 }}>
         <HeaderTitle title={"Density Tests"} />
         <Stack gap={2}>
           {densityTests.map((test) => (

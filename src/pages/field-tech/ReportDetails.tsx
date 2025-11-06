@@ -207,7 +207,7 @@ const Report: React.FC = () => {
         title={`Job #${jobId}`}
         subtitle={`Report ${reportId}`}
       />
-      <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
+      <Container maxWidth="md" sx={{ my: 3, mb: 12 }}>
         {/* Density Test Section */}
         <Stack gap={1}>
           <Box id="densityTestSection">

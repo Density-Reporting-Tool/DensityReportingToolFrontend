@@ -56,7 +56,7 @@ const ProctorDetails = () => {
         title={`Job #${jobId}`}
         subtitle={`Proctor Details`}
       />
-      <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
+      <Container maxWidth="md" sx={{ my: 3, mb: 12 }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack id="proctor-info" sx={{ mb: 10 }} gap={2}>
             <Typography variant="h5">Proctor Details</Typography>

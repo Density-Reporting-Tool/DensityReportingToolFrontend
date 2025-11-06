@@ -60,7 +60,7 @@ const FieldTechDashboard: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ my: 3 }}>
+    <Container maxWidth="md" sx={{ my: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Box

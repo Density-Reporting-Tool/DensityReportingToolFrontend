@@ -16,7 +16,7 @@ const AllProctors = () => {
   return (
     <>
       <HeaderWithBackButton title={`Job #${jobId}`} />
-      <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
+      <Container maxWidth="md" sx={{ my: 3, mb: 12 }}>
         <Box
           sx={{
             display: "flex",

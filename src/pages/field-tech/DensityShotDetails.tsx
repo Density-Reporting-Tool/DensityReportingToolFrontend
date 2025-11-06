@@ -137,7 +137,7 @@ const DensityShotDetails = () => {
         title={`Job #${jobId}`}
         subtitle={`Report ${reportId}`}
       />
-      <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
+      <Container maxWidth="md" sx={{ my: 3, mb: 12 }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Density Info */}
           <Stack id="density-info" sx={{ mb: 2 }} gap={2}>

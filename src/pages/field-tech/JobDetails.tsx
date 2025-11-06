@@ -78,7 +78,7 @@ const JobDetails: React.FC = () => {
         subtitle={`${jobData.address}`}
         onSubtitleClick={handleAddressClick}
       />
-      <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
+      <Container maxWidth="md" sx={{ my: 3, mb: 12 }}>
         {/* Contact Information */}
         <Box
           sx={{
