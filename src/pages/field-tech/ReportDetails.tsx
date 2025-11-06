@@ -27,7 +27,6 @@ import HeaderTitle from "@/components/headers/HeaderTitle";
 import BottomNavBar from "@/components/navbar/BottomNavBar";
 import Webcam from "react-webcam";
 import { useRef, useState } from "react";
-
 import UploadWidget from "@/components/UploadWidget";
 import EditIcon from "@mui/icons-material/Edit";
 
@@ -293,8 +292,19 @@ const Report: React.FC = () => {
                   </Accordion>
                 ))
               ) : (
-                <Card sx={{ padding: 2, borderRadius: 2 }}>
-                  No density tests
+                <Card
+                  sx={{
+                    padding: 2,
+                    borderRadius: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    minHeight: "75px",
+                    backgroundColor: "lightgrey",
+                    alignItems: "center",
+                  }}
+                >
+                  No Density Test yet
                 </Card>
               )}
             </Box>
@@ -393,7 +403,20 @@ const Report: React.FC = () => {
                 ))}
               </Stack>
             ) : (
-              <Card sx={{ padding: 2, borderRadius: 2 }}>No density tests</Card>
+              <Card
+                sx={{
+                  padding: 2,
+                  borderRadius: 2,
+                  display: "flex",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  minHeight: "75px",
+                  backgroundColor: "lightgrey",
+                  alignItems: "center",
+                }}
+              >
+                No Report Photos yet
+              </Card>
             )}
             <Box
               sx={{
