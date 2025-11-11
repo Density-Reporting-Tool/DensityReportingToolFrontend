@@ -104,7 +104,7 @@ class JobsAPIService extends BaseApiService {
     return this.post(ENDPOINTS.JOBS.CREATE, jobData);
   }
 
-  async getJob(jobNumber: string): Promise<ApiResponse<any>> {
+  async getJob(jobNumber: string): Promise<ApiResponse<JobReadDTO>> {
     return this.get(ENDPOINTS.JOBS.GET(jobNumber));
   }
 

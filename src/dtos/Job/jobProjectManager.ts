@@ -9,6 +9,7 @@ export interface JobProjectManagerBaseDTO {
   endDate?: string;        // ISO 8601 string, optional
 
   notes?: string;
+  isPrimary: boolean;
   isActive: boolean;
 }
 
