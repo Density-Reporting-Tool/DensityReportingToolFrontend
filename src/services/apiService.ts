@@ -1,4 +1,7 @@
 import { JobCreateDTO, JobReadDTO, JobUpdateDTO } from "@/dtos/Job/job";
+import { JobNoteReadDTO } from "@/dtos/Job/jobNote";
+import { JobProjectManagerCreateDTO, JobProjectManagerReadDTO, JobProjectManagerUpdateDTO } from "@/dtos/Job/jobProjectManager";
+import { JobSiteContactCreateDTO, JobSiteContactReadDTO, JobSiteContactUpdateDTO } from "@/dtos/Job/jobSiteContact";
 import { buildApiUrl, getAuthHeaders, getRequestTimeout } from "../config/api";
 import { ENDPOINTS } from "@/config/endpoints";
 
@@ -38,25 +41,40 @@ class BaseApiService {
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`API Error ${response.status}:`, errorText);
-        throw new Error(
+        // Create error object with status code preserved
+        const error: any = new Error(
           `HTTP error! status: ${response.status} - ${response.statusText}`,
         );
+        error.status = response.status;
+        error.responseText = errorText;
+        throw error;
       }
 
-      const data = await response.json();
+      let data: T;
+
+      if (response.status === 204) {
+        data = undefined as T;
+      } else {
+        const responseText = await response.text();
+        data = responseText ? (JSON.parse(responseText) as T) : (undefined as T);
+      }
 
       return {
         data,
         status: response.status,
         message: response.statusText,
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof Error) {
         console.error("API Service Error:", error);
+        // Preserve status if it exists (from HTTP errors), otherwise default to 500
+        const httpStatus = (error as any).status || 500;
+        const responseText = (error as any).responseText;
         throw {
           message: error.message,
-          status: 500,
+          status: httpStatus,
           details: error,
+          responseText: responseText,
         } as ApiError;
       }
       throw error;
@@ -125,6 +143,84 @@ class JobsAPIService extends BaseApiService {
   ): Promise<ApiResponse<JobReadDTO[]>> {
     return this.get(ENDPOINTS.JOBS.SEARCH(jobNumber));
   }
+
+  async addJobNote(
+    jobNumber: string,
+    note: string,
+  ): Promise<ApiResponse<JobNoteReadDTO>> {
+    return this.post(ENDPOINTS.JOBS.NOTES(jobNumber), { note });
+  }
+
+  async deleteJobNote(
+    jobNumber: string,
+    noteId: number,
+  ): Promise<ApiResponse<void>> {
+    return this.delete(ENDPOINTS.JOBS.NOTE(jobNumber, noteId));
+  }
+
+  // Project Manager methods
+  async createProjectManager(
+    jobNumber: string,
+    pmData: JobProjectManagerCreateDTO,
+  ): Promise<ApiResponse<JobProjectManagerReadDTO>> {
+    return this.post(ENDPOINTS.JOBS.PROJECT_MANAGER.CREATE(jobNumber), pmData);
+  }
+
+  async updateProjectManager(
+    jobNumber: string,
+    pmId: number,
+    pmData: JobProjectManagerUpdateDTO,
+  ): Promise<ApiResponse<JobProjectManagerReadDTO>> {
+    return this.put(ENDPOINTS.JOBS.PROJECT_MANAGER.UPDATE(jobNumber, pmId), pmData);
+  }
+
+  async deleteProjectManager(
+    jobNumber: string,
+    pmId: number,
+  ): Promise<ApiResponse<void>> {
+    return this.delete(ENDPOINTS.JOBS.PROJECT_MANAGER.DELETE(jobNumber, pmId));
+  }
+
+  // Site Contact methods
+  async createSiteContact(
+    jobNumber: string,
+    scData: JobSiteContactCreateDTO,
+  ): Promise<ApiResponse<JobSiteContactReadDTO>> {
+    return this.post(ENDPOINTS.JOBS.SITE_CONTACT.CREATE(jobNumber), scData);
+  }
+
+  async updateSiteContact(
+    jobNumber: string,
+    scId: number,
+    scData: JobSiteContactUpdateDTO,
+  ): Promise<ApiResponse<JobSiteContactReadDTO>> {
+    return this.put(ENDPOINTS.JOBS.SITE_CONTACT.UPDATE(jobNumber, scId), scData);
+  }
+
+  async deleteSiteContact(
+    jobNumber: string,
+    scId: number,
+  ): Promise<ApiResponse<void>> {
+    return this.delete(ENDPOINTS.JOBS.SITE_CONTACT.DELETE(jobNumber, scId));
+  }
+}
+
+class PeopleAPIService extends BaseApiService {
+  async getPeople(): Promise<ApiResponse<any[]>> {
+    return this.get(ENDPOINTS.PEOPLE.LIST);
+  }
+
+  async getPerson(id: number): Promise<ApiResponse<any>> {
+    return this.get(ENDPOINTS.PEOPLE.GET(id));
+  }
+
+  async createEmployee(employeeData: any): Promise<ApiResponse<any>> {
+    return this.post(ENDPOINTS.PEOPLE.CREATE_EMPLOYEE, employeeData);
+  }
+
+  async createContractor(contractorData: any): Promise<ApiResponse<any>> {
+    return this.post(ENDPOINTS.PEOPLE.CREATE_CONTRACTOR, contractorData);
+  }
 }
 
 // class ProctorsAPIService extends BaseApiService {
@@ -182,6 +278,7 @@ class TestAPIService extends BaseApiService {
 
 export const apiService = new BaseApiService();
 export const jobsAPIService = new JobsAPIService();
+export const peopleAPIService = new PeopleAPIService();
 export const testAPIService = new TestAPIService();
 
 export type { ApiResponse, ApiError };

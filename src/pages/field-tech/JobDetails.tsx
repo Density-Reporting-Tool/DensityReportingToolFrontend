@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -9,16 +9,23 @@ import {
   Button,
   Stack,
   Divider,
+  TextField,
 } from "@mui/material";
 import {
   Add as AddIcon,
   ChevronRight as ChevronRightIcon,
+  DeleteOutline as DeleteOutlineIcon,
+  Edit as EditIcon,
 } from "@mui/icons-material";
+import IconButton from "@mui/material/IconButton";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
 import HeaderTitle from "@/components/headers/HeaderTitle";
+import ContactEditDialog from "@/components/ContactEditDialog";
 import { jobsAPIService } from "@/services/apiService";
 import { JobReadDTO } from "@/dtos/Job/job";
 import { JobProjectManagerReadDTO } from "@/dtos/Job/jobProjectManager";
+import { JobSiteContactReadDTO } from "@/dtos/Job/jobSiteContact";
+import { JobNoteReadDTO } from "@/dtos/Job/jobNote";
 
 interface ContactDisplay {
   id: string;
@@ -78,12 +85,37 @@ const formatDate = (isoDate?: string | null) => {
   }).format(parsed);
 };
 
+const formatDateTime = (isoDate?: string | null) => {
+  if (!isoDate) {
+    return "";
+  }
+
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(parsed);
+};
+
 const JobDetails: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
   const [jobData, setJobData] = useState<JobReadDTO | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [newNote, setNewNote] = useState<string>("");
+  const [isAddingNote, setIsAddingNote] = useState<boolean>(false);
+  const [notesError, setNotesError] = useState<string | null>(null);
+  const [deletingNoteIds, setDeletingNoteIds] = useState<number[]>([]);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<{
+    type: "project-manager" | "site-contact";
+    contact: JobProjectManagerReadDTO | JobSiteContactReadDTO | null;
+  } | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -200,13 +232,36 @@ const JobDetails: React.FC = () => {
     return contactDisplays;
   }, [jobData]);
 
-  const notes = useMemo(
-    () =>
-      jobData?.jobNotes
-        ?.map((note) => note?.note)
-        .filter((note): note is string => Boolean(note && note.trim())) ?? [],
-    [jobData?.jobNotes],
-  );
+  const jobNotes = useMemo<JobNoteReadDTO[]>(() => {
+    if (!jobData?.jobNotes?.length) {
+      return [];
+    }
+
+    const normalizedNotes = jobData.jobNotes
+      .filter((note): note is JobNoteReadDTO => Boolean(note))
+      .map((note) => {
+        const noteText =
+          (note as JobNoteReadDTO).note ??
+          ((note as unknown as { Note?: string }).Note ?? "");
+        const created =
+          note.createdDate ??
+          ((note as unknown as { CreatedDate?: string }).CreatedDate ?? "");
+
+        return {
+          ...note,
+          note: typeof noteText === "string" ? noteText : String(noteText ?? ""),
+          createdDate:
+            typeof created === "string" ? created : String(created ?? ""),
+        };
+      })
+      .filter((note) => Boolean(note.note && note.note.trim()));
+
+    return normalizedNotes.sort(
+      (a, b) =>
+        new Date(b.createdDate ?? 0).getTime() -
+        new Date(a.createdDate ?? 0).getTime(),
+    );
+  }, [jobData?.jobNotes]);
 
   const recentReports = useMemo<RecentReportDisplay[]>(() => {
     if (!jobData?.reports?.length) {
@@ -243,6 +298,67 @@ const JobDetails: React.FC = () => {
     });
   }, [jobData?.reports]);
 
+  const handleAddNote = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!jobId || !newNote.trim() || isAddingNote) {
+      return;
+    }
+
+    setIsAddingNote(true);
+    setNotesError(null);
+
+    try {
+      const response = await jobsAPIService.addJobNote(jobId, newNote.trim());
+      const createdNote = response.data;
+
+      setJobData((previous) =>
+        previous
+          ? {
+              ...previous,
+              jobNotes: [...(previous.jobNotes ?? []), createdNote],
+            }
+          : previous,
+      );
+      setNewNote("");
+    } catch (err) {
+      console.error("Failed to add job note", err);
+      setNotesError("Failed to add note. Please try again.");
+    } finally {
+      setIsAddingNote(false);
+    }
+  };
+
+  const handleDeleteNote = async (noteId?: number) => {
+    if (!jobId || !noteId || deletingNoteIds.includes(noteId)) {
+      return;
+    }
+
+    setDeletingNoteIds((previous) => [...previous, noteId]);
+    setNotesError(null);
+
+    try {
+      await jobsAPIService.deleteJobNote(jobId, noteId);
+      setJobData((previous) =>
+        previous
+          ? {
+              ...previous,
+              jobNotes: (previous.jobNotes ?? []).filter(
+                (note) => note?.id !== noteId,
+              ),
+            }
+          : previous,
+      );
+    } catch (err) {
+      console.error("Failed to delete job note", err);
+      setNotesError("Failed to delete note. Please try again.");
+    } finally {
+      setDeletingNoteIds((previous) =>
+        previous.filter((id) => id !== noteId),
+      );
+    }
+  };
+
   const handleClickReport = (reportId: number) => {
     navigate(`report/${reportId}`);
   };
@@ -266,6 +382,50 @@ const JobDetails: React.FC = () => {
     window.open(googleMapsUrl, "_blank");
   };
 
+  const handleEditContact = (
+    type: "project-manager" | "site-contact",
+    contact: JobProjectManagerReadDTO | JobSiteContactReadDTO | null,
+  ) => {
+    setEditingContact({ type, contact });
+    setEditDialogOpen(true);
+  };
+
+  const handleContactSaved = async () => {
+    // Reload job data to get updated contacts
+    if (!jobId) return;
+
+    try {
+      const response = await jobsAPIService.getJob(jobId);
+      setJobData(response.data);
+    } catch (err) {
+      console.error("Failed to reload job data", err);
+    }
+  };
+
+  const getContactForEdit = (
+    contactId: string,
+  ): JobProjectManagerReadDTO | JobSiteContactReadDTO | null => {
+    if (!jobData) return null;
+
+    if (contactId.startsWith("pm-")) {
+      const pmId = parseInt(contactId.replace("pm-", ""));
+      return (
+        (jobData.projectManagers as JobProjectManagerReadDTO[] | undefined)?.find(
+          (pm) => pm.id === pmId,
+        ) || null
+      );
+    } else if (contactId.startsWith("sc-")) {
+      const scId = parseInt(contactId.replace("sc-", ""));
+      return (
+        (jobData.siteContacts as JobSiteContactReadDTO[] | undefined)?.find(
+          (sc) => sc.id === scId,
+        ) || null
+      );
+    }
+
+    return null;
+  };
+
   return (
     <>
       <HeaderWithBackButton
@@ -286,65 +446,176 @@ const JobDetails: React.FC = () => {
         {!isLoading && !error && jobData && (
           <>
             {/* Contact Information */}
-              <Box
+            <Box
               sx={{
                 my: 3,
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-around",
+                gap: 2,
               }}
-              >
-              {contacts.map((contact) => (
-                <Box
-                  key={contact.id}
-                  sx={{
-                    display: "flex",
-                    gap: 1,
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Avatar
+            >
+              {contacts.map((contact) => {
+                // Check if this is a placeholder contact
+                const isPlaceholder =
+                  contact.id === "pm-placeholder" ||
+                  contact.id === "sc-placeholder" ||
+                  contact.isPlaceholder === true;
+                
+                const contactType = contact.id.startsWith("pm-")
+                  ? "project-manager"
+                  : "site-contact";
+                
+                // Get the contact data for editing (only if not a placeholder)
+                const contactForEdit = isPlaceholder
+                  ? null
+                  : getContactForEdit(contact.id);
+
+                return (
+                  <Box
+                    key={contact.id}
                     sx={{
-                      width: 45,
-                      height: 45,
-                      bgcolor: "primary.main",
+                      display: "flex",
+                      gap: 1,
+                      alignItems: "center",
+                      flex: 1,
+                      maxWidth: "300px",
+                      position: "relative",
                     }}
                   >
-                    {contact.initials}
-                  </Avatar>
-                  <Box>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                      {contact.name}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {contact.role}
-                    </Typography>
+                    <Avatar
+                      sx={{
+                        width: 45,
+                        height: 45,
+                        bgcolor: isPlaceholder
+                          ? "grey.300"
+                          : "primary.main",
+                      }}
+                    >
+                      {contact.initials}
+                    </Avatar>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {contact.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {contact.role}
+                      </Typography>
+                    </Box>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        // Allow editing even for placeholders (to add new contact)
+                        handleEditContact(
+                          contactType as "project-manager" | "site-contact",
+                          contactForEdit, // Will be null for placeholders, which is fine for creating
+                        );
+                      }}
+                      sx={{
+                        ml: 1,
+                        position: "relative",
+                        zIndex: 10,
+                        opacity: isPlaceholder ? 0.6 : 1,
+                      }}
+                      aria-label={
+                        isPlaceholder
+                          ? `Add ${contact.role}`
+                          : `Edit ${contact.role}`
+                      }
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
                   </Box>
-                </Box>
-              ))}
-              </Box>
+                );
+              })}
+            </Box>
             {/* Notes Section */}
             <Box sx={{ mb: 3 }}>
               <Card sx={{ p: 2 }}>
                 <Typography variant="h6">Notes</Typography>
 
-                {notes.map((note, index) => (
+                {jobNotes.map((note, index) => (
                   <Box
-                    key={`${note}-${index}`}
-                    sx={{ mb: index < notes.length - 1 ? 2 : 0 }}
+                    key={note.id ?? `note-${index}`}
+                    sx={{ mb: index < jobNotes.length - 1 ? 2 : 0 }}
                   >
-                    <Typography variant="body1" color="text.secondary">
-                      {note}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        gap: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ flex: 1, wordBreak: "break-word", mr: 2 }}
+                      >
+                        {note.note}
+                      </Typography>
+                      <Button
+                        size="small"
+                        color="error"
+                        startIcon={<DeleteOutlineIcon fontSize="small" />}
+                        onClick={() => handleDeleteNote(note.id)}
+                        disabled={
+                          !note.id || deletingNoteIds.includes(note.id)
+                        }
+                      >
+                        {deletingNoteIds.includes(note.id ?? -1)
+                          ? "Deleting..."
+                          : "Delete"}
+                      </Button>
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
+                      {formatDateTime(note.createdDate)}
                     </Typography>
-                    {index < notes.length - 1 && <Divider sx={{ mt: 2 }} />}
+                    {index < jobNotes.length - 1 && <Divider sx={{ mt: 2 }} />}
                   </Box>
                 ))}
 
-                {!notes.length && (
+                {!jobNotes.length && (
                   <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
                     No notes available for this job.
                   </Typography>
                 )}
+
+                <Box
+                  component="form"
+                  onSubmit={handleAddNote}
+                  sx={{ mt: 3 }}
+                >
+                  <TextField
+                    value={newNote}
+                    onChange={(event) => setNewNote(event.target.value)}
+                    placeholder="Add a note..."
+                    multiline
+                    minRows={3}
+                    fullWidth
+                    disabled={isAddingNote}
+                  />
+                  {notesError && (
+                    <Typography
+                      variant="caption"
+                      color="error"
+                      sx={{ display: "block", mt: 1 }}
+                    >
+                      {notesError}
+                    </Typography>
+                  )}
+                  <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={!newNote.trim() || isAddingNote}
+                    >
+                      {isAddingNote ? "Adding..." : "Add Note"}
+                    </Button>
+                  </Box>
+                </Box>
               </Card>
             </Box>
 
@@ -434,6 +705,22 @@ const JobDetails: React.FC = () => {
               </Button>
             </Box>
           </>
+        )}
+
+        {/* Edit Contact Dialog */}
+        {editingContact && (
+          <ContactEditDialog
+            open={editDialogOpen}
+            onClose={() => {
+              setEditDialogOpen(false);
+              setEditingContact(null);
+            }}
+            jobNumber={jobId || ""}
+            jobId={jobData?.id || 0}
+            type={editingContact.type}
+            contact={editingContact.contact}
+            onSave={handleContactSaved}
+          />
         )}
       </Container>
     </>

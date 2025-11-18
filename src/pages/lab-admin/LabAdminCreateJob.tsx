@@ -13,6 +13,8 @@ import {
   DialogActions,
   IconButton,
   Stack,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import {
   Person as PersonIcon,
@@ -23,9 +25,11 @@ import {
 import DistributionListManager, {
   Contact,
 } from "../../components/DistributionListManager";
+import { peopleAPIService } from "@/services/apiService";
 
 const LabAdminCreateJob: React.FC = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(0);
   const [projectManager, setProjectManager] = useState("Jakub Szary");
   const [client, setClient] = useState("GeoPacific");
   const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false);
@@ -47,6 +51,8 @@ const LabAdminCreateJob: React.FC = () => {
     },
   ]);
   const [contactManagerOpen, setContactManagerOpen] = useState(false);
+  const [savingPerson, setSavingPerson] = useState(false);
+  const [personError, setPersonError] = useState<string | null>(null);
 
   const handleNavigation = (section: string) => {
     switch (section) {
@@ -95,16 +101,57 @@ const LabAdminCreateJob: React.FC = () => {
 
   const handleCloseDialog = () => {
     setAddPersonDialogOpen(false);
+    setPersonError(null);
+    // Reset form when closing
+    setNewPerson({
+      clientName: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+    });
   };
 
-  const handleSavePerson = () => {
-    // Add the new person to the project manager options
-    const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`;
-    if (!projectManagerOptions.includes(newPersonName)) {
-      projectManagerOptions.push(newPersonName);
+  const handleSavePerson = async () => {
+    // Validate required fields
+    if (!newPerson.firstName || !newPerson.lastName || !newPerson.email || !newPerson.clientName || !newPerson.phone) {
+      setPersonError("Please fill in all required fields (First Name, Last Name, Email, Phone Number, and Client Name)");
+      return;
     }
-    setProjectManager(newPersonName);
-    setAddPersonDialogOpen(false);
+
+    setSavingPerson(true);
+    setPersonError(null);
+
+    try {
+      const contractorData = {
+        firstName: newPerson.firstName,
+        lastName: newPerson.lastName,
+        email: newPerson.email,
+        phoneNumber: newPerson.phone,
+        company: newPerson.clientName,
+      };
+
+      const response = await peopleAPIService.createContractor(contractorData);
+      
+      if (response.data) {
+        // Success - close dialog and reset form
+        setAddPersonDialogOpen(false);
+        setNewPerson({
+          clientName: "",
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+        });
+        // Optionally show success message or refresh people list
+        // You might want to add a success notification here
+      }
+    } catch (err: any) {
+      console.error("Failed to save person", err);
+      setPersonError(err.message || "Failed to save person. Please try again.");
+    } finally {
+      setSavingPerson(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -115,7 +162,8 @@ const LabAdminCreateJob: React.FC = () => {
   };
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <>
+      <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header Bar */}
       <Box
         sx={{
@@ -241,14 +289,37 @@ const LabAdminCreateJob: React.FC = () => {
           sx={{
             flex: 1,
             backgroundColor: "background.default",
-            p: 4,
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
-            Job Details
-          </Typography>
+          {/* Tabs */}
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              value={activeTab}
+              onChange={(_, newValue) => setActiveTab(newValue)}
+              sx={{
+                "& .MuiTab-root": {
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: "1rem",
+                },
+              }}
+            >
+              <Tab label="Jobs" />
+              <Tab label="Add Contact" />
+            </Tabs>
+          </Box>
 
-          <Box sx={{ maxWidth: 600 }}>
+          {/* Tab Content */}
+          <Box sx={{ flex: 1, overflow: "auto", p: 4 }}>
+            {activeTab === 0 && (
+              <Box>
+                <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
+                  Job Details
+                </Typography>
+
+                <Box sx={{ maxWidth: 600 }}>
             {/* Job Number */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
@@ -462,6 +533,43 @@ const LabAdminCreateJob: React.FC = () => {
                 Save Job
               </Button>
             </Box>
+                </Box>
+              </Box>
+            )}
+
+            {activeTab === 1 && (
+              <Box>
+                <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
+                  Add Contact
+                </Typography>
+
+                <Box sx={{ maxWidth: 600 }}>
+                  <Button
+                    variant="contained"
+                    startIcon={<PersonAddIcon />}
+                    onClick={handleAddPerson}
+                    sx={{
+                      backgroundColor: "primary.main",
+                      color: "white",
+                      fontWeight: "bold",
+                      py: 1.5,
+                      px: 3,
+                      borderRadius: 2,
+                      mb: 3,
+                      "&:hover": {
+                        backgroundColor: "primary.dark",
+                      },
+                    }}
+                  >
+                    Add New Person
+                  </Button>
+
+                  <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+                    Click the button above to add a new contact to the system.
+                  </Typography>
+                </Box>
+              </Box>
+            )}
           </Box>
         </Box>
       </Box>
@@ -481,10 +589,11 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Client Name */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Client Name
+                Client Name *
               </Typography>
               <TextField
                 fullWidth
+                required
                 value={newPerson.clientName}
                 onChange={(e) =>
                   handleInputChange("clientName", e.target.value)
@@ -503,10 +612,11 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Contact First Name */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Contact First Name
+                Contact First Name *
               </Typography>
               <TextField
                 fullWidth
+                required
                 value={newPerson.firstName}
                 onChange={(e) => handleInputChange("firstName", e.target.value)}
                 variant="outlined"
@@ -523,10 +633,11 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Contact Last Name */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Contact Last Name
+                Contact Last Name *
               </Typography>
               <TextField
                 fullWidth
+                required
                 value={newPerson.lastName}
                 onChange={(e) => handleInputChange("lastName", e.target.value)}
                 variant="outlined"
@@ -543,10 +654,12 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Contact Email */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Contact Email
+                Contact Email *
               </Typography>
               <TextField
                 fullWidth
+                required
+                type="email"
                 value={newPerson.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 variant="outlined"
@@ -563,10 +676,12 @@ const LabAdminCreateJob: React.FC = () => {
             {/* Contact Phone Number */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                Contact Phone Number
+                Contact Phone Number *
               </Typography>
               <TextField
                 fullWidth
+                required
+                type="tel"
                 value={newPerson.phone}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
                 variant="outlined"
@@ -580,24 +695,31 @@ const LabAdminCreateJob: React.FC = () => {
               />
             </Box>
           </Box>
+          {personError && (
+            <Box sx={{ mt: 2, p: 2, backgroundColor: "error.light", borderRadius: 1 }}>
+              <Typography variant="body2" color="error.main">
+                {personError}
+              </Typography>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions sx={{ backgroundColor: "grey.50", p: 2, gap: 2 }}>
           <Button
-            variant="contained"
-            onClick={handleSavePerson}
+            variant="outlined"
+            onClick={handleCloseDialog}
+            disabled={savingPerson}
             sx={{
-              backgroundColor: "primary.main",
-              color: "white",
               fontWeight: "bold",
               px: 3,
               py: 1,
             }}
           >
-            Save Client
+            Cancel
           </Button>
           <Button
             variant="contained"
-            onClick={handleAddPerson}
+            onClick={handleSavePerson}
+            disabled={savingPerson}
             sx={{
               backgroundColor: "primary.main",
               color: "white",
@@ -606,7 +728,7 @@ const LabAdminCreateJob: React.FC = () => {
               py: 1,
             }}
           >
-            Add Additional Contact
+            {savingPerson ? "Saving..." : "Save Contact"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -621,7 +743,8 @@ const LabAdminCreateJob: React.FC = () => {
         jobNumber="25900"
         mode="dialog"
       />
-    </Box>
+      </Box>
+    </>
   );
 };
 
