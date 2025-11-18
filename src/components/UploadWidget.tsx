@@ -8,16 +8,24 @@ interface CloudinaryUploadWidget {
   destroy: () => void;
 }
 
+interface Cloudinary {
+  createUploadWidget: (options: {
+    cloudName: string;
+    uploadPreset: string;
+  }) => CloudinaryUploadWidget;
+}
+
 const UploadWidget = () => {
   const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-  const cloudinaryRef = useRef<typeof window.cloudinary>();
+  const cloudinaryRef = useRef<Cloudinary | undefined>();
   const widgetRef = useRef<CloudinaryUploadWidget | undefined>();
 
   useEffect(() => {
-    if (window.cloudinary) {
-      cloudinaryRef.current = window.cloudinary;
-      widgetRef.current = cloudinaryRef.current.createUploadWidget({
+    const cloudinary = (window as any).cloudinary as Cloudinary | undefined;
+    if (cloudinary) {
+      cloudinaryRef.current = cloudinary;
+      widgetRef.current = cloudinary.createUploadWidget({
         cloudName: cloudName,
         uploadPreset: uploadPreset,
       });
