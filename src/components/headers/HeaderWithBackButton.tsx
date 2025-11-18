@@ -24,12 +24,15 @@ const HeaderWithBackButton: React.FC<HeaderProps> = ({
   return (
     <>
       <AppBar
-        position="sticky"
+        position="fixed"
         sx={{
-          display: "flex",
+          display: "fix",
           flexDirection: "row",
           backgroundColor: "white",
           minHeight: "100px",
+          top: 0,
+          right: 0,
+          left: 0,
         }}
       >
         <Box sx={{ display: "flex", pt: 5 }}>
