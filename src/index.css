@@ -1,15 +1,17 @@
 /* Global styles that complement Material UI */
+@import "tailwindcss";
+
 * {
   box-sizing: border-box;
 }
 
 html {
-  font-size: 16px
+  font-size: 16px;
 }
 
 body {
   margin: 0;
-  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f5f5f5;
