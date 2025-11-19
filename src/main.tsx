@@ -20,6 +20,7 @@ import ProctorDetails from "./pages/field-tech/ProctorDetails";
 import AllPhotos from "./pages/field-tech/AllPhotos";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Layout from "@/components/Layout";
+import CreateReport from "./pages/field-tech/CreateReport";
 
 // PWA service worker registration is handled automatically by vite-plugin-pwa
 const queryClient = new QueryClient();
@@ -34,9 +35,16 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               {/* Field tech pages */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/field-tech/" element={<FieldTechDashboard />} />
-              <Route path="/field-tech/job/:jobId" element={<JobDetails />} />
               <Route
-                path="/field-tech/job/:jobId/report/:reportId"
+                path="/field-tech/job/:jobNumber"
+                element={<JobDetails />}
+              />
+              <Route
+                path="/field-tech/job/:jobId/create-report"
+                element={<CreateReport />}
+              />
+              <Route
+                path="/field-tech/job/:jobNumber/report/:reportId"
                 element={<ReportDetails />}
               />
               <Route
