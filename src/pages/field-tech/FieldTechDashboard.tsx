@@ -17,8 +17,8 @@ import {
 
 // Mock data
 const todaysSchedule = [
-  { id: 1, time: "7:00am", jobNumber: "000001" },
-  { id: 2, time: "9:00am", jobNumber: "000002" },
+  { id: 1, time: "7:00am", jobNumber: "2024-TEST-002" },
+  { id: 2, time: "9:00am", jobNumber: "TEST-1758139681" },
   { id: 3, time: "5:00pm", jobNumber: "000003" },
 ];
 
@@ -27,9 +27,9 @@ const reportsInProgress = [
     id: 1,
     period: "May 1 - May 31",
     reports: [
-      { id: 1, jobNumber: "000101", reportNumber: "2" },
-      { id: 2, jobNumber: "000102", reportNumber: "15" },
-      { id: 3, jobNumber: "000103", reportNumber: "7" },
+      { id: 1, jobNumber: "2024-TEST-002", reportNumber: "8" },
+      { id: 2, jobNumber: "2024-TEST-002", reportNumber: "9" },
+      { id: 3, jobNumber: "2024-TEST-002", reportNumber: "7" },
       { id: 4, jobNumber: "000104", reportNumber: "35" },
     ],
   },
