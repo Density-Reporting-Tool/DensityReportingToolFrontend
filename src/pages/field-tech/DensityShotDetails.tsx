@@ -17,7 +17,7 @@ import {
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { proctorApiService } from "@/services/lab-admin/proctorApiService";
+import { proctorApiService } from "@/services/proctorApi";
 import { ProctorData } from "@/types/proctors";
 import { SitePlan } from "@/types/sitePlan";
 import { useProctorStore } from "@/stores/proctorStore";
@@ -123,7 +123,8 @@ const DensityShotDetails = () => {
 
   const handleGetAllProctors = async () => {
     try {
-      const response = await proctorApiService.getAllProctors(jobNumber);
+      const response =
+        await proctorApiService.getProctorsByJobNumber(jobNumber);
       console.log(response);
       setProctors(response.data);
     } catch (error) {

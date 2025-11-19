@@ -17,7 +17,7 @@ import {
   Schedule as ScheduleIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
-import { proctorApiService } from "../../services/lab-admin/proctorApiService";
+import { proctorApiService } from "@/services/proctorApi";
 import { ProctorData } from "@/types/proctors";
 
 const LabAdminAddProctor: React.FC = () => {

@@ -8,7 +8,7 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import { apiService } from "../services/apiService";
+import { baseApiService } from "@/services/baseApiService";
 import { API_CONFIG, isRenderBackend } from "../config/api";
 
 const BackendStatus: React.FC = () => {
@@ -23,30 +23,38 @@ const BackendStatus: React.FC = () => {
   }, []);
 
   const testConnection = async () => {
-  setStatus("loading");
-  setMessage("");
+    setStatus("loading");
+    setMessage("");
 
-  const candidates = [
-    { url: ENDPOINTS.HEALTH.HEALTH, name: `health (${ENDPOINTS.HEALTH.HEALTH})` },
-    { url: ENDPOINTS.HEALTH.HOME, name: `home (${ENDPOINTS.HEALTH.HOME})` },
-    { url: ENDPOINTS.HEALTH.API_HEALTH, name: `api health (${ENDPOINTS.HEALTH.API_HEALTH})` },
-  ];
+    const candidates = [
+      {
+        url: ENDPOINTS.HEALTH.HEALTH,
+        name: `health (${ENDPOINTS.HEALTH.HEALTH})`,
+      },
+      { url: ENDPOINTS.HEALTH.HOME, name: `home (${ENDPOINTS.HEALTH.HOME})` },
+      {
+        url: ENDPOINTS.HEALTH.API_HEALTH,
+        name: `api health (${ENDPOINTS.HEALTH.API_HEALTH})`,
+      },
+    ];
 
-  for (const candidate of candidates) {
-    try {
-      const response = await apiService.get(candidate.url);
-      setStatus("success");
-      setMessage(`Connected via ${candidate.name}`);
-      return response;
-    } catch {
-      // keep trying next
+    for (const candidate of candidates) {
+      try {
+        const response = await baseApiService.get(candidate.url);
+        setStatus("success");
+        setMessage(`Connected via ${candidate.name}`);
+        return response;
+      } catch {
+        // keep trying next
+      }
     }
-  }
 
-  setStatus("error");
-  setMessage("All endpoints failed. Backend might be down or endpoints are different.");
-  throw new Error("Connection test failed");
-};
+    setStatus("error");
+    setMessage(
+      "All endpoints failed. Backend might be down or endpoints are different.",
+    );
+    throw new Error("Connection test failed");
+  };
 
   return (
     <Box sx={{ p: 2, border: 1, borderColor: "grey.300", borderRadius: 1 }}>

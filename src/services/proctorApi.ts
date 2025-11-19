@@ -1,52 +1,40 @@
-import { ProctorData, ProctorCreateResponse } from "@/types/proctors";
-import { apiService, ApiResponse } from "../apiService";
-import { ENDPOINTS } from "../../config/endpoints";
+import { ProctorData } from "@/types/proctors";
+import { ApiResponse } from "@/types/api";
+import { BaseApiService, baseApiService } from "./baseApiService";
+import { ENDPOINTS } from "@/config/endpoints";
 
-// Main ProctorApiService class
-class ProctorApiService {
-  private readonly baseEndpoint = "/api/proctors/lab-admin";
+class ProctorApiService extends BaseApiService {
+  async getAllProctdors(): Promise<ApiResponse<ProctorData[]>> {
+    return baseApiService.get(ENDPOINTS.PROCTOR.LIST);
+  }
 
-  async getAllProctors(jobNumber: string): Promise<ApiResponse<ProctorData[]>> {
-    try {
-      console.log("Getting all proctors for the job id: ", jobNumber);
-      return await apiService.get<ProctorData[]>(
-        `/api/proctors/job/${jobNumber}`,
-      );
-    } catch (error) {
-      console.error("Error fetching proctors for a job id", error);
-
-      throw error;
-    }
+  async createProctor(
+    proctorData: ProctorData,
+  ): Promise<ApiResponse<ProctorData>> {
+    return baseApiService.post(ENDPOINTS.PROCTOR.CREATE, proctorData);
   }
 
   async getProctorById(proctorId: string): Promise<ApiResponse<ProctorData>> {
-    try {
-      console.log("Getting proctor details for proctor id: ", proctorId);
-      const response = await apiService.get<ProctorData>(
-        `/api/proctors/${proctorId}`,
-      );
-      console.log(response);
-      return response;
-    } catch (error) {
-      console.error("Error fetching proctors for a job id", error);
-      throw error;
-    }
+    return baseApiService.get(ENDPOINTS.PROCTOR.GET(proctorId));
   }
 
-  // Create a new proctor
-  async createProctor(
+  async getProctorsByJobNumber(
+    jobNumber: string,
+  ): Promise<ApiResponse<ProctorData[]>> {
+    return baseApiService.get(ENDPOINTS.PROCTOR.JOB(jobNumber));
+  }
+
+  async updateProctorById(
+    proctorId: string,
     proctorData: ProctorData,
-  ): Promise<ApiResponse<ProctorCreateResponse>> {
-    try {
-      console.log("Creating proctor with data:", proctorData);
-      return await apiService.post<ProctorCreateResponse>(
-        ENDPOINTS.PROCTOR.LAB_ADMIN.CREATE,
-        proctorData,
-      );
-    } catch (error) {
-      console.error("Error creating proctor:", error);
-      throw error;
-    }
+  ): Promise<ApiResponse<ProctorData>> {
+    return baseApiService.put(ENDPOINTS.PROCTOR.UPDATE(proctorId), proctorData);
+  }
+
+  async deleteProctorById(
+    proctorId: string,
+  ): Promise<ApiResponse<ProctorData>> {
+    return baseApiService.delete(ENDPOINTS.PROCTOR.DELETE(proctorId));
   }
 
   // Validate proctor data before submission
