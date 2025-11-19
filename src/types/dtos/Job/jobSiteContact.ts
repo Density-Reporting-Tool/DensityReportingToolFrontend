@@ -17,9 +17,9 @@ export interface JobSiteContactUpdateDTO extends JobSiteContactBaseDTO {}
 
 export interface JobSiteContactReadDTO extends JobSiteContactBaseDTO {
   id: number;
-  contactName?: string;        // Full name from PersonalInfo
-  createdDate: string;         // ISO 8601 string
-  lastModifiedDate?: string;   // ISO 8601 string, optional
+  contactName?: string; // Full name from PersonalInfo
+  createdDate: string; // ISO 8601 string
+  lastModifiedDate?: string; // ISO 8601 string, optional
 
   personalInfo?: PersonalInfoReadDTO;
 }
