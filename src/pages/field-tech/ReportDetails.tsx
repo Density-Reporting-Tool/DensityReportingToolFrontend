@@ -18,6 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
 import {
   Add as AddIcon,
   CameraAlt as CameraAltIcon,
@@ -30,69 +31,87 @@ import { useRef, useState } from "react";
 
 import UploadWidget from "@/components/UploadWidget";
 import EditIcon from "@mui/icons-material/Edit";
+import { ReportReadDTO } from "@/types/dtos/report";
+import { reportApiService } from "@/services/reportApi";
 
-const report = {
-  id: 4,
-  jobId: 1,
-  initials: "IC",
-  densityTests: [
-    {
-      id: 1,
-      name: "Density Shot 1",
-      location: "Grid AB-07",
-      elevation: " 1.2m below final",
-      material: "Riversand",
-      density: "1789",
-      compactionSpecification: "96% SPMDD",
-      pass: 1,
-    },
-    {
-      id: 2,
-      name: "Density Shot 2",
-      location: "Grid AB-07",
-      elevation: " 1.2m below final",
-      material: "Riversand",
-      density: "1789",
-      compactionSpecification: "96% SPMDD",
-      pass: 0,
-    },
-    {
-      id: 3,
-      name: "Density Shot 3",
-      location: "Grid AB-07",
-      elevation: " 1.2m below final",
-      material: "Riversand",
-      density: "1789",
-      compactionSpecification: "96% SPMDD",
-      pass: 1,
-    },
-  ],
-  reportPhotos: [
-    {
-      id: 1,
-      src: "https://placehold.co/400",
-      title: "Gridlines AA-01",
-      elevation: "0.5m Above subgrade",
-    },
-    {
-      id: 2,
-      src: "https://placehold.co/400",
-      title: "Gridlines AA-02",
-      elevation: "0.7m Above subgrade",
-    },
-  ],
-  description:
-    "Description duis aute irure dolor in reprehenderit in voluptate",
-  date: "Today",
-};
+// const report = {
+//   id: 4,
+//   jobId: 1,
+//   initials: "IC",
+//   densityTests: [
+//     {
+//       id: 1,
+//       name: "Density Shot 1",
+//       location: "Grid AB-07",
+//       elevation: " 1.2m below final",
+//       material: "Riversand",
+//       density: "1789",
+//       compactionSpecification: "96% SPMDD",
+//       pass: 1,
+//     },
+//     {
+//       id: 2,
+//       name: "Density Shot 2",
+//       location: "Grid AB-07",
+//       elevation: " 1.2m below final",
+//       material: "Riversand",
+//       density: "1789",
+//       compactionSpecification: "96% SPMDD",
+//       pass: 0,
+//     },
+//     {
+//       id: 3,
+//       name: "Density Shot 3",
+//       location: "Grid AB-07",
+//       elevation: " 1.2m below final",
+//       material: "Riversand",
+//       density: "1789",
+//       compactionSpecification: "96% SPMDD",
+//       pass: 1,
+//     },
+//   ],
+//   reportPhotos: [
+//     {
+//       id: 1,
+//       src: "https://placehold.co/400",
+//       title: "Gridlines AA-01",
+//       elevation: "0.5m Above subgrade",
+//     },
+//     {
+//       id: 2,
+//       src: "https://placehold.co/400",
+//       title: "Gridlines AA-02",
+//       elevation: "0.7m Above subgrade",
+//     },
+//   ],
+//   description:
+//     "Description duis aute irure dolor in reprehenderit in voluptate",
+//   date: "Today",
+// };
 
 const Report: React.FC = () => {
-  const { jobId, reportId } = useParams<{ jobId: string; reportId: string }>();
+  const { jobNumber, reportId } = useParams<{
+    jobNumber: string;
+    reportId: string;
+  }>();
   const navigate = useNavigate();
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
-  const [reportPhotos, setReportPhotos] = useState(report.reportPhotos);
+  const [reportData, setReportData] = useState<ReportReadDTO | null>(null);
+  // const [reportPhotos, setReportPhotos] = useState(reportData?.photos);
 
+  useEffect(() => {
+    const fetchReportData = async () => {
+      try {
+        const response = await reportApiService.getReportById(reportId);
+        setReportData(response);
+        console.log("Report data: ", response?.data);
+      } catch (err) {
+        console.error("Error occured while fetching report data", err);
+      }
+    };
+    fetchReportData();
+  }, [reportId]);
   const webcamRef = useRef<Webcam>(null);
 
   const handleClickEdit = () => {
@@ -107,82 +126,86 @@ const Report: React.FC = () => {
     }
   };
 
-  const handleKeepPhoto = async () => {
-    if (capturedPhoto) {
-      try {
-        const uploadedUrl = await uploadImageToCloudinary(capturedPhoto);
+  // const handleKeepPhoto = async () => {
+  //   if (capturedPhoto) {
+  //     try {
+  //       const uploadedUrl = await uploadImageToCloudinary(capturedPhoto);
 
-        if (uploadedUrl) {
-          const newPhoto = {
-            id: reportPhotos.length + 1,
-            src: uploadedUrl,
-            title: `Photo ${reportPhotos.length + 1}`,
-            elevation: "New photo",
-          };
-          setReportPhotos([...reportPhotos, newPhoto]);
-        } else {
-          const newPhoto = {
-            id: reportPhotos.length + 1,
-            src: capturedPhoto,
-            title: `Photo ${reportPhotos.length + 1}`,
-            elevation: "New photo",
-          };
-          setReportPhotos([...reportPhotos, newPhoto]);
-        }
-      } catch (error) {
-        console.error("Error handling photo:", error);
-        const newPhoto = {
-          id: reportPhotos.length + 1,
-          src: capturedPhoto,
-          title: `Photo ${reportPhotos.length + 1}`,
-          elevation: "New photo",
-        };
-        setReportPhotos([...reportPhotos, newPhoto]);
-      }
-    }
+  //       if (uploadedUrl) {
+  //         const newPhoto = {
+  //           id: reportPhotos.length + 1,
+  //           src: uploadedUrl,
+  //           title: `Photo ${reportPhotos.length + 1}`,
+  //           elevation: "New photo",
+  //         };
+  //         setReportPhotos([...reportPhotos, newPhoto]);
+  //       } else {
+  //         const newPhoto = {
+  //           id: reportPhotos.length + 1,
+  //           src: capturedPhoto,
+  //           title: `Photo ${reportPhotos.length + 1}`,
+  //           elevation: "New photo",
+  //         };
+  //         setReportPhotos([...reportPhotos, newPhoto]);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error handling photo:", error);
+  //       const newPhoto = {
+  //         id: reportPhotos.length + 1,
+  //         src: capturedPhoto,
+  //         title: `Photo ${reportPhotos.length + 1}`,
+  //         elevation: "New photo",
+  //       };
+  //       setReportPhotos([...reportPhotos, newPhoto]);
+  //     }
+  //   }
 
-    setShowPhotoModal(false);
-    setCapturedPhoto(null);
+  //   setShowPhotoModal(false);
+  //   setCapturedPhoto(null);
+  // };
+
+  const handleSaveReport = () => {
+    console.log("Save Report");
   };
 
-  const uploadImageToCloudinary = async (base64Photo: string) => {
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+  // const uploadImageToCloudinary = async (base64Photo: string) => {
+  //   const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  //   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
-    if (!cloudName || !uploadPreset) {
-      console.error(
-        "Cloudinary credentials not found in environment variables",
-      );
-      return null;
-    }
+  //   if (!cloudName || !uploadPreset) {
+  //     console.error(
+  //       "Cloudinary credentials not found in environment variables",
+  //     );
+  //     return null;
+  //   }
 
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+  //   const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
 
-    try {
-      const response = await fetch(base64Photo);
-      const blob = await response.blob();
+  //   try {
+  //     const response = await fetch(base64Photo);
+  //     const blob = await response.blob();
 
-      const formData = new FormData();
-      formData.append("file", blob);
-      formData.append("upload_preset", uploadPreset);
+  //     const formData = new FormData();
+  //     formData.append("file", blob);
+  //     formData.append("upload_preset", uploadPreset);
 
-      const uploadResponse = await fetch(url, {
-        method: "POST",
-        body: formData,
-      });
+  //     const uploadResponse = await fetch(url, {
+  //       method: "POST",
+  //       body: formData,
+  //     });
 
-      if (!uploadResponse.ok) {
-        throw new Error(`Upload failed: ${uploadResponse.statusText}`);
-      }
+  //     if (!uploadResponse.ok) {
+  //       throw new Error(`Upload failed: ${uploadResponse.statusText}`);
+  //     }
 
-      const data = await uploadResponse.json();
-      console.log("Cloudinary uploaded URL:", data.secure_url);
-      return data.secure_url;
-    } catch (error) {
-      console.error("Upload to Cloudinary failed:", error);
-      return null;
-    }
-  };
+  //     const data = await uploadResponse.json();
+  //     console.log("Cloudinary uploaded URL:", data.secure_url);
+  //     return data.secure_url;
+  //   } catch (error) {
+  //     console.error("Upload to Cloudinary failed:", error);
+  //     return null;
+  //   }
+  // };
 
   const handleCloseModal = () => {
     setShowPhotoModal(false);
@@ -194,17 +217,17 @@ const Report: React.FC = () => {
   };
 
   const handleShowAllDensity = () => {
-    navigate(`/job/${jobId}/report/${reportId}/all-density-shots`);
+    navigate(`/job/${jobNumber}/report/${reportId}/all-density-shots`);
   };
 
   const handleShowAllPhotos = () => {
-    navigate(`/job/${jobId}/report/${reportId}/all-photos`);
+    navigate(`/job/${jobNumber}/report/${reportId}/all-photos`);
   };
 
   return (
     <>
       <HeaderWithBackButton
-        title={`Job #${jobId}`}
+        title={`Job #${jobNumber}`}
         subtitle={`Report ${reportId}`}
       />
       <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
@@ -225,8 +248,8 @@ const Report: React.FC = () => {
                 borderRadius: 2,
               }}
             >
-              {report.densityTests.length > 0 ? (
-                report.densityTests.map((test) => (
+              {reportData?.densityTests?.length > 0 ? (
+                reportData?.densityTests?.map((test) => (
                   <Accordion
                     key={test.id}
                     disableGutters
@@ -359,9 +382,9 @@ const Report: React.FC = () => {
               showAll={true}
               onClick={handleShowAllPhotos}
             />
-            {reportPhotos.length > 0 ? (
+            {reportData?.photos?.length > 0 ? (
               <Stack gap={2}>
-                {reportPhotos.map((photo) => (
+                {reportData?.photos?.map((photo: any) => (
                   <Card
                     key={photo.id}
                     sx={{
@@ -393,7 +416,7 @@ const Report: React.FC = () => {
                 ))}
               </Stack>
             ) : (
-              <Card sx={{ padding: 2, borderRadius: 2 }}>No density tests</Card>
+              <Card sx={{ padding: 2, borderRadius: 2 }}>No photos </Card>
             )}
             <Box
               sx={{
@@ -416,9 +439,9 @@ const Report: React.FC = () => {
               </Box>
               <SolidBackgroundColorButton
                 icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
-                handleClick={() => console.log("See Overview")}
+                handleClick={handleSaveReport}
               >
-                See Overview
+                Save
               </SolidBackgroundColorButton>
             </Box>
           </Box>
@@ -476,7 +499,7 @@ const Report: React.FC = () => {
                 Retake Photo
               </Button>
               <Button
-                onClick={handleKeepPhoto}
+                // onClick={handleKeepPhoto}
                 variant="contained"
                 color="success"
               >
