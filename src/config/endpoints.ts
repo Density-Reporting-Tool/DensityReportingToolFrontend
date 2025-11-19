@@ -11,7 +11,7 @@ export const ENDPOINTS = {
     GET: (id: number) => `/api/reports/${id}`,
     UPDATE: (id: number) => `/api/reports/${id}`,
     DELETE: (id: number) => `/api/reports/${id}`,
-    SEARCH: (jobNumber: string) => `/api/reports/search?jobNumber=${jobNumber}`,
+    // SEARCH: (jobNumber: string) => `/api/reports/search?jobNumber=${jobNumber}`,
     JOB: (jobNumber: string) => `/api/reports/job/${jobNumber}`,
     PROCTORS_FOR_JOB: (jobId: number) => `/api/reports/proctors/job/${jobId}`,
     CREATE_DENSITY_TEST: (reportId: number) =>
@@ -30,7 +30,7 @@ export const ENDPOINTS = {
   JOBS: {
     LIST: "/api/jobs",
     CREATE: "/api/jobs",
-    GET: (id: string) => `/api/jobs/${id}`,
+    GET: (jobNumber: string) => `/api/jobs/${jobNumber}`,
     UPDATE: (id: string) => `/api/jobs/${id}`,
     DELETE: (id: string) => `/api/jobs/${id}`,
     SEARCH: (jobNumber: string) => `/api/jobs/search?jobNumber=${jobNumber}`,
