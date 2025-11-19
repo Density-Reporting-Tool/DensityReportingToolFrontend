@@ -1,3 +1,4 @@
+import { PersonData } from "./People/personalInfo";
 export interface ReportBaseDTO {
   jobId: number;
   employeeId: number;
@@ -23,14 +24,6 @@ export interface ReportReadDTO extends ReportBaseDTO {
   //   photos?: ReportPhotoDTO[];
   //   memos?: ReportMemoDTO[];
   //   densityTests?: DensityTestDTO[];
-}
-
-export interface PersonData {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
 }
 
 export interface ReportListDTO {

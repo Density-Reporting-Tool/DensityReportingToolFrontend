@@ -6,6 +6,14 @@ export interface PersonalInfoBaseDTO {
   company?: string;
 }
 
+export interface PersonData {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+}
+
 export interface PersonalInfoCreateDTO extends PersonalInfoBaseDTO {}
 export interface PersonalInfoUpdateDTO extends PersonalInfoBaseDTO {}
 
