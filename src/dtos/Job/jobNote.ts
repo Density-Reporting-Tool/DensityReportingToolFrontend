@@ -1,12 +1,16 @@
 export interface JobNoteBaseDTO {
-  jobId: number;
   note: string;
+  createdDate: string;
+  commentId: number | null;
 }
-
-export interface JobNoteCreateDTO extends JobNoteBaseDTO {}
-export interface JobNoteUpdateDTO extends JobNoteBaseDTO {}
 
 export interface JobNoteReadDTO extends JobNoteBaseDTO {
   id: number;
-  createdDate: string;
+  jobId: number;
+}
+
+export interface JobNoteCreateDTO extends JobNoteBaseDTO {}
+
+export interface JobNoteUpdateDTO extends JobNoteBaseDTO {
+  id: number;
 }

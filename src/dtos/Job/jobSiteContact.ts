@@ -1,25 +1,27 @@
 import { PersonalInfoReadDTO } from "../People/personalInfo";
 
 export interface JobSiteContactBaseDTO {
-  jobId: number;
-  personalInfoId: number;
-
-  area?: string;
-  company?: string;
-  role?: string;
+  area: string | null;
+  company: string | null;
+  role: string | null;
   isPrimary: boolean;
-  notes?: string;
+  notes: string | null;
   isActive: boolean;
 }
 
-export interface JobSiteContactCreateDTO extends JobSiteContactBaseDTO {}
-export interface JobSiteContactUpdateDTO extends JobSiteContactBaseDTO {}
-
 export interface JobSiteContactReadDTO extends JobSiteContactBaseDTO {
   id: number;
-  contactName?: string;        // Full name from PersonalInfo
-  createdDate: string;         // ISO 8601 string
-  lastModifiedDate?: string;   // ISO 8601 string, optional
+  jobId: number;
+  personalInfoId: number;
+  personalInfo: PersonalInfoReadDTO;
+  createdDate: string; // ISO 8601 string
+  lastModifiedDate: string | null;
+}
 
-  personalInfo?: PersonalInfoReadDTO;
+export interface JobSiteContactCreateDTO extends JobSiteContactBaseDTO {
+  personalInfoId: number;
+}
+
+export interface JobSiteContactUpdateDTO extends JobSiteContactBaseDTO {
+  id: number;
 }
