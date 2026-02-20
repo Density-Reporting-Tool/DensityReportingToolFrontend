@@ -15,58 +15,66 @@ import {
 } from "@mui/icons-material";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
 import HeaderTitle from "@/components/headers/HeaderTitle";
-
-// Mock data
-const jobData = {
-  id: 1,
-  jobNumber: "000001",
-  address: "123 Main St, Vancouver, BC",
-  contacts: [
-    { id: 1, initials: "JS", name: "Jakub Szary", role: "Project Manager" },
-    { id: 2, initials: "MK", name: "Matt Kokan", role: "Site Contact" },
-  ],
-  notes: [
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam, quis nostrud exercitation ullamco",
-    "laboris nisi ut aliquip ex ea commodo consequat.",
-  ],
-
-  recentReports: [
-    {
-      id: 4,
-      initials: "IC",
-      description:
-        "Description duis aute irure dolor in reprehenderit in voluptate",
-      date: "Today",
-    },
-    {
-      id: 3,
-      initials: "PS",
-      description:
-        "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-      date: "Two weeks ago",
-    },
-  ],
-};
+import { jobsApi } from "@/services/api/jobsApiService";
+import { JobReadDTO } from "@/dtos/Job/job";
+import { ApiResponse } from "@/types/api";
+import { useEffect, useState } from "react";
+import { ReportReadDTO } from "@/dtos/Reports/report";
+import { JobNoteReadDTO } from "@/dtos/Job/jobNote";
+import { JobSiteContactReadDTO } from "@/dtos/Job/jobSiteContact";
 
 const JobDetails: React.FC = () => {
-  const { jobId } = useParams<{ jobId: string }>();
+  const { jobNumber } = useParams<{ jobNumber: string }>();
   const navigate = useNavigate();
+
+  const [jobData, setJob] = useState<JobReadDTO | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchJob = async () => {
+      if (!jobNumber) return;
+
+      try {
+        setLoading(true);
+        // 3. Call your new service
+        const data = await jobsApi.getByNumber(jobNumber);
+
+        console.log("Successfully fetched job object:", data);
+        setJob(data);
+        setError(null);
+      } catch (err: any) {
+        // 'err' is the unwrapped ApiResponse from BaseApiService
+        const apiError = err as ApiResponse<null>;
+        console.error("Fetch error:", apiError);
+        setError(apiError.message || "Failed to load job");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJob();
+  }, [jobNumber]);
+
+  if (loading) return <div>Loading job details...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!jobData) return <div>Job not found.</div>;
 
   const handleClickReport = (reportId: number) => {
     navigate(`report/${reportId}`);
   };
 
   const handleNewReport = () => {
-    console.log("Create new report for job:", jobId);
+    console.log("Create new report for job:", jobNumber);
   };
 
   const handleClickShowAll = () => {
     console.log("CLICK SHOW");
-    navigate(`/job/${jobId}/all-reports`);
+    navigate(`/job/${jobNumber}/all-reports`);
   };
 
   const handleAddressClick = () => {
-    const encodedAddress = encodeURIComponent(jobData.address);
+    const encodedAddress = encodeURIComponent(jobData.siteAddress);
     const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
     window.open(googleMapsUrl, "_blank");
   };
@@ -74,8 +82,8 @@ const JobDetails: React.FC = () => {
   return (
     <>
       <HeaderWithBackButton
-        title={`Job #${jobId}`}
-        subtitle={`${jobData.address}`}
+        title={`Job #${jobNumber}`}
+        subtitle={`${jobData.siteAddress}`}
         onSubtitleClick={handleAddressClick}
       />
       <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
@@ -88,34 +96,36 @@ const JobDetails: React.FC = () => {
             justifyContent: "space-around",
           }}
         >
-          {jobData.contacts.map((contact, index) => (
-            <Box
-              key={index}
-              sx={{
-                display: "flex",
-                gap: 1,
-                justifyContent: "space-between",
-              }}
-            >
-              <Avatar
+          {jobData.siteContacts?.map(
+            (contact: JobSiteContactReadDTO, index) => (
+              <Box
+                key={index}
                 sx={{
-                  width: 45,
-                  height: 45,
-                  bgcolor: "primary.main",
+                  display: "flex",
+                  gap: 1,
+                  justifyContent: "space-between",
                 }}
               >
-                {contact.initials}
-              </Avatar>
-              <Box>
-                <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                  {contact.name}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {contact.role}
-                </Typography>
+                <Avatar
+                  sx={{
+                    width: 45,
+                    height: 45,
+                    bgcolor: "primary.main",
+                  }}
+                >
+                  {contact.personalInfo?.firstName}
+                </Avatar>
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    {contact.personalInfo?.firstName}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {contact.role}
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
-          ))}
+            ),
+          )}
         </Box>
 
         {/* Notes Section */}
@@ -123,15 +133,17 @@ const JobDetails: React.FC = () => {
           <Card sx={{ p: 2 }}>
             <Typography variant="h6">Notes</Typography>
 
-            {jobData.notes.map((note, index) => (
+            {jobData.jobNotes?.map((note: JobNoteReadDTO, index) => (
               <Box
                 key={index}
-                sx={{ mb: index < jobData.notes.length - 1 ? 2 : 0 }}
+                sx={{ mb: index < jobData.jobNotes!.length - 1 ? 2 : 0 }}
               >
                 <Typography variant="body1" color="text.secondary">
-                  {note}
+                  {note.note}
                 </Typography>
-                {index < jobData.notes.length - 1 && <Divider sx={{ mt: 2 }} />}
+                {index < jobData.jobNotes!.length - 1 && (
+                  <Divider sx={{ mt: 2 }} />
+                )}
               </Box>
             ))}
           </Card>
@@ -145,7 +157,7 @@ const JobDetails: React.FC = () => {
             onClick={handleClickShowAll}
           />
           <Stack spacing={1}>
-            {jobData.recentReports.map((report) => (
+            {jobData.reports?.map((report: ReportReadDTO) => (
               <Card
                 key={report.id}
                 sx={{
@@ -173,22 +185,22 @@ const JobDetails: React.FC = () => {
                       mr: 2,
                     }}
                   >
-                    {report.initials}
+                    {report.reviewer?.firstName}
                   </Avatar>
                   <Box sx={{ width: "75%" }}>
                     <Typography variant="body1" sx={{ fontWeight: 500 }}>
                       Report {report.id}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    {/* <Typography variant="body2" color="text.secondary">
                       {report.description}
-                    </Typography>
+                    </Typography> */}
                     <Typography
                       display="block"
                       variant="caption"
                       color="text.secondary"
                       sx={{ mt: 1 }}
                     >
-                      {report.date}
+                      {report.submitDate}
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
