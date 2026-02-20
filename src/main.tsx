@@ -32,7 +32,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             {/* Field tech pages */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/field-tech/" element={<FieldTechDashboard />} />
-            <Route path="/field-tech/job/:jobId" element={<JobDetails />} />
+            <Route path="/field-tech/job/:jobNumber" element={<JobDetails />} />
             <Route
               path="/field-tech/job/:jobId/report/:reportId"
               element={<ReportDetails />}
@@ -56,7 +56,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               path="/distribution-list-manager-demo"
               element={<DistributionListManagerDemo />}
             />
-            <Route path="/job/:jobId" element={<JobDetails />} />
+            <Route path="/job/:jobNumber" element={<JobDetails />} />
             <Route
               path="/job/:jobId/report/:reportId"
               element={<ReportDetails />}
