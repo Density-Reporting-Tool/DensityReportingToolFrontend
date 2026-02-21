@@ -1,47 +1,18 @@
-// Service Worker for PWA functionality
-const CACHE_NAME = 'drt-cache-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/src/main.tsx',
-  '/src/App.tsx',
-  '/src/index.css'
-];
+/* eslint-env serviceworker */
 
-// Install event - cache resources
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
+// This file will be processed by Vite PWA plugin
+// The plugin will generate a proper Workbox service worker
+// with all the caching strategies and runtime caching configured in vite.config.ts
+
+// Basic service worker template
+self.addEventListener("install", () => {
+  console.log("Service Worker installing...");
 });
 
-// Fetch event - serve from cache when offline
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
-  );
+self.addEventListener("activate", () => {
+  console.log("Service Worker activating...");
 });
 
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-}); 
+self.addEventListener("fetch", (event) => {
+  console.log("Service Worker fetching:", event.request.url);
+});

@@ -2,34 +2,80 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
-import Dashboard from "./pages/Dashboard";
+import FieldTechDashboard from "./pages/field-tech/FieldTechDashboard";
 import theme from "./theme";
-import JobDetails from "./pages/JobDetails";
+import JobDetails from "./pages/field-tech/JobDetails";
+import AllDensityShots from "./pages/field-tech/AllDensityShots";
+import AllReports from "./pages/field-tech/AllReports";
+import AllProctors from "./pages/field-tech/AllProctors";
+import LandingPage from "./pages/LandingPage";
+import LabAdminDashboard from "./pages/lab-admin/LabAdminDashboard";
+import LabAdminCreateJob from "./pages/lab-admin/LabAdminCreateJob";
+import LabAdminAddProctor from "./pages/lab-admin/LabAdminAddProctor";
+import DistributionListManagerDemo from "./pages/lab-admin/DistributionListManagerDemo";
 import "./index.css";
+import ReportDetails from "./pages/field-tech/ReportDetails";
+import DensityShotDetails from "./pages/field-tech/DensityShotDetails";
+import ProctorDetails from "./pages/field-tech/ProctorDetails";
+import AllPhotos from "./pages/field-tech/AllPhotos";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Register PWA service worker
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then((registration) => {
-        console.log("SW registered: ", registration);
-      })
-      .catch((registrationError) => {
-        console.log("SW registration failed: ", registrationError);
-      });
-  });
-}
+// PWA service worker registration is handled automatically by vite-plugin-pwa
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/job/:id" element={<JobDetails />} />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <Routes>
+            {/* Field tech pages */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/field-tech/" element={<FieldTechDashboard />} />
+            <Route path="/field-tech/job/:jobId" element={<JobDetails />} />
+            <Route
+              path="/field-tech/job/:jobId/report/:reportId"
+              element={<ReportDetails />}
+            />
+            <Route
+              path="/field-tech/add-density-test"
+              element={<DensityShotDetails />}
+            />
+
+            {/* Lab admin pages */}
+            <Route path="/lab-admin" element={<LabAdminDashboard />} />
+            <Route
+              path="/lab-admin/create-job"
+              element={<LabAdminCreateJob />}
+            />
+            <Route
+              path="/lab-admin/add-proctor"
+              element={<LabAdminAddProctor />}
+            />
+            <Route
+              path="/distribution-list-manager-demo"
+              element={<DistributionListManagerDemo />}
+            />
+            <Route path="/job/:jobId" element={<JobDetails />} />
+            <Route
+              path="/job/:jobId/report/:reportId"
+              element={<ReportDetails />}
+            />
+            <Route
+              path="/job/:jobId/report/:reportId/all-density-shots"
+              element={<AllDensityShots />}
+            />
+            <Route path="/job/:jobId/all-reports" element={<AllReports />} />
+            {/* TODO: fix */}
+            <Route path="/proctors/:id" element={<ProctorDetails />} />
+            <Route
+              path="/job/:jobId/report/:reportId/all-photos"
+              element={<AllPhotos />}
+            />
+            <Route path="/job/:jobId/all-proctors" element={<AllProctors />} />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </QueryClientProvider>
   </React.StrictMode>,
 );

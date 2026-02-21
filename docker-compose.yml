@@ -1,0 +1,13 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: density-frontend-dev
+    ports:
+      - "5173:5173"  # Vite dev server
+    volumes:
+      - .:/app:cached
+      - /app/node_modules
+    env_file:
+      - .env       # load all variables from your existing .env

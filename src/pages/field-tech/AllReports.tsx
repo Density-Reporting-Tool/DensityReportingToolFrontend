@@ -1,0 +1,173 @@
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  Box,
+  Container,
+  Typography,
+  Card,
+  Avatar,
+  Button,
+  Stack,
+} from "@mui/material";
+import {
+  Add as AddIcon,
+  ChevronRight as ChevronRightIcon,
+} from "@mui/icons-material";
+import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
+
+const jobData = {
+  id: 1,
+  jobNumber: "000001",
+  address: "123 Main St, Vancouver, BC",
+  contacts: [
+    { id: 1, initials: "JS", name: "Jakub Szary", role: "Project Manager" },
+    { id: 2, initials: "MK", name: "Matt Kokan", role: "Site Contact" },
+  ],
+  notes: [
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam, quis nostrud exercitation ullamco",
+    "laboris nisi ut aliquip ex ea commodo consequat.",
+  ],
+
+  allReports: [
+    {
+      id: 4,
+      initials: "IC",
+      description:
+        "Description duis aute irure dolor in reprehenderit in voluptate",
+      date: "Today",
+    },
+    {
+      id: 3,
+      initials: "PS",
+      description:
+        "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+      date: "Two weeks ago",
+    },
+  ],
+};
+
+const JobDetails: React.FC = () => {
+  const { jobId } = useParams<{ jobId: string }>();
+  const navigate = useNavigate();
+
+  const handleClickReport = (reportId: number) => {
+    navigate(`/job/${jobId}/report/${reportId}`);
+  };
+
+  const handleNewReport = () => {
+    console.log("Create new report for job:", jobId);
+  };
+
+  const handleAddressClick = () => {
+    const encodedAddress = encodeURIComponent(jobData.address);
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+    window.open(googleMapsUrl, "_blank");
+  };
+
+  return (
+    <>
+      <HeaderWithBackButton
+        title={`Job #${jobId}`}
+        subtitle={`${jobData.address}`}
+        onSubtitleClick={handleAddressClick}
+      />
+      <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
+        {/* Recent Reports */}
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <Typography variant="h6">All Reports</Typography>
+          <Button
+            variant="contained"
+            disableElevation
+            sx={{
+              borderRadius: 10,
+            }}
+            onClick={handleNewReport}
+          >
+            <AddIcon />
+          </Button>
+        </Box>
+
+        <Stack spacing={1}>
+          {jobData.allReports.map((report) => (
+            <Card
+              key={report.id}
+              sx={{
+                cursor: "pointer",
+                "&:hover": { boxShadow: 3 },
+                p: 2,
+                boxShadow: 0,
+                borderRadius: 2,
+              }}
+              onClick={() => handleClickReport(report.id)}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Avatar
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    bgcolor: "primary.main",
+                    fontSize: "0.875rem",
+                    mr: 2,
+                  }}
+                >
+                  {report.initials}
+                </Avatar>
+                <Box sx={{ width: "75%" }}>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    Report {report.id}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {report.description}
+                  </Typography>
+                  <Typography
+                    display="block"
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
+                    {report.date}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <ChevronRightIcon color="action" />
+                </Box>
+              </Box>
+            </Card>
+          ))}
+        </Stack>
+
+        {/* New Report Button */}
+        {/* <Box sx={{ position: "fixed", bottom: 20, left: 20, right: 20 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleNewReport}
+            sx={{
+              py: 1.5,
+              borderRadius: 3,
+              boxShadow: 3,
+            }}
+          >
+            New Report
+          </Button>
+        </Box> */}
+      </Container>
+    </>
+  );
+};
+
+export default JobDetails;
