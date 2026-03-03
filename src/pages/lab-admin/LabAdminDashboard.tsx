@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Avatar, Stack } from "@mui/material";
 import {
   Schedule as ScheduleIcon,
@@ -9,10 +9,9 @@ import {
 
 const LabAdminDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedSection, setSelectedSection] = useState<string>("");
 
-  const handleNavigation = (section: string) => {
-    setSelectedSection(section);
+  const handleSchedule = () => {
+    navigate("/lab-admin/schedule");
   };
 
   const handleCreateJob = () => {
@@ -21,60 +20,6 @@ const LabAdminDashboard: React.FC = () => {
 
   const handleEnterProctor = () => {
     navigate("/lab-admin/add-proctor");
-  };
-
-  const renderContent = () => {
-    switch (selectedSection) {
-      case "schedule":
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Schedule
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Schedule management content will appear here.
-            </Typography>
-          </Box>
-        );
-      case "createJob":
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Create Job
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Job creation form will appear here.
-            </Typography>
-          </Box>
-        );
-      case "enterProctor":
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Enter Proctor
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Proctor entry form will appear here.
-            </Typography>
-          </Box>
-        );
-      default:
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "100%",
-              color: "text.secondary",
-            }}
-          >
-            <Typography variant="h6">
-              Select an option from the sidebar to get started
-            </Typography>
-          </Box>
-        );
-    }
   };
 
   return (
@@ -144,7 +89,7 @@ const LabAdminDashboard: React.FC = () => {
             {/* Schedule Button */}
             <Button
               variant="contained"
-              onClick={() => handleNavigation("schedule")}
+              onClick={handleSchedule}
               sx={{
                 backgroundColor: "primary.main",
                 color: "white",
@@ -208,7 +153,7 @@ const LabAdminDashboard: React.FC = () => {
             borderLeft: "1px solid grey.300",
           }}
         >
-          {renderContent()}
+          <Outlet />
         </Box>
       </Box>
     </Box>
