@@ -18,9 +18,9 @@ import type {
   ScheduleJobReadDTO,
   ScheduleJobCreateDTO,
   ScheduleJobUpdateDTO,
-  GeoPacificEmployeeReadDTO,
 } from "@/dtos/Scheduling/scheduleJob";
 import type { JobReadDTO } from "@/dtos/Job/job";
+import type { PersonalInfoReadDTO } from "@/dtos/People/personalInfo";
 import { schedulingApiService } from "@/services/schedulingApiService";
 
 interface ScheduleEventDialogProps {
@@ -30,7 +30,7 @@ interface ScheduleEventDialogProps {
   onSaved: (event: ScheduleJobReadDTO) => void;
   onDeleted?: (eventId: number) => void;
   jobs: JobReadDTO[];
-  employees?: GeoPacificEmployeeReadDTO[];
+  employees?: PersonalInfoReadDTO[];
   defaultStart?: string;
   defaultEnd?: string;
 }
@@ -55,11 +55,10 @@ export default function ScheduleEventDialog({
   defaultEnd,
 }: ScheduleEventDialogProps) {
   const [jobId, setJobId] = useState<number | "">("");
-  const [geoPacificEmployeeId, setGeoPacificEmployeeId] = useState<number | "">("");
+  const [personalInfoId, setPersonalInfoId] = useState<number | "">("");
   const [startDateTime, setStartDateTime] = useState("");
   const [endDateTime, setEndDateTime] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
   const [status, setStatus] = useState<string>("Scheduled");
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -71,19 +70,17 @@ export default function ScheduleEventDialog({
     setErrors([]);
     if (initialEvent) {
       setJobId(initialEvent.jobId);
-      setGeoPacificEmployeeId(initialEvent.geoPacificEmployeeId);
+      setPersonalInfoId(initialEvent.personalInfoId);
       setStartDateTime(toLocalDatetimeInput(initialEvent.startDateTime));
       setEndDateTime(toLocalDatetimeInput(initialEvent.endDateTime));
       setDescription(initialEvent.description ?? "");
-      setLocation(initialEvent.location ?? "");
       setStatus(initialEvent.status ?? "Scheduled");
     } else {
       setJobId("");
-      setGeoPacificEmployeeId("");
+      setPersonalInfoId("");
       setStartDateTime(defaultStart ? toLocalDatetimeInput(defaultStart) : "");
       setEndDateTime(defaultEnd ? toLocalDatetimeInput(defaultEnd) : "");
       setDescription("");
-      setLocation("");
       setStatus("Scheduled");
     }
   }, [open, initialEvent, defaultStart, defaultEnd]);
@@ -91,8 +88,8 @@ export default function ScheduleEventDialog({
   function validate(): boolean {
     const list: string[] = [];
     if (jobId === "" || jobId == null) list.push("Job is required.");
-    if (geoPacificEmployeeId === "" || geoPacificEmployeeId == null)
-      list.push("Employee is required.");
+    if (personalInfoId === "" || personalInfoId == null)
+      list.push("Person is required.");
     if (!startDateTime.trim()) list.push("Start date/time is required.");
     if (!endDateTime.trim()) list.push("End date/time is required.");
     if (startDateTime && endDateTime) {
@@ -107,11 +104,10 @@ export default function ScheduleEventDialog({
   function buildCreatePayload(): ScheduleJobCreateDTO {
     return {
       jobId: Number(jobId),
-      geoPacificEmployeeId: Number(geoPacificEmployeeId),
+      personalInfoId: Number(personalInfoId),
       startDateTime: new Date(startDateTime).toISOString(),
       endDateTime: new Date(endDateTime).toISOString(),
       description: description.trim() || null,
-      location: location.trim() || null,
       status: status || null,
     };
   }
@@ -120,11 +116,10 @@ export default function ScheduleEventDialog({
     return {
       id: initialEvent!.id,
       jobId: Number(jobId),
-      geoPacificEmployeeId: Number(geoPacificEmployeeId),
+      personalInfoId: Number(personalInfoId),
       startDateTime: new Date(startDateTime).toISOString(),
       endDateTime: new Date(endDateTime).toISOString(),
       description: description.trim() || null,
-      location: location.trim() || null,
       status: status || null,
     };
   }
@@ -187,7 +182,7 @@ export default function ScheduleEventDialog({
   const jobList = Array.isArray(jobs) ? jobs : [];
   const employeeList = Array.isArray(employees) ? employees : [];
   const selectedJob = jobList.find((j) => j.id === jobId) ?? null;
-  const selectedEmployee = employeeList.find((e) => e.id === geoPacificEmployeeId) ?? null;
+  const selectedEmployee = employeeList.find((e) => e.id === personalInfoId) ?? null;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -213,25 +208,28 @@ export default function ScheduleEventDialog({
           {employeeList.length > 0 ? (
             <Autocomplete
               options={employeeList}
-              getOptionLabel={(emp) => `${emp.role?.roleTitle ?? ""} (ID ${emp.id})`}
+              getOptionLabel={(emp) => `${emp.firstName} ${emp.lastName} (ID ${emp.id})`}
               value={selectedEmployee}
-              onChange={(_, v) => setGeoPacificEmployeeId(v?.id ?? "")}
+              onChange={(_, v) => setPersonalInfoId(v?.id ?? "")}
               renderInput={(params) => (
-                <TextField {...params} label="Employee" required />
+                <TextField {...params} label="Person" required />
               )}
             />
           ) : (
             <TextField
-              label="Employee ID"
+              label="Person ID"
               type="number"
-              value={geoPacificEmployeeId === "" ? "" : geoPacificEmployeeId}
+              value={personalInfoId === "" ? "" : personalInfoId}
               onChange={(e) =>
-                setGeoPacificEmployeeId(e.target.value === "" ? "" : Number(e.target.value))
+                setPersonalInfoId(e.target.value === "" ? "" : Number(e.target.value))
               }
               required
-              helperText="Must be a valid GeoPacific employee ID."
+              helperText="Enter a valid person ID."
             />
           )}
+
+          
+
 
           <TextField
             label="Start"
@@ -256,11 +254,7 @@ export default function ScheduleEventDialog({
             onChange={(e) => setDescription(e.target.value)}
             multiline
           />
-          <TextField
-            label="Location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
+       
           <FormControl fullWidth>
             <InputLabel>Status</InputLabel>
             <Select

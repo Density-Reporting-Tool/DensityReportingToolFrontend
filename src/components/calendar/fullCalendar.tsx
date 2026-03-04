@@ -8,8 +8,9 @@ import { EventDropArg, type EventInput } from '@fullcalendar/core'
 import { schedulingApiService } from '@/services/schedulingApiService'
 import { jobsAPIService, apiService } from '@/services/apiService'
 import { ENDPOINTS } from '@/config/endpoints'
-import type { ScheduleJobReadDTO, GeoPacificEmployeeReadDTO } from '@/dtos/Scheduling/scheduleJob'
+import type { ScheduleJobReadDTO } from '@/dtos/Scheduling/scheduleJob'
 import type { JobReadDTO } from '@/dtos/Job/job'
+import type { PersonalInfoReadDTO } from '@/dtos/People/personalInfo'
 import ScheduleEventDialog from './ScheduleEventDialog'
 
 function unwrapList<T>(raw: unknown): T[] {
@@ -24,13 +25,27 @@ function unwrapList<T>(raw: unknown): T[] {
     }
     return []
 }
+const TECHNICIAN_COLORS = [
+    '#1976d2', // blue
+    '#2e7d32', // green
+    '#ed6c02', // orange
+    '#9c27b0', // purple
+    '#c62828', // red
+    '#00838f', // teal
+    '#5d4037', // brown
+    '#455a64', // blue grey
+]
+
+function getColorForPerson(personId: number): string {
+    return TECHNICIAN_COLORS[Math.abs(personId) % TECHNICIAN_COLORS.length]
+}
 
 export default function CalendarView() {
     const [dialogOpen, setDialogOpen] = useState(false)
     const [selectedEvent, setSelectedEvent] = useState<ScheduleJobReadDTO | null>(null)
     const [createRange, setCreateRange] = useState<{ start: string; end: string } | null>(null)
     const [jobs, setJobs] = useState<JobReadDTO[]>([])
-    const [technicians, setTechnicians] = useState<GeoPacificEmployeeReadDTO[]>([])
+    const [people, setPeople] = useState<PersonalInfoReadDTO[]>([])
     const calendarRef = useRef<FullCalendar>(null)
 
     useEffect(() => {
@@ -40,8 +55,8 @@ export default function CalendarView() {
     useEffect(() => {
         apiService
             .get<unknown>(ENDPOINTS.PEOPLE.LIST)
-            .then((res) => setTechnicians(unwrapList<GeoPacificEmployeeReadDTO>(res.data)))
-            .catch(() => setTechnicians([]))
+            .then((res) => setPeople(unwrapList<PersonalInfoReadDTO>(res.data)))
+            .catch(() => setPeople([]))
     }, [])
 
     const refetchEvents = () => {
@@ -96,12 +111,13 @@ export default function CalendarView() {
                         title: `${dto.job.jobNumber} - ${dto.job.siteAddress}`,
                         start: dto.startDateTime,
                         end: dto.endDateTime,
+                        backgroundColor: getColorForPerson(dto.personalInfoId),
                         extendedProps: {
                             jobId: dto.jobId,
                             jobNumber: dto.job.jobNumber,
                             siteAddress: dto.job.siteAddress,
                             status: dto.status,
-                            geoPacificEmployeeId: dto.geoPacificEmployeeId,
+                            personalInfoId: dto.personalInfoId,
                         },
                     }))
                     successCallback(mapped)
@@ -126,7 +142,7 @@ export default function CalendarView() {
                 events={fetchEvents}
                 editable={true}
                 selectable={true}
-                timeZone="UTC"
+                timeZone="local"
                 eventDrop={handleMove}
                 eventResize={handleResize}
                 select={handleSelect}
@@ -139,7 +155,7 @@ export default function CalendarView() {
                 onSaved={() => { refetchEvents(); handleClose() }}
                 onDeleted={() => { refetchEvents(); handleClose() }}
                 jobs={jobs}
-                employees={technicians}
+                employees={people}
                 defaultStart={createRange?.start}
                 defaultEnd={createRange?.end}
             />

@@ -1,4 +1,5 @@
 import { JobReadDTO } from "../Job/job";
+import { PersonalInfoReadDTO } from "../People/personalInfo";
 
 // --- Nested types (backend GeoPacificEmployeeReadDto, RoleReadDto) ---
 
@@ -7,52 +8,43 @@ export interface RoleReadDTO {
   roleTitle: string;
 }
 
-export interface GeoPacificEmployeeReadDTO {
-  id: number;
-  personalInfoId: number;
-  roleId: number;
-  role: RoleReadDTO;
-}
 
 export interface ScheduleJobReadDTO {
     id: number
     jobId: number
-    geoPacificEmployeeId: number
+    personalInfoId: number
+    personalInfo: PersonalInfoReadDTO
     startDateTime: string 
     endDateTime: string 
     description: string | null
-    location: string | null
     status: string | null //e.g. "Scheduled", "Cancelled"
     createdById: number | null
-    createdBy: GeoPacificEmployeeReadDTO | null
+    createdBy: PersonalInfoReadDTO | null
     createdDate: string 
     job: JobReadDTO 
-    geoPacificEmployee: GeoPacificEmployeeReadDTO
 }
 
 export interface ScheduleJobCreateDTO {
     jobId: number
-    geoPacificEmployeeId: number
+    personalInfoId: number
     startDateTime: string 
     endDateTime: string 
     description?: string | null
-    location?: string | null
     status?: string | null //e.g. "Scheduled", "Cancelled"
     createdById?: number | null
-    createdBy?: GeoPacificEmployeeReadDTO | null
+    createdBy?: PersonalInfoReadDTO | null
     createdDate?: string | null
 }
 
 export interface ScheduleJobUpdateDTO {
     id: number
     jobId: number
-    geoPacificEmployeeId: number
+    personalInfoId: number
     startDateTime: string 
     endDateTime: string 
     description?: string | null
-    location?: string | null
     status?: string | null //e.g. "Scheduled", "Cancelled"
     createdById?: number | null
-    createdBy?: GeoPacificEmployeeReadDTO | null
+    createdBy?: PersonalInfoReadDTO | null
     createdDate?: string | null
 }
