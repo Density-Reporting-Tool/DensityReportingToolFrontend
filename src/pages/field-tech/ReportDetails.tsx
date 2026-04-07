@@ -1,9 +1,18 @@
 import SolidBackgroundColorButton from "@/components/button/SolidBackgroundColorButton";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
+  Button,
   Card,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
   Stack,
   TextField,
   Typography,
@@ -11,11 +20,16 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Add as AddIcon,
-  FileUpload as FileUploadIcon,
   CameraAlt as CameraAltIcon,
+  ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import HeaderTitle from "@/components/headers/HeaderTitle";
 import BottomNavBar from "@/components/navbar/BottomNavBar";
+import Webcam from "react-webcam";
+import { useRef, useState } from "react";
+
+import UploadWidget from "@/components/UploadWidget";
+import EditIcon from "@mui/icons-material/Edit";
 
 const report = {
   id: 4,
@@ -24,10 +38,11 @@ const report = {
   densityTests: [
     {
       id: 1,
-      name: "Desnity Shot 1",
+      name: "Density Shot 1",
       location: "Grid AB-07",
       elevation: " 1.2m below final",
       material: "Riversand",
+      density: "1789",
       compactionSpecification: "96% SPMDD",
       pass: 1,
     },
@@ -37,8 +52,19 @@ const report = {
       location: "Grid AB-07",
       elevation: " 1.2m below final",
       material: "Riversand",
+      density: "1789",
       compactionSpecification: "96% SPMDD",
       pass: 0,
+    },
+    {
+      id: 3,
+      name: "Density Shot 3",
+      location: "Grid AB-07",
+      elevation: " 1.2m below final",
+      material: "Riversand",
+      density: "1789",
+      compactionSpecification: "96% SPMDD",
+      pass: 1,
     },
   ],
   reportPhotos: [
@@ -63,28 +89,118 @@ const report = {
 const Report: React.FC = () => {
   const { jobId, reportId } = useParams<{ jobId: string; reportId: string }>();
   const navigate = useNavigate();
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [reportPhotos, setReportPhotos] = useState(report.reportPhotos);
+
+  const webcamRef = useRef<Webcam>(null);
+
+  const handleClickEdit = () => {
+    navigate(`/field-tech/add-density-test`);
+  };
+  const handleTakePhoto = () => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      if (imageSrc) {
+        setCapturedPhoto(imageSrc);
+      }
+    }
+  };
+
+  const handleKeepPhoto = async () => {
+    if (capturedPhoto) {
+      try {
+        const uploadedUrl = await uploadImageToCloudinary(capturedPhoto);
+
+        if (uploadedUrl) {
+          const newPhoto = {
+            id: reportPhotos.length + 1,
+            src: uploadedUrl,
+            title: `Photo ${reportPhotos.length + 1}`,
+            elevation: "New photo",
+          };
+          setReportPhotos([...reportPhotos, newPhoto]);
+        } else {
+          const newPhoto = {
+            id: reportPhotos.length + 1,
+            src: capturedPhoto,
+            title: `Photo ${reportPhotos.length + 1}`,
+            elevation: "New photo",
+          };
+          setReportPhotos([...reportPhotos, newPhoto]);
+        }
+      } catch (error) {
+        console.error("Error handling photo:", error);
+        const newPhoto = {
+          id: reportPhotos.length + 1,
+          src: capturedPhoto,
+          title: `Photo ${reportPhotos.length + 1}`,
+          elevation: "New photo",
+        };
+        setReportPhotos([...reportPhotos, newPhoto]);
+      }
+    }
+
+    setShowPhotoModal(false);
+    setCapturedPhoto(null);
+  };
+
+  const uploadImageToCloudinary = async (base64Photo: string) => {
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+    if (!cloudName || !uploadPreset) {
+      console.error(
+        "Cloudinary credentials not found in environment variables",
+      );
+      return null;
+    }
+
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+
+    try {
+      const response = await fetch(base64Photo);
+      const blob = await response.blob();
+
+      const formData = new FormData();
+      formData.append("file", blob);
+      formData.append("upload_preset", uploadPreset);
+
+      const uploadResponse = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed: ${uploadResponse.statusText}`);
+      }
+
+      const data = await uploadResponse.json();
+      console.log("Cloudinary uploaded URL:", data.secure_url);
+      return data.secure_url;
+    } catch (error) {
+      console.error("Upload to Cloudinary failed:", error);
+      return null;
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowPhotoModal(false);
+    setCapturedPhoto(null);
+  };
 
   const handleAddDensityShot = () => {
-    console.log("new density shot");
     navigate(`/field-tech/add-density-test`);
   };
 
-  const handleTakePhoto = () => {
-    console.log("Take photo");
-  };
-
-  const handleUploadImage = () => {
-    console.log("Upload image");
-  };
-
   const handleShowAllDensity = () => {
-    console.log("show all density shot");
     navigate(`/job/${jobId}/report/${reportId}/all-density-shots`);
   };
 
   const handleShowAllPhotos = () => {
-    console.log("show all photos");
+    navigate(`/job/${jobId}/report/${reportId}/all-photos`);
   };
+
   return (
     <>
       <HeaderWithBackButton
@@ -93,7 +209,7 @@ const Report: React.FC = () => {
       />
       <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
         {/* Density Test Section */}
-        <Stack gap={3}>
+        <Stack gap={1}>
           <Box id="densityTestSection">
             <HeaderTitle
               title="Density Tests"
@@ -111,39 +227,70 @@ const Report: React.FC = () => {
             >
               {report.densityTests.length > 0 ? (
                 report.densityTests.map((test) => (
-                  <Card
+                  <Accordion
                     key={test.id}
+                    disableGutters
+                    square={true}
                     sx={{
-                      padding: 2,
-                      borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      borderRadius: "5px",
+                      border: "1px solid lightgrey",
                     }}
                   >
-                    <Box>
-                      <Typography variant="body1" fontWeight="700">
-                        Density shot {test.id}
-                      </Typography>
-                      <Typography variant="body2">
-                        Location: {test.location}
-                      </Typography>
-                      <Typography variant="body2">
-                        Elevation: {test.elevation}
-                      </Typography>
-                      <Typography variant="body2">
-                        Material: {test.material}
-                      </Typography>
-                      <Typography variant="body2">
-                        Compaction Specification {test.compactionSpecification}
-                      </Typography>
-                    </Box>
-                    <Typography
-                      color={test.pass ? "success.main" : "error.main"}
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1-content"
+                      id="panel1-header"
+                      sx={{
+                        minHeight: 40,
+                        "&.Mui-expanded": {
+                          minHeight: 40,
+                        },
+                        "& .MuiAccordionSummary-content": {
+                          margin: 0,
+                        },
+                      }}
                     >
-                      {test.pass ? "PASS" : "FAIL"}
-                    </Typography>
-                  </Card>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
+                        <Typography component="span">{test.name}</Typography>
+                        <Typography
+                          color={test.pass ? "success.main" : "error.main"}
+                        >
+                          {test.pass ? "PASS" : "FAIL"}
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Box>
+                        <Typography variant="body2">
+                          Location: {test.location}
+                        </Typography>
+                        <Typography variant="body2">
+                          Elevation: {test.elevation}
+                        </Typography>
+                        <Typography variant="body2">
+                          Material: {test.material}
+                        </Typography>
+                        <Typography variant="body2">
+                          Density: {test.density}
+                        </Typography>
+                        <Typography variant="body2">
+                          Compaction Specification:
+                          {test.compactionSpecification}
+                        </Typography>
+                      </Box>
+                      <IconButton sx={{ height: "100px" }}>
+                        <EditIcon onClick={handleClickEdit}></EditIcon>
+                      </IconButton>
+                    </AccordionDetails>
+                  </Accordion>
                 ))
               ) : (
                 <Card sx={{ padding: 2, borderRadius: 2 }}>
@@ -160,7 +307,7 @@ const Report: React.FC = () => {
               </SolidBackgroundColorButton>
             </Box>
           </Box>
-          <Box id="reportMemoSection">
+          <Box id="reportMemoSection" sx={{ my: 2 }}>
             <Typography variant="h5" sx={{ mb: 1 }}>
               Report
             </Typography>
@@ -206,11 +353,15 @@ const Report: React.FC = () => {
               </Box>
             </Stack>
           </Box>
-          <Box id="reportPhotos">
-            <HeaderTitle title="Report Photos" onClick={handleShowAllPhotos} />
-            {report.reportPhotos.length > 0 ? (
+          <Box id="reportPhotos" sx={{ my: 2 }}>
+            <HeaderTitle
+              title="Report Photos"
+              showAll={true}
+              onClick={handleShowAllPhotos}
+            />
+            {reportPhotos.length > 0 ? (
               <Stack gap={2}>
-                {report.reportPhotos.map((photo) => (
+                {reportPhotos.map((photo) => (
                   <Card
                     key={photo.id}
                     sx={{
@@ -254,22 +405,18 @@ const Report: React.FC = () => {
               <Box
                 sx={{ display: "flex", justifyContent: "space-around", mb: 1 }}
               >
-                <SolidBackgroundColorButton
-                  icon={<FileUploadIcon sx={{ fontSize: "1.25rem" }} />}
-                  handleClick={() => handleUploadImage}
-                >
-                  Upload Image
-                </SolidBackgroundColorButton>
+                <UploadWidget />
+
                 <SolidBackgroundColorButton
                   icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
-                  handleClick={() => handleTakePhoto}
+                  handleClick={() => setShowPhotoModal(true)}
                 >
                   Take Photo
                 </SolidBackgroundColorButton>
               </Box>
               <SolidBackgroundColorButton
                 icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
-                handleClick={() => handleTakePhoto}
+                handleClick={() => console.log("See Overview")}
               >
                 See Overview
               </SolidBackgroundColorButton>
@@ -278,6 +425,83 @@ const Report: React.FC = () => {
         </Stack>
       </Container>
       <BottomNavBar />
+
+      <Dialog
+        open={showPhotoModal}
+        onClose={handleCloseModal}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {capturedPhoto ? "Review Photo" : "Take Photo"}
+        </DialogTitle>
+        <DialogContent>
+          {capturedPhoto ? (
+            <Box>
+              <Box
+                component="img"
+                src={capturedPhoto}
+                alt="Captured photo"
+                sx={{
+                  width: "100%",
+                  height: "auto",
+                  borderRadius: 2,
+                  mb: 2,
+                }}
+              />
+            </Box>
+          ) : (
+            <Box>
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/png"
+                videoConstraints={{ facingMode: "environment" }}
+                width="100%"
+                style={{ borderRadius: 8 }}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          {capturedPhoto ? (
+            <>
+              <Button
+                onClick={() => {
+                  setCapturedPhoto(null);
+                }}
+                variant="outlined"
+                color="secondary"
+              >
+                Retake Photo
+              </Button>
+              <Button
+                onClick={handleKeepPhoto}
+                variant="contained"
+                color="success"
+              >
+                Keep Photo
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                onClick={handleCloseModal}
+                variant="outlined"
+                color="secondary"
+              >
+                Cancel
+              </Button>
+              <SolidBackgroundColorButton
+                icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
+                handleClick={handleTakePhoto}
+              >
+                Take Photo
+              </SolidBackgroundColorButton>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

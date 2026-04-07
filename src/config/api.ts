@@ -1,42 +1,23 @@
-// Debug environment variables
-console.log("Environment Variables:", {
-  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
-  NODE_ENV: import.meta.env.NODE_ENV,
-  PROD: import.meta.env.PROD,
-  DEV: import.meta.env.DEV,
-});
+import { ENDPOINTS } from "./endpoints";
+
+const envBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+const resolvedBaseUrl = envBaseUrl || (import.meta.env.DEV ? "http://localhost:5013" : "");
+
+if (!resolvedBaseUrl && import.meta.env.PROD) {
+  throw new Error(
+    "Missing VITE_API_BASE_URL for production build/runtime configuration.",
+  );
+}
+
+const normalizedBaseUrl = resolvedBaseUrl.replace(/\/+$/, "");
 
 // API configuration for backend integration
 export const API_CONFIG = {
-  // Base URL for API calls - can be overridden by environment variables
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000",
+  // Base URL for API calls. Production must provide VITE_API_BASE_URL.
+  BASE_URL: normalizedBaseUrl,
 
   // API endpoints
-  ENDPOINTS: {
-    AUTH: {
-      LOGIN: "/api/auth/login",
-      LOGOUT: "/api/auth/logout",
-      REFRESH: "/api/auth/refresh",
-      REGISTER: "/api/auth/register",
-    },
-    REPORTS: {
-      LIST: "/api/reports",
-      CREATE: "/api/reports",
-      GET: (id: string) => `/api/reports/${id}`,
-      UPDATE: (id: string) => `/api/reports/${id}`,
-      DELETE: (id: string) => `/api/reports/${id}`,
-    },
-    DENSITY: {
-      CALCULATE: "/api/density/calculate",
-      ANALYZE: "/api/density/analyze",
-      EXPORT: "/api/density/export",
-    },
-    USERS: {
-      PROFILE: "/api/users/profile",
-      UPDATE: "/api/users/profile",
-      PREFERENCES: "/api/users/preferences",
-    },
-  },
+  ENDPOINTS: ENDPOINTS,
 
   // Request timeout in milliseconds (longer for Render's cold starts)
   TIMEOUT: import.meta.env.PROD ? 60000 : 30000,
@@ -58,7 +39,8 @@ export const API_CONFIG = {
 
 // Helper function to build full API URL
 export const buildApiUrl = (endpoint: string): string => {
-  const fullUrl = `${API_CONFIG.BASE_URL}${endpoint}`;
+  const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const fullUrl = `${API_CONFIG.BASE_URL}${normalizedEndpoint}`;
   console.log(
     `Building API URL: ${fullUrl} (BASE_URL: ${API_CONFIG.BASE_URL})`,
   );
@@ -73,7 +55,10 @@ export const getAuthHeaders = (): Record<string, string> => {
 
 // Helper function to check if we're connecting to Render
 export const isRenderBackend = (): boolean => {
-  return API_CONFIG.BASE_URL.includes("onrender.com");
+  return (
+    API_CONFIG.BASE_URL.includes("onrender.com") ||
+    API_CONFIG.BASE_URL.includes("ondigitalocean.app")
+  );
 };
 
 // Helper function to get appropriate timeout for current environment

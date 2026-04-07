@@ -47,7 +47,8 @@ const HeaderWithBackButton: React.FC<HeaderProps> = ({
             sx={{
               display: "flex",
               flexDirection: "column",
-              mb: 1,
+              justifyContent: "center",
+              mb: subtitle ? 1 : 0,
             }}
           >
             <Typography variant="h4" sx={{ fontWeight: 400, color: "black" }}>

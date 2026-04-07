@@ -17,15 +17,50 @@ import {
   Schedule as ScheduleIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
+import { proctorApiService } from "../../services/lab-admin/proctorApiService";
+import { ProctorData } from "@/types/proctors";
 
 const LabAdminAddProctor: React.FC = () => {
   const navigate = useNavigate();
-  const [proctorType, setProctorType] = useState("MPDD");
 
-  const handleProctorTypeChange = (event: SelectChangeEvent) => {
-    setProctorType(event.target.value);
+  // Form state management
+  const [formData, setFormData] = useState<ProctorData>({
+    id: null,
+    jobNumber: "",
+    proctorTestNumber: "",
+    materialType: "",
+    dateSampled: "",
+    proctorType: "MPDD",
+    maxDryDensity: "",
+    correctedDensity: "",
+    labLocation: "",
+    proctorId: "",
+    dateTested: "",
+    oversizePercentage: 0,
+    optimumMoisture: 0,
+    specificGravity: "",
+    image_src: "",
+  });
+
+  // UI state management
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Form field handlers
+  const handleInputChange = (
+    field: keyof ProctorData,
+    value: string | number,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
+  const handleProctorTypeChange = (event: SelectChangeEvent) => {
+    handleInputChange("proctorType", event.target.value as "MPDD" | "SPDD");
+  };
+
+  // Navigation handler
   const handleNavigation = (section: string) => {
     switch (section) {
       case "schedule":
@@ -37,6 +72,52 @@ const LabAdminAddProctor: React.FC = () => {
       default:
         break;
     }
+  };
+
+  // Save proctor data
+  const handleSaveProctor = async () => {
+    try {
+      setIsLoading(true);
+
+      // Validate form data
+      const validation = proctorApiService.validateProctorData(formData);
+      if (!validation.isValid) {
+        console.error("Validation errors:", validation.errors);
+        return;
+      }
+
+      // Save to database
+      const response = await proctorApiService.createProctor(formData);
+
+      console.log("Proctor data saved successfully!", response.data);
+    } catch (error) {
+      console.error("Error saving proctor:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Clear form
+  const handleClearForm = () => {
+    setFormData({
+      id: null,
+      jobNumber: "",
+      proctorTestNumber: "",
+      materialType: "",
+      dateSampled: "",
+      proctorType: "MPDD",
+      maxDryDensity: "",
+      correctedDensity: "",
+      labLocation: "",
+      proctorId: "",
+      dateTested: "",
+      oversizePercentage: 0,
+      optimumMoisture: 0,
+      specificGravity: "",
+      image_src: "",
+    });
+
+    console.log("Form cleared successfully");
   };
 
   return (
@@ -187,7 +268,10 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <TextField
                     fullWidth
-                    value="22541"
+                    value={formData.jobNumber}
+                    onChange={(e) =>
+                      handleInputChange("jobNumber", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
                     sx={{
@@ -206,7 +290,10 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <TextField
                     fullWidth
-                    value="13"
+                    value={formData.proctorTestNumber}
+                    onChange={(e) =>
+                      handleInputChange("proctorTestNumber", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
                     sx={{
@@ -225,7 +312,10 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <TextField
                     fullWidth
-                    value="Riversand"
+                    value={formData.materialType}
+                    onChange={(e) =>
+                      handleInputChange("materialType", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
                     sx={{
@@ -245,9 +335,12 @@ const LabAdminAddProctor: React.FC = () => {
                   <TextField
                     type="date"
                     fullWidth
+                    value={formData.dateSampled}
+                    onChange={(e) =>
+                      handleInputChange("dateSampled", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
-                    defaultValue="2025-08-08"
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -267,7 +360,7 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <FormControl fullWidth size="small">
                     <Select
-                      value={proctorType}
+                      value={formData.proctorType}
                       onChange={handleProctorTypeChange}
                       sx={{
                         backgroundColor: "white",
@@ -275,8 +368,7 @@ const LabAdminAddProctor: React.FC = () => {
                       }}
                     >
                       <MenuItem value="MPDD">MPDD</MenuItem>
-                      <MenuItem value="Standard">Standard</MenuItem>
-                      <MenuItem value="Modified">Modified</MenuItem>
+                      <MenuItem value="SPDD">SPDD</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
@@ -288,7 +380,10 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <TextField
                     fullWidth
-                    value="1800 kg/m3"
+                    value={formData.maxDryDensity}
+                    onChange={(e) =>
+                      handleInputChange("maxDryDensity", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
                     sx={{
@@ -307,7 +402,10 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <TextField
                     fullWidth
-                    value="1938 kg/m3"
+                    value={formData.correctedDensity}
+                    onChange={(e) =>
+                      handleInputChange("correctedDensity", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
                     sx={{
@@ -329,7 +427,10 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <TextField
                     fullWidth
-                    value="Vancouver, BC"
+                    value={formData.labLocation}
+                    onChange={(e) =>
+                      handleInputChange("labLocation", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
                     sx={{
@@ -348,7 +449,10 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <TextField
                     fullWidth
-                    value="12345"
+                    value={formData.proctorId}
+                    onChange={(e) =>
+                      handleInputChange("proctorId", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
                     sx={{
@@ -368,9 +472,12 @@ const LabAdminAddProctor: React.FC = () => {
                   <TextField
                     type="date"
                     fullWidth
+                    value={formData.dateTested}
+                    onChange={(e) =>
+                      handleInputChange("dateTested", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
-                    defaultValue="2025-08-08"
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -390,9 +497,16 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <TextField
-                      value="13.2"
+                      value={formData.oversizePercentage}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "oversizePercentage",
+                          parseFloat(e.target.value) || 0,
+                        )
+                      }
                       variant="outlined"
                       size="small"
+                      type="number"
                       sx={{
                         flex: 1,
                         "& .MuiOutlinedInput-root": {
@@ -417,9 +531,16 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <TextField
-                      value="13"
+                      value={formData.optimumMoisture}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "optimumMoisture",
+                          parseFloat(e.target.value) || 0,
+                        )
+                      }
                       variant="outlined"
                       size="small"
+                      type="number"
                       sx={{
                         flex: 1,
                         "& .MuiOutlinedInput-root": {
@@ -444,7 +565,10 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <TextField
                     fullWidth
-                    value="2.7 Gs"
+                    value={formData.specificGravity}
+                    onChange={(e) =>
+                      handleInputChange("specificGravity", e.target.value)
+                    }
                     variant="outlined"
                     size="small"
                     sx={{
@@ -462,6 +586,8 @@ const LabAdminAddProctor: React.FC = () => {
             <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
               <Button
                 variant="contained"
+                onClick={handleSaveProctor}
+                disabled={isLoading}
                 sx={{
                   backgroundColor: "primary.main",
                   color: "white",
@@ -474,10 +600,12 @@ const LabAdminAddProctor: React.FC = () => {
                   },
                 }}
               >
-                Save Proctor Data
+                {isLoading ? "Saving..." : "Save Proctor Data"}
               </Button>
               <Button
                 variant="outlined"
+                onClick={handleClearForm}
+                disabled={isLoading}
                 sx={{
                   borderColor: "primary.main",
                   color: "primary.main",

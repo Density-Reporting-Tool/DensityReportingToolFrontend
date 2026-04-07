@@ -92,21 +92,25 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    watch: {
+      usePolling: true, // Check docker mounted files for changes
+      interval: 500, // Check every 500ms
+    },
     proxy:
       process.env.NODE_ENV === "development"
         ? {
             "/api": {
-              target: "http://localhost:8000", // Only used in development
+              target: "http://localhost:8080", // Only used in development
               changeOrigin: true,
               secure: false,
             },
             "/health": {
-              target: "http://localhost:8000", // Add health endpoint proxy
+              target: "http://localhost:9080", // Add health endpoint proxy
               changeOrigin: true,
               secure: false,
             },
             "/home": {
-              target: "http://localhost:8000", // Add home endpoint proxy
+              target: "http://localhost:8080", // Add home endpoint proxy
               changeOrigin: true,
               secure: false,
             },

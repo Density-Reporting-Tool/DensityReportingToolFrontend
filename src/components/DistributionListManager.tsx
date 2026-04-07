@@ -43,7 +43,7 @@ interface DistributionListManagerProps {
   open: boolean;
   onClose: () => void;
   contacts: Contact[];
-  onContactsChange: () => void;
+  onContactsChange: (contacts: Contact[]) => void;
   title?: string;
   jobNumber?: string;
   mode?: "dialog" | "page";
