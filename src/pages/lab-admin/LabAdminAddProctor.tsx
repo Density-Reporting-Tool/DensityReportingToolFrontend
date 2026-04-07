@@ -17,6 +17,7 @@ import {
   Person as PersonIcon,
   Schedule as ScheduleIcon,
   Add as AddIcon,
+  List as ListIcon,
 } from "@mui/icons-material";
 import { proctorApi } from "@/services/api/proctorApiService";
 import { ProctorCreateDTO } from "@/dtos/Proctor/proctor";
@@ -62,15 +63,8 @@ const LabAdminAddProctor: React.FC = () => {
     handleInputChange("proctorTypeId", Number(event.target.value));
   };
 
-  const handleNavigation = (section: string) => {
-    switch (section) {
-      case "schedule":
-        navigate("/lab-admin");
-        break;
-      case "createJob":
-        navigate("/lab-admin/create-job");
-        break;
-    }
+  const handleNavigation = (path: string) => {
+    navigate(path);
   };
 
   const validate = (): string[] => {
@@ -210,38 +204,42 @@ const LabAdminAddProctor: React.FC = () => {
           <Stack spacing={2} sx={{ width: "90%" }}>
             <Button
               variant="contained"
-              onClick={() => handleNavigation("schedule")}
+              onClick={() => handleNavigation("/lab-admin/schedule")}
+              startIcon={<ScheduleIcon />}
               sx={{
                 backgroundColor: "white",
                 color: "text.primary",
                 fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                "&:hover": { backgroundColor: "grey.50" },
+                boxShadow: "none",
+                "&:hover": { backgroundColor: "grey.50", boxShadow: "none" },
               }}
-              startIcon={<ScheduleIcon />}
             >
               Schedule
             </Button>
 
             <Button
               variant="contained"
-              onClick={() => handleNavigation("createJob")}
+              onClick={() => handleNavigation("/lab-admin/create-job")}
+              startIcon={<AddIcon />}
               sx={{
                 backgroundColor: "white",
                 color: "text.primary",
                 fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                "&:hover": { backgroundColor: "grey.50" },
+                boxShadow: "none",
+                "&:hover": { backgroundColor: "grey.50", boxShadow: "none" },
               }}
-              startIcon={<AddIcon />}
             >
               Create Job
             </Button>
 
+            {/* Active: Enter Proctor */}
             <Button
               variant="contained"
+              startIcon={<PersonIcon />}
               sx={{
                 backgroundColor: "primary.main",
                 color: "white",
@@ -250,9 +248,25 @@ const LabAdminAddProctor: React.FC = () => {
                 borderRadius: 2,
                 "&:hover": { backgroundColor: "primary.dark" },
               }}
-              startIcon={<PersonIcon />}
             >
               Enter Proctor
+            </Button>
+
+            <Button
+              variant="contained"
+              onClick={() => handleNavigation("/lab-admin/proctors")}
+              startIcon={<ListIcon />}
+              sx={{
+                backgroundColor: "white",
+                color: "text.primary",
+                fontWeight: "bold",
+                py: 1.5,
+                borderRadius: 2,
+                boxShadow: "none",
+                "&:hover": { backgroundColor: "grey.50", boxShadow: "none" },
+              }}
+            >
+              View Proctors
             </Button>
           </Stack>
         </Box>

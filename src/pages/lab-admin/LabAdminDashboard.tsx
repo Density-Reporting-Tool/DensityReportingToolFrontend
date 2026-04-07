@@ -1,26 +1,25 @@
 import React from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Avatar, Stack } from "@mui/material";
 import {
   Schedule as ScheduleIcon,
   Add as AddIcon,
   Person as PersonIcon,
+  List as ListIcon,
 } from "@mui/icons-material";
+
+const NAV_ITEMS = [
+  { label: "Schedule", icon: <ScheduleIcon />, path: "/lab-admin/schedule" },
+  { label: "Create Job", icon: <AddIcon />, path: "/lab-admin/create-job" },
+  { label: "Enter Proctor", icon: <PersonIcon />, path: "/lab-admin/add-proctor" },
+  { label: "View Proctors", icon: <ListIcon />, path: "/lab-admin/proctors" },
+];
 
 const LabAdminDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleSchedule = () => {
-    navigate("/lab-admin/schedule");
-  };
-
-  const handleCreateJob = () => {
-    navigate("/lab-admin/create-job");
-  };
-
-  const handleEnterProctor = () => {
-    navigate("/lab-admin/add-proctor");
-  };
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -34,7 +33,6 @@ const LabAdminDashboard: React.FC = () => {
           width: "100%",
         }}
       >
-        {/* Title Section */}
         <Box
           sx={{
             backgroundColor: "primary.dark",
@@ -45,7 +43,6 @@ const LabAdminDashboard: React.FC = () => {
             minWidth: 200,
           }}
         >
-          {/* Avatar Circle */}
           <Avatar
             sx={{
               bgcolor: "white",
@@ -61,11 +58,7 @@ const LabAdminDashboard: React.FC = () => {
           </Avatar>
           <Typography
             variant="h6"
-            sx={{
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-            }}
+            sx={{ color: "white", fontWeight: "bold", fontSize: "1.1rem" }}
           >
             Lab Admin
           </Typography>
@@ -73,7 +66,7 @@ const LabAdminDashboard: React.FC = () => {
       </Box>
 
       {/* Main Content Area */}
-      <Box sx={{ display: "flex", flex: 1 }}>
+      <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
         {/* Left Sidebar */}
         <Box
           sx={{
@@ -83,74 +76,53 @@ const LabAdminDashboard: React.FC = () => {
             flexDirection: "column",
             alignItems: "center",
             pt: 3,
+            flexShrink: 0,
           }}
         >
           <Stack spacing={2} sx={{ width: "90%" }}>
-            {/* Schedule Button */}
-            <Button
-              variant="contained"
-              onClick={handleSchedule}
-              sx={{
-                backgroundColor: "primary.main",
-                color: "white",
-                fontWeight: "bold",
-                py: 1.5,
-                borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "primary.dark",
-                },
-              }}
-              startIcon={<ScheduleIcon />}
-            >
-              Schedule
-            </Button>
-
-            {/* Create Job Button */}
-            <Button
-              variant="contained"
-              onClick={handleCreateJob}
-              sx={{
-                backgroundColor: "primary.main",
-                color: "white",
-                fontWeight: "bold",
-                py: 1.5,
-                borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "primary.dark",
-                },
-              }}
-              startIcon={<AddIcon />}
-            >
-              Create Job
-            </Button>
-
-            {/* Enter Proctor Button */}
-            <Button
-              variant="contained"
-              onClick={handleEnterProctor}
-              sx={{
-                backgroundColor: "primary.main",
-                color: "white",
-                fontWeight: "bold",
-                py: 1.5,
-                borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "primary.dark",
-                },
-              }}
-              startIcon={<PersonIcon />}
-            >
-              Enter Proctor
-            </Button>
+            {NAV_ITEMS.map(({ label, icon, path }) => (
+              <Button
+                key={path}
+                variant="contained"
+                onClick={() => navigate(path)}
+                startIcon={icon}
+                sx={
+                  isActive(path)
+                    ? {
+                        backgroundColor: "primary.main",
+                        color: "white",
+                        fontWeight: "bold",
+                        py: 1.5,
+                        borderRadius: 2,
+                        "&:hover": { backgroundColor: "primary.dark" },
+                      }
+                    : {
+                        backgroundColor: "white",
+                        color: "text.primary",
+                        fontWeight: "bold",
+                        py: 1.5,
+                        borderRadius: 2,
+                        boxShadow: "none",
+                        "&:hover": { backgroundColor: "grey.50", boxShadow: "none" },
+                      }
+                }
+              >
+                {label}
+              </Button>
+            ))}
           </Stack>
         </Box>
 
-        {/* Main Content Area */}
+        {/* Main Content */}
         <Box
           sx={{
             flex: 1,
             backgroundColor: "background.default",
-            borderLeft: "1px solid grey.300",
+            borderLeft: "1px solid",
+            borderColor: "grey.200",
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Outlet />
