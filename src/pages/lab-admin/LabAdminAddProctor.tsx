@@ -27,10 +27,29 @@ const PROCTOR_TYPES = [
   { id: 2, label: "Modified" },
 ];
 
-const emptyForm = (): ProctorCreateDTO => ({
+interface FormData {
+  proctorID: string;
+  proctorTestNumber: string;
+  jobNumber: string;
+  labTestId: number | null;
+  sieveId: number | null;
+  proctorTypeId: number;
+  materialType: string;
+  labLocation: string;
+  dateSampled: string | null;
+  dateTested: string | null;
+  maxDensity: number | null;
+  correctedDensity: number | null;
+  optimumMoistureContent: number | null;
+  specificGravity: number | null;
+  oversizePercentage: number | null;
+}
+
+const emptyForm = (): FormData => ({
   proctorID: "",
   proctorTestNumber: "",
-  labTestId: 0,
+  jobNumber: "",
+  labTestId: null,
   sieveId: null,
   proctorTypeId: 1,
   materialType: "",
@@ -47,13 +66,13 @@ const emptyForm = (): ProctorCreateDTO => ({
 const LabAdminAddProctor: React.FC = () => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState<ProctorCreateDTO>(emptyForm());
+  const [formData, setFormData] = useState<FormData>(emptyForm());
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleInputChange = (
-    field: keyof ProctorCreateDTO,
+    field: keyof FormData,
     value: string | number | null,
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -74,8 +93,8 @@ const LabAdminAddProctor: React.FC = () => {
     if (!formData.labLocation?.trim()) errors.push("Lab location is required");
     if (!formData.proctorTypeId || formData.proctorTypeId <= 0)
       errors.push("Proctor type is required");
-    if (!formData.labTestId || formData.labTestId <= 0)
-      errors.push("Lab Test ID is required");
+    if (!formData.jobNumber?.trim() && (!formData.labTestId || formData.labTestId <= 0))
+      errors.push("Either a Job Number or Lab Test ID is required");
     if (
       formData.maxDensity != null &&
       (formData.maxDensity < 0 || formData.maxDensity > 3000)
@@ -109,6 +128,30 @@ const LabAdminAddProctor: React.FC = () => {
     return errors;
   };
 
+  const buildCreateDTO = (): ProctorCreateDTO => {
+    const base = {
+      proctorID: formData.proctorID,
+      proctorTestNumber: formData.proctorTestNumber,
+      sieveId: formData.sieveId,
+      proctorTypeId: formData.proctorTypeId,
+      materialType: formData.materialType,
+      labLocation: formData.labLocation,
+      dateSampled: formData.dateSampled,
+      dateTested: formData.dateTested,
+      maxDensity: formData.maxDensity,
+      correctedDensity: formData.correctedDensity,
+      optimumMoistureContent: formData.optimumMoistureContent,
+      specificGravity: formData.specificGravity,
+      oversizePercentage: formData.oversizePercentage,
+    };
+    // If a lab test ID is provided, use it directly (links to existing lab test).
+    // Otherwise, send the job number and let the backend create a new lab test.
+    if (formData.labTestId && formData.labTestId > 0) {
+      return { ...base, labTestId: formData.labTestId };
+    }
+    return { ...base, jobNumber: formData.jobNumber };
+  };
+
   const handleSaveProctor = async () => {
     setSuccessMessage(null);
     setErrorMessage(null);
@@ -121,11 +164,13 @@ const LabAdminAddProctor: React.FC = () => {
 
     try {
       setIsLoading(true);
-      await proctorApi.create(formData);
+      await proctorApi.create(buildCreateDTO());
       setSuccessMessage("Proctor saved successfully.");
       setFormData(emptyForm());
     } catch (err: any) {
-      setErrorMessage(err?.message || "Failed to save proctor.");
+      const base = err?.message || "Failed to save proctor.";
+      const detail = err?.errors?.length ? ` — ${(err.errors as string[]).join(", ")}` : "";
+      setErrorMessage(base + detail);
     } finally {
       setIsLoading(false);
     }
@@ -322,20 +367,39 @@ const LabAdminAddProctor: React.FC = () => {
                   />
                 </Box>
 
+                {/* Job Number */}
+                <Box>
+                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                    Job Number
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    placeholder="e.g. 25482"
+                    value={formData.jobNumber}
+                    onChange={(e) => handleInputChange("jobNumber", e.target.value)}
+                    variant="outlined"
+                    size="small"
+                    helperText="A new Lab Test will be created and linked to this job"
+                    sx={fieldSx}
+                  />
+                </Box>
+
                 {/* Lab Test ID */}
                 <Box>
                   <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                    Lab Test ID *
+                    Lab Test ID
                   </Typography>
                   <TextField
                     fullWidth
                     type="number"
-                    value={formData.labTestId || ""}
+                    placeholder="e.g. 5"
+                    value={formData.labTestId ?? ""}
                     onChange={(e) =>
-                      handleInputChange("labTestId", parseInt(e.target.value) || 0)
+                      handleInputChange("labTestId", parseInt(e.target.value) || null)
                     }
                     variant="outlined"
                     size="small"
+                    helperText="Link to an existing Lab Test (takes priority over Job Number)"
                     sx={fieldSx}
                   />
                 </Box>

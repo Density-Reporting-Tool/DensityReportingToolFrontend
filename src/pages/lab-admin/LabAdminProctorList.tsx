@@ -137,7 +137,9 @@ const EditDialog: React.FC<EditDialogProps> = ({ proctor, onClose, onSaved }) =>
       const updated = await proctorApi.update(proctor.id, form);
       onSaved(updated);
     } catch (err: any) {
-      setError(err?.message || "Failed to save changes.");
+      const base = err?.message || "Failed to save changes.";
+      const detail = err?.errors?.length ? ` — ${(err.errors as string[]).join(", ")}` : "";
+      setError(base + detail);
     } finally {
       setSaving(false);
     }
@@ -185,6 +187,40 @@ const EditDialog: React.FC<EditDialogProps> = ({ proctor, onClose, onSaved }) =>
             {error}
           </Alert>
         )}
+
+        {/* Job / Lab Test info */}
+        <Box
+          sx={{
+            mb: 2,
+            p: 1.5,
+            borderRadius: 1,
+            backgroundColor: "grey.50",
+            border: "1px solid",
+            borderColor: "grey.200",
+          }}
+        >
+          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+            Job Association
+          </Typography>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Typography variant="body2">
+              <strong>
+                Job {proctor.labTest?.job?.jobNumber ?? `#${proctor.labTest?.jobId ?? "—"}`}
+              </strong>
+              {" · Lab Test ID: "}
+              {proctor.labTestId}
+            </Typography>
+          </Stack>
+          <TextField
+            label="Lab Test ID *"
+            type="number"
+            size="small"
+            value={form.labTestId}
+            onChange={(e) => set("labTestId", parseInt(e.target.value) || form.labTestId)}
+            helperText="Change to reassign this proctor to a different lab test"
+            sx={{ mt: 1, ...fieldSx }}
+          />
+        </Box>
 
         <Grid container spacing={2}>
           {/* Left column */}
@@ -315,7 +351,7 @@ const ProctorRow: React.FC<ProctorRowProps> = ({ proctor, onEdit }) => (
       {/* Row 1: Job number + material type */}
       <Stack direction="row" spacing={1.5} alignItems="baseline" flexWrap="wrap">
         <Typography variant="body1" fontWeight={700}>
-          Job #{proctor.labTest?.jobId ?? proctor.labTestId}
+          Job {proctor.labTest?.job?.jobNumber ?? `#${proctor.labTest?.jobId ?? proctor.labTestId}`}
         </Typography>
         {proctor.materialType && (
           <>
