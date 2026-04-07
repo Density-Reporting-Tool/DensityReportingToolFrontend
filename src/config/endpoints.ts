@@ -60,4 +60,14 @@ export const ENDPOINTS = {
     HOME: "/home",
     API_HEALTH: "/api/health",
   },
+  SCHEDULING: {
+    EVENTS: "/api/scheduling/events",
+    EVENT: (id: number | string) => `/api/scheduling/events/${id}`,
+  },
+  /** People / employees (technicians). Matches backend /api/People and /api/People/employees/{id} */
+  PEOPLE: {
+    LIST: "/api/People",
+    EMPLOYEE: (id: number | string) => `/api/People/employees/${id}`,
+  },
 };
+  

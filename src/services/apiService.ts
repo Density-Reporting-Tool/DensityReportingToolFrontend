@@ -183,5 +183,5 @@ class TestAPIService extends BaseApiService {
 export const apiService = new BaseApiService();
 export const jobsAPIService = new JobsAPIService();
 export const testAPIService = new TestAPIService();
-
+export { BaseApiService as ApiService };
 export type { ApiResponse, ApiError };

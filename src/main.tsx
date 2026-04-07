@@ -12,6 +12,7 @@ import LandingPage from "./pages/LandingPage";
 import LabAdminDashboard from "./pages/lab-admin/LabAdminDashboard";
 import LabAdminCreateJob from "./pages/lab-admin/LabAdminCreateJob";
 import LabAdminAddProctor from "./pages/lab-admin/LabAdminAddProctor";
+import LabAdminSchedule from "./pages/lab-admin/LabAdminSchedule";
 import DistributionListManagerDemo from "./pages/lab-admin/DistributionListManagerDemo";
 import "./index.css";
 import ReportDetails from "./pages/field-tech/ReportDetails";
@@ -43,7 +44,18 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             />
 
             {/* Lab admin pages */}
-            <Route path="/lab-admin" element={<LabAdminDashboard />} />
+            <Route path="/lab-admin" element={<LabAdminDashboard />}>
+              <Route
+                index
+                element={
+                  <div style={{ padding: 24, color: "#666" }}>
+                    Select an option from the sidebar to get started
+                  </div>
+                }
+              />
+              <Route path="schedule" element={<LabAdminSchedule />} />
+            </Route>
+
             <Route
               path="/lab-admin/create-job"
               element={<LabAdminCreateJob />}
