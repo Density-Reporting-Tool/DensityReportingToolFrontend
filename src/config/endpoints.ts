@@ -36,24 +36,13 @@ export const ENDPOINTS = {
     SEARCH: (jobNumber: string) => `/api/jobs/search?jobNumber=${jobNumber}`,
   },
   PROCTOR: {
-    LIST: "/api/proctors",
-    CREATE: "/api/proctors",
-    GET: (id: string) => `/api/proctors/${id}`,
-    UPDATE: (id: string) => `/api/proctors/${id}`,
-    DELETE: (id: string) => `/api/proctors/${id}`,
-    SEARCH: (jobNumber: string) =>
-      `/api/proctors/search?jobNumber=${jobNumber}`,
-    LAB_ADMIN: {
-      LIST: "/api/proctors/lab-admin",
-      CREATE: "/api/proctors/lab-admin",
-      GET: (id: number) => `/api/proctors/${id}`,
-      UPDATE: (id: number) => `/api/proctors/lab-admin/${id}`,
-    },
-    FIELD_TECH: {
-      DENSITY_REQUIREMENTS: (id: number) =>
-        `/api/proctors/field-tech/${id}/density-requirements`,
-    },
-    JOB: (jobNumber: string) => `/api/proctors/job/${jobNumber}`,
+    LIST: "/api/proctor",
+    CREATE: "/api/proctor",
+    GET: (id: number) => `/api/proctor/${id}`,
+    UPDATE: (id: number) => `/api/proctor/${id}`,
+    SEARCH: (jobNumber: string) => `/api/proctor/search/${jobNumber}`,
+    JOB: (jobNumber: string) => `/api/proctor/job/${jobNumber}`,
+    JOB_ID: (jobId: number) => `/api/proctor/job-id/${jobId}`,
   },
   HEALTH: {
     HEALTH: "/health",

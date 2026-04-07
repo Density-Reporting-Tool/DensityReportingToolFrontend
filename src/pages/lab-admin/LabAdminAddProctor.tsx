@@ -11,56 +11,57 @@ import {
   Avatar,
   SelectChangeEvent,
   Stack,
+  Alert,
 } from "@mui/material";
 import {
   Person as PersonIcon,
   Schedule as ScheduleIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
-import { proctorApiService } from "../../services/lab-admin/proctorApiService";
-import { ProctorData } from "@/types/proctors";
+import { proctorApi } from "@/services/api/proctorApiService";
+import { ProctorCreateDTO } from "@/dtos/Proctor/proctor";
+
+const PROCTOR_TYPES = [
+  { id: 1, label: "Standard" },
+  { id: 2, label: "Modified" },
+];
+
+const emptyForm = (): ProctorCreateDTO => ({
+  proctorID: "",
+  proctorTestNumber: "",
+  labTestId: 0,
+  sieveId: null,
+  proctorTypeId: 1,
+  materialType: "",
+  labLocation: "",
+  dateSampled: null,
+  dateTested: null,
+  maxDensity: null,
+  correctedDensity: null,
+  optimumMoistureContent: null,
+  specificGravity: null,
+  oversizePercentage: null,
+});
 
 const LabAdminAddProctor: React.FC = () => {
   const navigate = useNavigate();
 
-  // Form state management
-  const [formData, setFormData] = useState<ProctorData>({
-    id: null,
-    jobNumber: "",
-    proctorTestNumber: "",
-    materialType: "",
-    dateSampled: "",
-    proctorType: "MPDD",
-    maxDryDensity: "",
-    correctedDensity: "",
-    labLocation: "",
-    proctorId: "",
-    dateTested: "",
-    oversizePercentage: 0,
-    optimumMoisture: 0,
-    specificGravity: "",
-    image_src: "",
-  });
-
-  // UI state management
+  const [formData, setFormData] = useState<ProctorCreateDTO>(emptyForm());
   const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Form field handlers
   const handleInputChange = (
-    field: keyof ProctorData,
-    value: string | number,
+    field: keyof ProctorCreateDTO,
+    value: string | number | null,
   ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleProctorTypeChange = (event: SelectChangeEvent) => {
-    handleInputChange("proctorType", event.target.value as "MPDD" | "SPDD");
+  const handleProctorTypeChange = (event: SelectChangeEvent<number>) => {
+    handleInputChange("proctorTypeId", Number(event.target.value));
   };
 
-  // Navigation handler
   const handleNavigation = (section: string) => {
     switch (section) {
       case "schedule":
@@ -69,55 +70,84 @@ const LabAdminAddProctor: React.FC = () => {
       case "createJob":
         navigate("/lab-admin/create-job");
         break;
-      default:
-        break;
     }
   };
 
-  // Save proctor data
+  const validate = (): string[] => {
+    const errors: string[] = [];
+    if (!formData.proctorID?.trim()) errors.push("Proctor ID is required");
+    if (!formData.materialType?.trim()) errors.push("Material type is required");
+    if (!formData.labLocation?.trim()) errors.push("Lab location is required");
+    if (!formData.proctorTypeId || formData.proctorTypeId <= 0)
+      errors.push("Proctor type is required");
+    if (!formData.labTestId || formData.labTestId <= 0)
+      errors.push("Lab Test ID is required");
+    if (
+      formData.maxDensity != null &&
+      (formData.maxDensity < 0 || formData.maxDensity > 3000)
+    )
+      errors.push("Max density must be between 0 and 3000");
+    if (
+      formData.correctedDensity != null &&
+      (formData.correctedDensity < 0 || formData.correctedDensity > 3000)
+    )
+      errors.push("Corrected density must be between 0 and 3000");
+    if (
+      formData.optimumMoistureContent != null &&
+      (formData.optimumMoistureContent < 0 ||
+        formData.optimumMoistureContent > 100)
+    )
+      errors.push("Optimum moisture content must be between 0 and 100");
+    if (
+      formData.oversizePercentage != null &&
+      (formData.oversizePercentage < 0 || formData.oversizePercentage > 100)
+    )
+      errors.push("Oversize percentage must be between 0 and 100");
+    if (
+      formData.specificGravity != null &&
+      (formData.specificGravity < 0 || formData.specificGravity > 10)
+    )
+      errors.push("Specific gravity must be between 0 and 10");
+    if (formData.dateSampled && formData.dateTested) {
+      if (new Date(formData.dateTested) < new Date(formData.dateSampled))
+        errors.push("Date tested must be on or after date sampled");
+    }
+    return errors;
+  };
+
   const handleSaveProctor = async () => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
+
+    const errors = validate();
+    if (errors.length > 0) {
+      setErrorMessage(errors.join(" · "));
+      return;
+    }
+
     try {
       setIsLoading(true);
-
-      // Validate form data
-      const validation = proctorApiService.validateProctorData(formData);
-      if (!validation.isValid) {
-        console.error("Validation errors:", validation.errors);
-        return;
-      }
-
-      // Save to database
-      const response = await proctorApiService.createProctor(formData);
-
-      console.log("Proctor data saved successfully!", response.data);
-    } catch (error) {
-      console.error("Error saving proctor:", error);
+      await proctorApi.create(formData);
+      setSuccessMessage("Proctor saved successfully.");
+      setFormData(emptyForm());
+    } catch (err: any) {
+      setErrorMessage(err?.message || "Failed to save proctor.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Clear form
   const handleClearForm = () => {
-    setFormData({
-      id: null,
-      jobNumber: "",
-      proctorTestNumber: "",
-      materialType: "",
-      dateSampled: "",
-      proctorType: "MPDD",
-      maxDryDensity: "",
-      correctedDensity: "",
-      labLocation: "",
-      proctorId: "",
-      dateTested: "",
-      oversizePercentage: 0,
-      optimumMoisture: 0,
-      specificGravity: "",
-      image_src: "",
-    });
+    setFormData(emptyForm());
+    setSuccessMessage(null);
+    setErrorMessage(null);
+  };
 
-    console.log("Form cleared successfully");
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: "white",
+      borderRadius: 1,
+    },
   };
 
   return (
@@ -132,7 +162,6 @@ const LabAdminAddProctor: React.FC = () => {
           width: "100%",
         }}
       >
-        {/* Title Section */}
         <Box
           sx={{
             backgroundColor: "primary.dark",
@@ -143,7 +172,6 @@ const LabAdminAddProctor: React.FC = () => {
             minWidth: 200,
           }}
         >
-          {/* Avatar Circle */}
           <Avatar
             sx={{
               bgcolor: "white",
@@ -159,11 +187,7 @@ const LabAdminAddProctor: React.FC = () => {
           </Avatar>
           <Typography
             variant="h6"
-            sx={{
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-            }}
+            sx={{ color: "white", fontWeight: "bold", fontSize: "1.1rem" }}
           >
             Lab Admin
           </Typography>
@@ -184,7 +208,6 @@ const LabAdminAddProctor: React.FC = () => {
           }}
         >
           <Stack spacing={2} sx={{ width: "90%" }}>
-            {/* Schedule Button */}
             <Button
               variant="contained"
               onClick={() => handleNavigation("schedule")}
@@ -194,16 +217,13 @@ const LabAdminAddProctor: React.FC = () => {
                 fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "grey.50",
-                },
+                "&:hover": { backgroundColor: "grey.50" },
               }}
               startIcon={<ScheduleIcon />}
             >
               Schedule
             </Button>
 
-            {/* Create Job Button */}
             <Button
               variant="contained"
               onClick={() => handleNavigation("createJob")}
@@ -213,16 +233,13 @@ const LabAdminAddProctor: React.FC = () => {
                 fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "grey.50",
-                },
+                "&:hover": { backgroundColor: "grey.50" },
               }}
               startIcon={<AddIcon />}
             >
               Create Job
             </Button>
 
-            {/* Enter Proctor Button - Active State */}
             <Button
               variant="contained"
               sx={{
@@ -231,9 +248,7 @@ const LabAdminAddProctor: React.FC = () => {
                 fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "primary.dark",
-                },
+                "&:hover": { backgroundColor: "primary.dark" },
               }}
               startIcon={<PersonIcon />}
             >
@@ -242,44 +257,39 @@ const LabAdminAddProctor: React.FC = () => {
           </Stack>
         </Box>
 
-        {/* Main Content Area - Proctor Data Entry Form */}
-        <Box
-          sx={{
-            flex: 1,
-            backgroundColor: "background.default",
-            p: 4,
-          }}
-        >
-          <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
+        {/* Form Area */}
+        <Box sx={{ flex: 1, backgroundColor: "background.default", p: 4 }}>
+          <Typography variant="h4" sx={{ mb: 2, fontWeight: 600 }}>
             Proctor Data Entry
           </Typography>
 
+          {successMessage && (
+            <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccessMessage(null)}>
+              {successMessage}
+            </Alert>
+          )}
+          {errorMessage && (
+            <Alert severity="error" sx={{ mb: 3 }} onClose={() => setErrorMessage(null)}>
+              {errorMessage}
+            </Alert>
+          )}
+
           <Box sx={{ maxWidth: 1200 }}>
-            {/* Form Grid - Two Columns */}
-            <Box
-              sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}
-            >
+            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
               {/* Left Column */}
               <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                {/* Job # */}
+                {/* Proctor ID */}
                 <Box>
                   <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                    Job #
+                    Proctor ID *
                   </Typography>
                   <TextField
                     fullWidth
-                    value={formData.jobNumber}
-                    onChange={(e) =>
-                      handleInputChange("jobNumber", e.target.value)
-                    }
+                    value={formData.proctorID}
+                    onChange={(e) => handleInputChange("proctorID", e.target.value)}
                     variant="outlined"
                     size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
+                    sx={fieldSx}
                   />
                 </Box>
 
@@ -291,40 +301,79 @@ const LabAdminAddProctor: React.FC = () => {
                   <TextField
                     fullWidth
                     value={formData.proctorTestNumber}
+                    onChange={(e) => handleInputChange("proctorTestNumber", e.target.value)}
+                    variant="outlined"
+                    size="small"
+                    sx={fieldSx}
+                  />
+                </Box>
+
+                {/* Lab Test ID */}
+                <Box>
+                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                    Lab Test ID *
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    value={formData.labTestId || ""}
                     onChange={(e) =>
-                      handleInputChange("proctorTestNumber", e.target.value)
+                      handleInputChange("labTestId", parseInt(e.target.value) || 0)
                     }
                     variant="outlined"
                     size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
+                    sx={fieldSx}
                   />
                 </Box>
 
                 {/* Material Type */}
                 <Box>
                   <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                    Material Type
+                    Material Type *
                   </Typography>
                   <TextField
                     fullWidth
                     value={formData.materialType}
-                    onChange={(e) =>
-                      handleInputChange("materialType", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("materialType", e.target.value)}
                     variant="outlined"
                     size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
+                    sx={fieldSx}
                   />
+                </Box>
+
+                {/* Lab Location */}
+                <Box>
+                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                    Lab Location *
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    value={formData.labLocation}
+                    onChange={(e) => handleInputChange("labLocation", e.target.value)}
+                    variant="outlined"
+                    size="small"
+                    sx={fieldSx}
+                  />
+                </Box>
+
+                {/* Proctor Type */}
+                <Box>
+                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                    Proctor Type *
+                  </Typography>
+                  <FormControl fullWidth size="small">
+                    <Select
+                      value={formData.proctorTypeId}
+                      onChange={handleProctorTypeChange}
+                      sx={{ backgroundColor: "white", borderRadius: 1 }}
+                    >
+                      {PROCTOR_TYPES.map((t) => (
+                        <MenuItem key={t.id} value={t.id}>
+                          {t.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Box>
 
                 {/* Date Sampled */}
@@ -335,132 +384,14 @@ const LabAdminAddProctor: React.FC = () => {
                   <TextField
                     type="date"
                     fullWidth
-                    value={formData.dateSampled}
+                    value={formData.dateSampled ?? ""}
                     onChange={(e) =>
-                      handleInputChange("dateSampled", e.target.value)
+                      handleInputChange("dateSampled", e.target.value || null)
                     }
                     variant="outlined"
                     size="small"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
-                  />
-                </Box>
-
-                {/* Proctor Type */}
-                <Box>
-                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                    Proctor Type
-                  </Typography>
-                  <FormControl fullWidth size="small">
-                    <Select
-                      value={formData.proctorType}
-                      onChange={handleProctorTypeChange}
-                      sx={{
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      }}
-                    >
-                      <MenuItem value="MPDD">MPDD</MenuItem>
-                      <MenuItem value="SPDD">SPDD</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-
-                {/* Max Dry Density */}
-                <Box>
-                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                    Max Dry Density
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    value={formData.maxDryDensity}
-                    onChange={(e) =>
-                      handleInputChange("maxDryDensity", e.target.value)
-                    }
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
-                  />
-                </Box>
-
-                {/* Corrected Density */}
-                <Box>
-                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                    Corrected Density
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    value={formData.correctedDensity}
-                    onChange={(e) =>
-                      handleInputChange("correctedDensity", e.target.value)
-                    }
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
-                  />
-                </Box>
-              </Box>
-
-              {/* Right Column */}
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                {/* Lab Location */}
-                <Box>
-                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                    Lab Location
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    value={formData.labLocation}
-                    onChange={(e) =>
-                      handleInputChange("labLocation", e.target.value)
-                    }
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
-                  />
-                </Box>
-
-                {/* Proctor ID # */}
-                <Box>
-                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                    Proctor ID #
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    value={formData.proctorId}
-                    onChange={(e) =>
-                      handleInputChange("proctorId", e.target.value)
-                    }
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
+                    InputLabelProps={{ shrink: true }}
+                    sx={fieldSx}
                   />
                 </Box>
 
@@ -472,22 +403,85 @@ const LabAdminAddProctor: React.FC = () => {
                   <TextField
                     type="date"
                     fullWidth
-                    value={formData.dateTested}
+                    value={formData.dateTested ?? ""}
                     onChange={(e) =>
-                      handleInputChange("dateTested", e.target.value)
+                      handleInputChange("dateTested", e.target.value || null)
                     }
                     variant="outlined"
                     size="small"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
+                    InputLabelProps={{ shrink: true }}
+                    sx={fieldSx}
                   />
+                </Box>
+              </Box>
+
+              {/* Right Column */}
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                {/* Max Density */}
+                <Box>
+                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                    Max Density (kg/m³)
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    value={formData.maxDensity ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "maxDensity",
+                        e.target.value === "" ? null : parseFloat(e.target.value),
+                      )
+                    }
+                    variant="outlined"
+                    size="small"
+                    sx={fieldSx}
+                  />
+                </Box>
+
+                {/* Corrected Density */}
+                <Box>
+                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                    Corrected Density (kg/m³)
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    value={formData.correctedDensity ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "correctedDensity",
+                        e.target.value === "" ? null : parseFloat(e.target.value),
+                      )
+                    }
+                    variant="outlined"
+                    size="small"
+                    sx={fieldSx}
+                  />
+                </Box>
+
+                {/* Optimum Moisture Content */}
+                <Box>
+                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                    Optimum Moisture Content
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <TextField
+                      type="number"
+                      value={formData.optimumMoistureContent ?? ""}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "optimumMoistureContent",
+                          e.target.value === "" ? null : parseFloat(e.target.value),
+                        )
+                      }
+                      variant="outlined"
+                      size="small"
+                      sx={{ flex: 1, ...fieldSx }}
+                    />
+                    <Typography variant="body1" sx={{ color: "text.secondary" }}>
+                      %
+                    </Typography>
+                  </Box>
                 </Box>
 
                 {/* Oversize Percentage */}
@@ -497,62 +491,19 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <TextField
-                      value={formData.oversizePercentage}
+                      type="number"
+                      value={formData.oversizePercentage ?? ""}
                       onChange={(e) =>
                         handleInputChange(
                           "oversizePercentage",
-                          parseFloat(e.target.value) || 0,
+                          e.target.value === "" ? null : parseFloat(e.target.value),
                         )
                       }
                       variant="outlined"
                       size="small"
-                      type="number"
-                      sx={{
-                        flex: 1,
-                        "& .MuiOutlinedInput-root": {
-                          backgroundColor: "white",
-                          borderRadius: 1,
-                        },
-                      }}
+                      sx={{ flex: 1, ...fieldSx }}
                     />
-                    <Typography
-                      variant="body1"
-                      sx={{ color: "text.secondary" }}
-                    >
-                      %
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Optimum Moisture */}
-                <Box>
-                  <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                    Optimum Moisture
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <TextField
-                      value={formData.optimumMoisture}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "optimumMoisture",
-                          parseFloat(e.target.value) || 0,
-                        )
-                      }
-                      variant="outlined"
-                      size="small"
-                      type="number"
-                      sx={{
-                        flex: 1,
-                        "& .MuiOutlinedInput-root": {
-                          backgroundColor: "white",
-                          borderRadius: 1,
-                        },
-                      }}
-                    />
-                    <Typography
-                      variant="body1"
-                      sx={{ color: "text.secondary" }}
-                    >
+                    <Typography variant="body1" sx={{ color: "text.secondary" }}>
                       %
                     </Typography>
                   </Box>
@@ -565,18 +516,17 @@ const LabAdminAddProctor: React.FC = () => {
                   </Typography>
                   <TextField
                     fullWidth
-                    value={formData.specificGravity}
+                    type="number"
+                    value={formData.specificGravity ?? ""}
                     onChange={(e) =>
-                      handleInputChange("specificGravity", e.target.value)
+                      handleInputChange(
+                        "specificGravity",
+                        e.target.value === "" ? null : parseFloat(e.target.value),
+                      )
                     }
                     variant="outlined"
                     size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "white",
-                        borderRadius: 1,
-                      },
-                    }}
+                    sx={fieldSx}
                   />
                 </Box>
               </Box>
@@ -595,9 +545,7 @@ const LabAdminAddProctor: React.FC = () => {
                   px: 4,
                   py: 1.5,
                   borderRadius: 2,
-                  "&:hover": {
-                    backgroundColor: "primary.dark",
-                  },
+                  "&:hover": { backgroundColor: "primary.dark" },
                 }}
               >
                 {isLoading ? "Saving..." : "Save Proctor Data"}
