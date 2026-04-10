@@ -53,10 +53,16 @@ export const ENDPOINTS = {
     EVENTS: "/api/scheduling/events",
     EVENT: (id: number | string) => `/api/scheduling/events/${id}`,
   },
-  /** People / employees (technicians). Matches backend /api/People and /api/People/employees/{id} */
+  /** People / employees and contractors. Matches backend /api/People */
   PEOPLE: {
     LIST: "/api/People",
     EMPLOYEE: (id: number | string) => `/api/People/employees/${id}`,
+    EMPLOYEE_CREATE: "/api/People/employees",
+    CONTRACTOR: (id: number | string) => `/api/People/contractors/${id}`,
+    CONTRACTOR_CREATE: "/api/People/contractors",
+  },
+  ROLES: {
+    LIST: "/api/roles",
   },
 };
   

@@ -14,6 +14,7 @@ import LabAdminCreateJob from "./pages/lab-admin/LabAdminCreateJob";
 import LabAdminAddProctor from "./pages/lab-admin/LabAdminAddProctor";
 import LabAdminSchedule from "./pages/lab-admin/LabAdminSchedule";
 import LabAdminProctorList from "./pages/lab-admin/LabAdminProctorList";
+import LabAdminPeopleList from "./pages/lab-admin/LabAdminPeopleList";
 import DistributionListManagerDemo from "./pages/lab-admin/DistributionListManagerDemo";
 import "./index.css";
 import ReportDetails from "./pages/field-tech/ReportDetails";
@@ -56,6 +57,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               />
               <Route path="schedule" element={<LabAdminSchedule />} />
               <Route path="proctors" element={<LabAdminProctorList />} />
+              <Route path="people" element={<LabAdminPeopleList />} />
             </Route>
 
             <Route

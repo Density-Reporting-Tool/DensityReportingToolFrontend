@@ -38,6 +38,17 @@ class BaseApiService {
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`API Error ${response.status}:`, errorText);
+        // Try to extract the backend's descriptive message from the JSON envelope
+        try {
+          const errorJson = JSON.parse(errorText);
+          const msg: string =
+            errorJson.message ||
+            errorJson.errors?.[0] ||
+            `HTTP error! status: ${response.status} - ${response.statusText}`;
+          throw new Error(msg);
+        } catch (parseErr) {
+          if (!(parseErr instanceof SyntaxError)) throw parseErr;
+        }
         throw new Error(
           `HTTP error! status: ${response.status} - ${response.statusText}`,
         );

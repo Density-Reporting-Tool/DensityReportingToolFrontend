@@ -38,7 +38,7 @@ class ProctorApiService {
     try {
       console.log("Creating proctor with data:", proctorData);
       return await apiService.post<ProctorCreateResponse>(
-        ENDPOINTS.PROCTOR.LAB_ADMIN.CREATE,
+        ENDPOINTS.PROCTOR.CREATE,
         proctorData,
       );
     } catch (error) {

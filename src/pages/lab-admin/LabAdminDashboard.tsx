@@ -6,6 +6,7 @@ import {
   Add as AddIcon,
   Person as PersonIcon,
   List as ListIcon,
+  People as PeopleIcon,
 } from "@mui/icons-material";
 
 const NAV_ITEMS = [
@@ -13,6 +14,7 @@ const NAV_ITEMS = [
   { label: "Create Job", icon: <AddIcon />, path: "/lab-admin/create-job" },
   { label: "Enter Proctor", icon: <PersonIcon />, path: "/lab-admin/add-proctor" },
   { label: "View Proctors", icon: <ListIcon />, path: "/lab-admin/proctors" },
+  { label: "People", icon: <PeopleIcon />, path: "/lab-admin/people" },
 ];
 
 const LabAdminDashboard: React.FC = () => {
