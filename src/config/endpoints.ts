@@ -56,6 +56,7 @@ export const ENDPOINTS = {
   /** People / employees and contractors. Matches backend /api/People */
   PEOPLE: {
     LIST: "/api/People",
+    SEARCH: (query: string) => `/api/People/search/${encodeURIComponent(query)}`,
     EMPLOYEE: (id: number | string) => `/api/People/employees/${id}`,
     EMPLOYEE_CREATE: "/api/People/employees",
     CONTRACTOR: (id: number | string) => `/api/People/contractors/${id}`,

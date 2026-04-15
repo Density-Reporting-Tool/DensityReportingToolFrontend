@@ -97,6 +97,14 @@ export class PersonApiService extends ApiService {
     );
   }
 
+  /** GET /api/People/search/{query}?limit=n */
+  async searchPeople(query: string, limit = 10): Promise<PersonReadDTO[]> {
+    if (!query.trim()) return [];
+    const url = `${ENDPOINTS.PEOPLE.SEARCH(query)}?limit=${limit}`;
+    const res = await this.get<unknown>(url);
+    return unwrapPersonList(res.data);
+  }
+
   /** GET /api/roles — pre-seeded lookup; returns [] on failure */
   async getRoles(): Promise<RoleDTO[]> {
     try {
