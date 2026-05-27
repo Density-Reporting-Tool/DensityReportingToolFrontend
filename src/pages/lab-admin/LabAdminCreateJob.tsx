@@ -13,6 +13,7 @@ import {
   DialogActions,
   IconButton,
   Stack,
+  Alert,
 } from "@mui/material";
 import {
   Person as PersonIcon,
@@ -23,29 +24,50 @@ import {
 import DistributionListManager, {
   Contact,
 } from "../../components/DistributionListManager";
+import { jobsAPIService } from "@/services/apiService";
+
+const clientOptions = [
+  "GeoPacific",
+  "City of Vancouver",
+  "Metro Vancouver",
+  "BC Ministry of Transportation",
+  "Private Developer A",
+  "Private Developer B",
+];
+
+const projectManagerOptions = [
+  "Jakub Szary",
+  "John Doe",
+  "Jane Smith",
+  "Mike Johnson",
+  "Sarah Wilson",
+  "David Brown",
+];
 
 const LabAdminCreateJob: React.FC = () => {
   const navigate = useNavigate();
-  const [projectManager, setProjectManager] = useState("Jakub Szary");
-  const [client, setClient] = useState("GeoPacific");
+
+  const [jobNumber, setJobNumber] = useState("");
+  const [projectManager, setProjectManager] = useState("");
+  const [client, setClient] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [siteAddress, setSiteAddress] = useState("");
+  const [jobNotes, setJobNotes] = useState("");
+  const [startDate, setStartDate] = useState("");
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
   const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false);
   const [newPerson, setNewPerson] = useState({
-    clientName: "GeoPacific",
-    firstName: "Peter",
-    lastName: "Senyk",
-    email: "Peter.Senyk@DRT.ca",
-    phone: "1-604-329-9559",
+    clientName: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
   });
-  const [contacts, setContacts] = useState<Contact[]>([
-    {
-      id: "1",
-      lastName: "Senyk",
-      firstName: "Peter",
-      email: "Peter.Senyk@DRT.ca",
-      phone: "1-604-329-9559",
-      company: "GeoPacific",
-    },
-  ]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [contactManagerOpen, setContactManagerOpen] = useState(false);
 
   const handleNavigation = (section: string) => {
@@ -56,36 +78,14 @@ const LabAdminCreateJob: React.FC = () => {
       case "enterProctor":
         navigate("/lab-admin/add-proctor");
         break;
-      default:
-        break;
     }
   };
 
-  // Sample client options - you can expand this list
-  const clientOptions = [
-    "GeoPacific",
-    "City of Vancouver",
-    "Metro Vancouver",
-    "BC Ministry of Transportation",
-    "Private Developer A",
-    "Private Developer B",
-  ];
-
-  // Sample project manager options
-  const projectManagerOptions = [
-    "Jakub Szary",
-    "John Doe",
-    "Jane Smith",
-    "Mike Johnson",
-    "Sarah Wilson",
-    "David Brown",
-  ];
-
-  const handleProjectManagerChange = (_event: any, newValue: string | null) => {
+  const handleProjectManagerChange = (_event: React.SyntheticEvent, newValue: string | null) => {
     setProjectManager(newValue || "");
   };
 
-  const handleClientChange = (_event: any, newValue: string | null) => {
+  const handleClientChange = (_event: React.SyntheticEvent, newValue: string | null) => {
     setClient(newValue || "");
   };
 
@@ -98,20 +98,34 @@ const LabAdminCreateJob: React.FC = () => {
   };
 
   const handleSavePerson = () => {
-    // Add the new person to the project manager options
-    const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`;
-    if (!projectManagerOptions.includes(newPersonName)) {
-      projectManagerOptions.push(newPersonName);
-    }
-    setProjectManager(newPersonName);
+    const newPersonName = `${newPerson.firstName} ${newPerson.lastName}`.trim();
+    if (newPersonName) setProjectManager(newPersonName);
     setAddPersonDialogOpen(false);
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setNewPerson((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setNewPerson((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveJob = async () => {
+    setSaveError(null);
+    setSaveSuccess(false);
+    setIsSaving(true);
+    try {
+      await jobsAPIService.createJob({
+        jobNumber,
+        clientName: client,
+        projectName,
+        siteAddress,
+        startDate: startDate || undefined,
+      });
+      setSaveSuccess(true);
+    } catch (err) {
+      console.error("Error creating job:", err);
+      setSaveError("Failed to save job. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -126,7 +140,6 @@ const LabAdminCreateJob: React.FC = () => {
           width: "100%",
         }}
       >
-        {/* Title Section */}
         <Box
           sx={{
             backgroundColor: "primary.dark",
@@ -137,7 +150,6 @@ const LabAdminCreateJob: React.FC = () => {
             minWidth: 200,
           }}
         >
-          {/* Avatar Circle */}
           <Avatar
             sx={{
               bgcolor: "white",
@@ -153,11 +165,7 @@ const LabAdminCreateJob: React.FC = () => {
           </Avatar>
           <Typography
             variant="h6"
-            sx={{
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-            }}
+            sx={{ color: "white", fontWeight: "bold", fontSize: "1.1rem" }}
           >
             Lab Admin
           </Typography>
@@ -178,7 +186,6 @@ const LabAdminCreateJob: React.FC = () => {
           }}
         >
           <Stack spacing={2} sx={{ width: "90%" }}>
-            {/* Schedule Button */}
             <Button
               variant="contained"
               onClick={() => handleNavigation("schedule")}
@@ -188,16 +195,13 @@ const LabAdminCreateJob: React.FC = () => {
                 fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "grey.50",
-                },
+                "&:hover": { backgroundColor: "grey.50" },
               }}
               startIcon={<ScheduleIcon />}
             >
               Schedule
             </Button>
 
-            {/* Create Job Button - Active State */}
             <Button
               variant="contained"
               sx={{
@@ -206,16 +210,13 @@ const LabAdminCreateJob: React.FC = () => {
                 fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "primary.dark",
-                },
+                "&:hover": { backgroundColor: "primary.dark" },
               }}
               startIcon={<AddIcon />}
             >
               Create Job
             </Button>
 
-            {/* Enter Proctor Button */}
             <Button
               variant="contained"
               onClick={() => handleNavigation("enterProctor")}
@@ -225,9 +226,7 @@ const LabAdminCreateJob: React.FC = () => {
                 fontWeight: "bold",
                 py: 1.5,
                 borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "grey.50",
-                },
+                "&:hover": { backgroundColor: "grey.50" },
               }}
               startIcon={<PersonIcon />}
             >
@@ -238,15 +237,22 @@ const LabAdminCreateJob: React.FC = () => {
 
         {/* Main Content Area - Job Details Form */}
         <Box
-          sx={{
-            flex: 1,
-            backgroundColor: "background.default",
-            p: 4,
-          }}
+          sx={{ flex: 1, backgroundColor: "background.default", p: 4 }}
         >
           <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
             Job Details
           </Typography>
+
+          {saveSuccess && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              Job created successfully.
+            </Alert>
+          )}
+          {saveError && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {saveError}
+            </Alert>
+          )}
 
           <Box sx={{ maxWidth: 600 }}>
             {/* Job Number */}
@@ -256,7 +262,8 @@ const LabAdminCreateJob: React.FC = () => {
               </Typography>
               <TextField
                 fullWidth
-                value="25900"
+                value={jobNumber}
+                onChange={(e) => setJobNumber(e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -293,9 +300,7 @@ const LabAdminCreateJob: React.FC = () => {
                   )}
                   sx={{
                     flex: 1,
-                    "& .MuiAutocomplete-popupIndicator": {
-                      color: "#666",
-                    },
+                    "& .MuiAutocomplete-popupIndicator": { color: "#666" },
                   }}
                 />
                 <IconButton
@@ -303,9 +308,7 @@ const LabAdminCreateJob: React.FC = () => {
                   sx={{
                     backgroundColor: "primary.main",
                     color: "white",
-                    "&:hover": {
-                      backgroundColor: "primary.dark",
-                    },
+                    "&:hover": { backgroundColor: "primary.dark" },
                     width: 40,
                     height: 40,
                   }}
@@ -338,9 +341,7 @@ const LabAdminCreateJob: React.FC = () => {
                   />
                 )}
                 sx={{
-                  "& .MuiAutocomplete-popupIndicator": {
-                    color: "#666",
-                  },
+                  "& .MuiAutocomplete-popupIndicator": { color: "#666" },
                 }}
               />
             </Box>
@@ -352,7 +353,8 @@ const LabAdminCreateJob: React.FC = () => {
               </Typography>
               <TextField
                 fullWidth
-                value="West Parking Lot Improvement"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -371,7 +373,8 @@ const LabAdminCreateJob: React.FC = () => {
               </Typography>
               <TextField
                 fullWidth
-                value="1779 W 75th Ave, Vancouver, BC V6P 3T1"
+                value={siteAddress}
+                onChange={(e) => setSiteAddress(e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -392,7 +395,8 @@ const LabAdminCreateJob: React.FC = () => {
                 fullWidth
                 multiline
                 rows={4}
-                value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis ante ut eros venenatis lacinia ut in nisl. Sed malesuada risus in nisi convallis aliquet. Aliquam convallis scelerisque gravida."
+                value={jobNotes}
+                onChange={(e) => setJobNotes(e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -413,10 +417,9 @@ const LabAdminCreateJob: React.FC = () => {
                 type="date"
                 variant="outlined"
                 size="small"
-                defaultValue="2025-08-15"
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     backgroundColor: "white",
@@ -438,9 +441,7 @@ const LabAdminCreateJob: React.FC = () => {
                   fontWeight: "bold",
                   py: 1.5,
                   borderRadius: 2,
-                  "&:hover": {
-                    backgroundColor: "primary.dark",
-                  },
+                  "&:hover": { backgroundColor: "primary.dark" },
                 }}
               >
                 Edit Distribution List
@@ -448,18 +449,18 @@ const LabAdminCreateJob: React.FC = () => {
               <Button
                 variant="contained"
                 fullWidth
+                disabled={isSaving}
+                onClick={handleSaveJob}
                 sx={{
                   backgroundColor: "primary.main",
                   color: "white",
                   fontWeight: "bold",
                   py: 1.5,
                   borderRadius: 2,
-                  "&:hover": {
-                    backgroundColor: "primary.dark",
-                  },
+                  "&:hover": { backgroundColor: "primary.dark" },
                 }}
               >
-                Save Job
+                {isSaving ? "Saving…" : "Save Job"}
               </Button>
             </Box>
           </Box>
@@ -478,7 +479,6 @@ const LabAdminCreateJob: React.FC = () => {
         </DialogTitle>
         <DialogContent sx={{ backgroundColor: "grey.50", pt: 2 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {/* Client Name */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Client Name
@@ -486,9 +486,7 @@ const LabAdminCreateJob: React.FC = () => {
               <TextField
                 fullWidth
                 value={newPerson.clientName}
-                onChange={(e) =>
-                  handleInputChange("clientName", e.target.value)
-                }
+                onChange={(e) => handleInputChange("clientName", e.target.value)}
                 variant="outlined"
                 size="small"
                 sx={{
@@ -499,8 +497,6 @@ const LabAdminCreateJob: React.FC = () => {
                 }}
               />
             </Box>
-
-            {/* Contact First Name */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Contact First Name
@@ -519,8 +515,6 @@ const LabAdminCreateJob: React.FC = () => {
                 }}
               />
             </Box>
-
-            {/* Contact Last Name */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Contact Last Name
@@ -539,8 +533,6 @@ const LabAdminCreateJob: React.FC = () => {
                 }}
               />
             </Box>
-
-            {/* Contact Email */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Contact Email
@@ -559,8 +551,6 @@ const LabAdminCreateJob: React.FC = () => {
                 }}
               />
             </Box>
-
-            {/* Contact Phone Number */}
             <Box>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
                 Contact Phone Number
@@ -618,7 +608,7 @@ const LabAdminCreateJob: React.FC = () => {
         contacts={contacts}
         onContactsChange={setContacts}
         title="Distribution List Manager"
-        jobNumber="25900"
+        jobNumber={jobNumber}
         mode="dialog"
       />
     </Box>

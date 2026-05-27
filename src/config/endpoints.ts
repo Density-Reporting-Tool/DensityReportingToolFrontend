@@ -16,6 +16,7 @@ export const ENDPOINTS = {
     PROCTORS_FOR_JOB: (jobId: number) => `/api/reports/proctors/job/${jobId}`,
     CREATE_DENSITY_TEST: (reportId: number) =>
       `/api/reports/${reportId}/density-test`,
+    UPDATE_MEMO: (reportId: number) => `/api/reports/${reportId}/memo`,
   },
   DENSITY: {
     CALCULATE: "/api/density/calculate",
@@ -43,6 +44,12 @@ export const ENDPOINTS = {
     SEARCH: (jobNumber: string) => `/api/proctor/search/${jobNumber}`,
     JOB: (jobNumber: string) => `/api/proctor/job/${jobNumber}`,
     JOB_ID: (jobId: number) => `/api/proctor/job-id/${jobId}`,
+  },
+  PEOPLE: {
+    LIST: "/api/people",
+  },
+  SCHEDULING: {
+    EVENTS: "/api/scheduling/events",
   },
   HEALTH: {
     HEALTH: "/health",
