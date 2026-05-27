@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -8,6 +9,7 @@ import {
   Button,
   Stack,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -15,67 +17,160 @@ import {
 } from "@mui/icons-material";
 import HeaderWithBackButton from "@/components/headers/HeaderWithBackButton";
 import HeaderTitle from "@/components/headers/HeaderTitle";
+import { jobsAPIService } from "@/services/apiService";
+import { reportsApiService } from "@/services/reportsApiService";
+import { ReportListByJobResponse } from "@/dtos/report";
+import { useAuthStore } from "@/stores/authStore";
 
-// Mock data
-const jobData = {
-  id: 1,
-  jobNumber: "000001",
-  address: "123 Main St, Vancouver, BC",
-  contacts: [
-    { id: 1, initials: "JS", name: "Jakub Szary", role: "Project Manager" },
-    { id: 2, initials: "MK", name: "Matt Kokan", role: "Site Contact" },
-  ],
-  notes: [
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam, quis nostrud exercitation ullamco",
-    "laboris nisi ut aliquip ex ea commodo consequat.",
-  ],
+interface PersonalInfo {
+  firstName: string;
+  lastName: string;
+}
 
-  recentReports: [
-    {
-      id: 4,
-      initials: "IC",
-      description:
-        "Description duis aute irure dolor in reprehenderit in voluptate",
-      date: "Today",
-    },
-    {
-      id: 3,
-      initials: "PS",
-      description:
-        "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-      date: "Two weeks ago",
-    },
-  ],
-};
+interface JobNote {
+  id: number;
+  note: string;
+}
 
-const JobDetails: React.FC = () => {
+interface ProjectManager {
+  id: number;
+  personalInfo: PersonalInfo;
+}
+
+interface SiteContact {
+  id: number;
+  role?: string;
+  personalInfo: PersonalInfo;
+}
+
+interface JobDetail {
+  id: number;
+  jobNumber: string;
+  clientName: string;
+  projectName: string;
+  siteAddress: string;
+  jobNotes: JobNote[];
+  projectManagers: ProjectManager[];
+  siteContacts: SiteContact[];
+}
+
+const JobDetails = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+
+  const [job, setJob] = useState<JobDetail | null>(null);
+  const [reports, setReports] = useState<ReportListByJobResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [creatingReport, setCreatingReport] = useState(false);
+
+  useEffect(() => {
+    if (!jobId) return;
+
+    const load = async () => {
+      try {
+        setLoading(true);
+        const [jobRes, reportsRes] = await Promise.all([
+          jobsAPIService.getJob(jobId),
+          reportsApiService.getReportsByJob(jobId),
+        ]);
+        setJob(jobRes.data as unknown as JobDetail);
+        setReports((reportsRes.data as unknown as ReportListByJobResponse[]) ?? []);
+      } catch (err) {
+        console.error("Error loading job details:", err);
+        setError("Failed to load job details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, [jobId]);
 
   const handleClickReport = (reportId: number) => {
     navigate(`report/${reportId}`);
   };
 
-  const handleNewReport = () => {
-    console.log("Create new report for job:", jobId);
+  const handleNewReport = async () => {
+    if (!job || creatingReport) return;
+    try {
+      setCreatingReport(true);
+      const res = await reportsApiService.createReport({
+        jobId: job.id,
+        employeeId: user?.id ?? 1,
+        startDate: new Date().toISOString(),
+      });
+      const newReport = res.data as unknown as { id: number; reportNumber: number; report?: { id: number } };
+      const reportId = newReport?.report?.id ?? newReport?.id;
+      navigate(`/field-tech/job/${jobId}/report/${reportId}`);
+    } catch (err) {
+      console.error("Failed to create report:", err);
+    } finally {
+      setCreatingReport(false);
+    }
   };
 
   const handleClickShowAll = () => {
-    console.log("CLICK SHOW");
     navigate(`/job/${jobId}/all-reports`);
   };
 
   const handleAddressClick = () => {
-    const encodedAddress = encodeURIComponent(jobData.address);
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-    window.open(googleMapsUrl, "_blank");
+    if (!job?.siteAddress) return;
+    const encoded = encodeURIComponent(job.siteAddress);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encoded}`, "_blank");
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error || !job) {
+    return (
+      <>
+        <HeaderWithBackButton title={`Job #${jobId}`} />
+        <Container maxWidth="xl" sx={{ my: 3 }}>
+          <Typography color="error">{error ?? "Job not found."}</Typography>
+        </Container>
+      </>
+    );
+  }
+
+  const fullName = (pi: PersonalInfo) =>
+    `${pi.firstName} ${pi.lastName}`.trim();
+
+  const initials = (name: string) =>
+    name
+      .split(" ")
+      .map((w) => w[0] ?? "")
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
+  const contacts = [
+    ...(job.projectManagers ?? []).map((pm: ProjectManager) => ({
+      id: `pm-${pm.id}`,
+      name: fullName(pm.personalInfo),
+      role: "Project Manager",
+    })),
+    ...(job.siteContacts ?? []).map((sc: SiteContact) => ({
+      id: `sc-${sc.id}`,
+      name: fullName(sc.personalInfo),
+      role: sc.role ?? "Site Contact",
+    })),
+  ];
+
+  const notes = (job.jobNotes ?? []).map((n: JobNote) => n.note);
 
   return (
     <>
       <HeaderWithBackButton
         title={`Job #${jobId}`}
-        subtitle={`${jobData.address}`}
+        subtitle={job.siteAddress}
         onSubtitleClick={handleAddressClick}
       />
       <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
@@ -88,23 +183,13 @@ const JobDetails: React.FC = () => {
             justifyContent: "space-around",
           }}
         >
-          {jobData.contacts.map((contact, index) => (
+          {contacts.map((contact) => (
             <Box
-              key={index}
-              sx={{
-                display: "flex",
-                gap: 1,
-                justifyContent: "space-between",
-              }}
+              key={contact.id}
+              sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}
             >
-              <Avatar
-                sx={{
-                  width: 45,
-                  height: 45,
-                  bgcolor: "primary.main",
-                }}
-              >
-                {contact.initials}
+              <Avatar sx={{ width: 45, height: 45, bgcolor: "primary.main" }}>
+                {initials(contact.name)}
               </Avatar>
               <Box>
                 <Typography variant="body1" sx={{ fontWeight: 500 }}>
@@ -119,23 +204,21 @@ const JobDetails: React.FC = () => {
         </Box>
 
         {/* Notes Section */}
-        <Box sx={{ mb: 3 }}>
-          <Card sx={{ p: 2 }}>
-            <Typography variant="h6">Notes</Typography>
-
-            {jobData.notes.map((note, index) => (
-              <Box
-                key={index}
-                sx={{ mb: index < jobData.notes.length - 1 ? 2 : 0 }}
-              >
-                <Typography variant="body1" color="text.secondary">
-                  {note}
-                </Typography>
-                {index < jobData.notes.length - 1 && <Divider sx={{ mt: 2 }} />}
-              </Box>
-            ))}
-          </Card>
-        </Box>
+        {notes.length > 0 && (
+          <Box sx={{ mb: 3 }}>
+            <Card sx={{ p: 2 }}>
+              <Typography variant="h6">Notes</Typography>
+              {notes.map((note: string, index: number) => (
+                <Box key={index} sx={{ mb: index < notes.length - 1 ? 2 : 0 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    {note}
+                  </Typography>
+                  {index < notes.length - 1 && <Divider sx={{ mt: 2 }} />}
+                </Box>
+              ))}
+            </Card>
+          </Box>
+        )}
 
         {/* Recent Reports */}
         <Box sx={{ mb: 3 }}>
@@ -145,58 +228,70 @@ const JobDetails: React.FC = () => {
             onClick={handleClickShowAll}
           />
           <Stack spacing={1}>
-            {jobData.recentReports.map((report) => (
-              <Card
-                key={report.id}
-                sx={{
-                  cursor: "pointer",
-                  "&:hover": { boxShadow: 3 },
-                  p: 2,
-                  boxShadow: 0,
-                  borderRadius: 2,
-                }}
-                onClick={() => handleClickReport(report.id)}
-              >
-                <Box
+            {reports.slice(0, 5).map((report: ReportListByJobResponse) => {
+              const employeeName =
+                `${report.employee?.firstName ?? ""} ${report.employee?.lastName ?? ""}`.trim();
+              return (
+                <Card
+                  key={report.id}
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
+                    cursor: "pointer",
+                    "&:hover": { boxShadow: 3 },
+                    p: 2,
+                    boxShadow: 0,
+                    borderRadius: 2,
                   }}
+                  onClick={() => handleClickReport(report.id)}
                 >
-                  <Avatar
+                  <Box
                     sx={{
-                      width: 40,
-                      height: 40,
-                      bgcolor: "primary.main",
-                      fontSize: "0.875rem",
-                      mr: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    {report.initials}
-                  </Avatar>
-                  <Box sx={{ width: "75%" }}>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                      Report {report.id}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {report.description}
-                    </Typography>
-                    <Typography
-                      display="block"
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mt: 1 }}
+                    <Avatar
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        bgcolor: "primary.main",
+                        fontSize: "0.875rem",
+                        mr: 2,
+                      }}
                     >
-                      {report.date}
-                    </Typography>
+                      {initials(employeeName)}
+                    </Avatar>
+                    <Box sx={{ width: "75%" }}>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        Report {report.reportNumber}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {report.densityTestsCount} test
+                        {report.densityTestsCount !== 1 ? "s" : ""},{" "}
+                        {report.photosCount} photo
+                        {report.photosCount !== 1 ? "s" : ""}
+                      </Typography>
+                      {report.startDate && (
+                        <Typography
+                          display="block"
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mt: 1 }}
+                        >
+                          {new Date(report.startDate).toLocaleDateString()}
+                        </Typography>
+                      )}
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <ChevronRightIcon color="action" />
+                    </Box>
                   </Box>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <ChevronRightIcon color="action" />
-                  </Box>
-                </Box>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
+            {reports.length === 0 && (
+              <Card sx={{ p: 2, borderRadius: 2 }}>No reports yet.</Card>
+            )}
           </Stack>
         </Box>
 
@@ -205,15 +300,12 @@ const JobDetails: React.FC = () => {
           <Button
             fullWidth
             variant="contained"
-            startIcon={<AddIcon />}
+            startIcon={creatingReport ? undefined : <AddIcon />}
+            disabled={creatingReport}
             onClick={handleNewReport}
-            sx={{
-              py: 1.5,
-              borderRadius: 3,
-              boxShadow: 3,
-            }}
+            sx={{ py: 1.5, borderRadius: 3, boxShadow: 3 }}
           >
-            New Report
+            {creatingReport ? "Creating…" : "New Report"}
           </Button>
         </Box>
       </Container>

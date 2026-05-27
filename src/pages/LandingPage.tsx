@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -9,18 +9,63 @@ import {
   CardContent,
   Grid,
   Paper,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  FormHelperText,
 } from "@mui/material";
 import {
   Dashboard as DashboardIcon,
   Science as ScienceIcon,
 } from "@mui/icons-material";
 import BackendStatus from "../components/BackendStatus";
+import { apiService } from "@/services/apiService";
+import { ENDPOINTS } from "@/config/endpoints";
+import { useAuthStore, AuthUser } from "@/stores/authStore";
+
+interface PersonListFlatDto {
+  id: number;
+  firstName: string;
+  lastName: string;
+  personType?: string;
+}
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { setUser } = useAuthStore();
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
+  const [employees, setEmployees] = useState<PersonListFlatDto[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<number | "">("");
+  const [userError, setUserError] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await apiService.get<PersonListFlatDto[]>(ENDPOINTS.PEOPLE.LIST);
+        const data = res.data as unknown as PersonListFlatDto[];
+        setEmployees(data.filter((p) => p.personType === "GeoPacific Employee"));
+      } catch {
+        // silently fail — user can still pick from whatever loaded
+      }
+    };
+    load();
+  }, []);
+
+  const handleEnterFieldTech = () => {
+    if (!selectedUserId) {
+      setUserError(true);
+      return;
+    }
+    const person = employees.find((e) => e.id === selectedUserId);
+    if (!person) return;
+    const user: AuthUser = {
+      id: person.id,
+      firstName: person.firstName,
+      lastName: person.lastName,
+    };
+    setUser(user);
+    navigate("/field-tech/");
   };
 
   return (
@@ -29,43 +74,28 @@ const LandingPage: React.FC = () => {
       <Box sx={{ textAlign: "center", mb: 6 }}>
         <Box
           component="img"
-          sx={{
-            width: "100%",
-            height: "auto",
-            maxWidth: 100,
-            mb: 4,
-          }}
+          sx={{ width: "100%", height: "auto", maxWidth: 100, mb: 4 }}
           alt="GeoPacific logo"
           src="/assets/Geo_Logo_Portrait_WithConsultants_Lrg.png"
         />
         <Typography variant="h5" color="text" sx={{ mb: 1 }}>
           Density Reporting Tool
         </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ maxWidth: 600, mx: "auto" }}
-        >
-          Welcome to the GEOPACIFIC Density Reporting Tool. Choose your
-          dashboard to get started.
+        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: "auto" }}>
+          Welcome to the GEOPACIFIC Density Reporting Tool. Choose your dashboard to get started.
         </Typography>
       </Box>
 
-      {/* Navigation Cards */}
       <Grid container spacing={4} justifyContent="center">
-        {/* Dashboard Card */}
+        {/* Field Tech Card */}
         <Grid item xs={12} sm={6} md={5}>
           <Card
             sx={{
               height: "100%",
-              cursor: "pointer",
+              cursor: "default",
               transition: "all 0.3s ease",
-              "&:hover": {
-                transform: "translateY(-8px)",
-                boxShadow: 8,
-              },
+              "&:hover": { boxShadow: 4 },
             }}
-            onClick={() => handleNavigation("/field-tech")}
           >
             <CardContent
               sx={{
@@ -78,41 +108,58 @@ const LandingPage: React.FC = () => {
               }}
             >
               <Box>
-                <DashboardIcon
-                  sx={{ fontSize: 64, color: "primary.main", mb: 3 }}
-                />
+                <DashboardIcon sx={{ fontSize: 64, color: "primary.main", mb: 3 }} />
                 <Typography variant="h4" sx={{ fontWeight: 600, mb: 2 }}>
                   Field Tech Dashboard
                 </Typography>
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  sx={{ mb: 3 }}
-                >
-                  Access job schedules, reports in progress, and density
-                  reporting tools.
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                  Access job schedules, reports in progress, and density reporting tools.
                 </Typography>
               </Box>
-              <Button variant="contained" size="large" sx={{ px: 4, py: 1.5 }}>
-                Enter Dashboard
-              </Button>
+
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <FormControl fullWidth error={userError} size="small">
+                  <InputLabel>Sign in as</InputLabel>
+                  <Select
+                    value={selectedUserId}
+                    label="Sign in as"
+                    onChange={(e) => {
+                      setSelectedUserId(e.target.value as number);
+                      setUserError(false);
+                    }}
+                  >
+                    {employees.map((emp) => (
+                      <MenuItem key={emp.id} value={emp.id}>
+                        {emp.firstName} {emp.lastName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {userError && <FormHelperText>Please select a user</FormHelperText>}
+                </FormControl>
+
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{ px: 4, py: 1.5 }}
+                  onClick={handleEnterFieldTech}
+                >
+                  Enter Dashboard
+                </Button>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Lab Admin Dashboard Card */}
+        {/* Lab Admin Card */}
         <Grid item xs={12} sm={6} md={5}>
           <Card
             sx={{
               height: "100%",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              "&:hover": {
-                transform: "translateY(-8px)",
-                boxShadow: 8,
-              },
+              "&:hover": { transform: "translateY(-8px)", boxShadow: 8 },
             }}
-            onClick={() => handleNavigation("/lab-admin")}
+            onClick={() => navigate("/lab-admin")}
           >
             <CardContent
               sx={{
@@ -125,17 +172,11 @@ const LandingPage: React.FC = () => {
               }}
             >
               <Box>
-                <ScienceIcon
-                  sx={{ fontSize: 64, color: "primary.main", mb: 3 }}
-                />
+                <ScienceIcon sx={{ fontSize: 64, color: "primary.main", mb: 3 }} />
                 <Typography variant="h4" sx={{ fontWeight: 600, mb: 2 }}>
                   Lab Admin Dashboard
                 </Typography>
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  sx={{ mb: 3 }}
-                >
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
                   Manage schedules, jobs, and lab test results.
                 </Typography>
               </Box>
@@ -147,17 +188,14 @@ const LandingPage: React.FC = () => {
         </Grid>
       </Grid>
 
-      {/* Footer Info */}
       <Box sx={{ textAlign: "center", mt: 8 }}>
         <Paper sx={{ p: 3, backgroundColor: "grey.50" }}>
           <Typography variant="body2" color="text.secondary">
-            This is a temporary landing page. Choose your destination above to
-            access the main application.
+            This is a temporary landing page. Choose your destination above to access the main application.
           </Typography>
         </Paper>
       </Box>
 
-      {/* Backend Status (for testing) */}
       <Box sx={{ mt: 4 }}>
         <BackendStatus />
       </Box>

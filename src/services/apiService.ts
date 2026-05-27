@@ -43,12 +43,12 @@ class BaseApiService {
         );
       }
 
-      const data = await response.json();
+      const backendResponse = await response.json();
 
       return {
-        data,
+        data: backendResponse.data as T,
         status: response.status,
-        message: response.statusText,
+        message: backendResponse.message ?? response.statusText,
       };
     } catch (error) {
       if (error instanceof Error) {

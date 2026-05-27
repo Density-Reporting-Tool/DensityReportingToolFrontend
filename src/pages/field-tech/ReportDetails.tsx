@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Card,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -26,162 +27,118 @@ import {
 import HeaderTitle from "@/components/headers/HeaderTitle";
 import BottomNavBar from "@/components/navbar/BottomNavBar";
 import Webcam from "react-webcam";
-import { useRef, useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
 import UploadWidget from "@/components/UploadWidget";
 import EditIcon from "@mui/icons-material/Edit";
-
-const report = {
-  id: 4,
-  jobId: 1,
-  initials: "IC",
-  densityTests: [
-    {
-      id: 1,
-      name: "Density Shot 1",
-      location: "Grid AB-07",
-      elevation: " 1.2m below final",
-      material: "Riversand",
-      density: "1789",
-      compactionSpecification: "96% SPMDD",
-      pass: 1,
-    },
-    {
-      id: 2,
-      name: "Density Shot 2",
-      location: "Grid AB-07",
-      elevation: " 1.2m below final",
-      material: "Riversand",
-      density: "1789",
-      compactionSpecification: "96% SPMDD",
-      pass: 0,
-    },
-    {
-      id: 3,
-      name: "Density Shot 3",
-      location: "Grid AB-07",
-      elevation: " 1.2m below final",
-      material: "Riversand",
-      density: "1789",
-      compactionSpecification: "96% SPMDD",
-      pass: 1,
-    },
-  ],
-  reportPhotos: [
-    {
-      id: 1,
-      src: "https://placehold.co/400",
-      title: "Gridlines AA-01",
-      elevation: "0.5m Above subgrade",
-    },
-    {
-      id: 2,
-      src: "https://placehold.co/400",
-      title: "Gridlines AA-02",
-      elevation: "0.7m Above subgrade",
-    },
-  ],
-  description:
-    "Description duis aute irure dolor in reprehenderit in voluptate",
-  date: "Today",
-};
+import { reportsApiService } from "@/services/reportsApiService";
+import { DensityTestInfo, PhotoInfo, ReportDetailResponse } from "@/dtos/report";
 
 const Report: React.FC = () => {
   const { jobId, reportId } = useParams<{ jobId: string; reportId: string }>();
   const navigate = useNavigate();
+
+  const [report, setReport] = useState<ReportDetailResponse | null>(null);
+  const [photos, setPhotos] = useState<PhotoInfo[]>([]);
+  const [purpose, setPurpose] = useState("");
+  const [comments, setComments] = useState("");
+  const [conclusion, setConclusion] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [savingMemo, setSavingMemo] = useState(false);
+  const [memoSaved, setMemoSaved] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
-  const [reportPhotos, setReportPhotos] = useState(report.reportPhotos);
 
   const webcamRef = useRef<Webcam>(null);
 
-  const handleClickEdit = () => {
-    navigate(`/field-tech/add-density-test`);
+  useEffect(() => {
+    if (!reportId) return;
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await reportsApiService.getReport(Number(reportId));
+        const data = res.data as unknown as ReportDetailResponse;
+        setReport(data);
+        setPhotos(data.photos ?? []);
+        if (data.memos?.length > 0) {
+          setPurpose(data.memos[0].purpose ?? "");
+          setComments(data.memos[0].commentsAndObservations ?? "");
+          setConclusion(data.memos[0].conclusion ?? "");
+        }
+      } catch (err) {
+        console.error("Error loading report:", err);
+        setError("Failed to load report.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [reportId]);
+
+  const handleClickEdit = (testId: number) => {
+    const jobNumber = report?.job?.jobNumber ?? "";
+    navigate(
+      `/field-tech/add-density-test?reportId=${reportId}&jobId=${jobId}&jobNumber=${jobNumber}&testId=${testId}`,
+    );
   };
+
+  const handleSaveMemo = async () => {
+    if (!reportId || savingMemo) return;
+    try {
+      setSavingMemo(true);
+      setMemoSaved(false);
+      await reportsApiService.updateMemo(Number(reportId), {
+        purpose,
+        commentsAndObservations: comments,
+        conclusion,
+      });
+      setMemoSaved(true);
+    } catch (err) {
+      console.error("Failed to save memo:", err);
+    } finally {
+      setSavingMemo(false);
+    }
+  };
+
   const handleTakePhoto = () => {
     if (webcamRef.current) {
       const imageSrc = webcamRef.current.getScreenshot();
-      if (imageSrc) {
-        setCapturedPhoto(imageSrc);
-      }
+      if (imageSrc) setCapturedPhoto(imageSrc);
+    }
+  };
+
+  const uploadImageToCloudinary = async (base64Photo: string): Promise<string | null> => {
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloudName || !uploadPreset) return null;
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+    try {
+      const response = await fetch(base64Photo);
+      const blob = await response.blob();
+      const formData = new FormData();
+      formData.append("file", blob);
+      formData.append("upload_preset", uploadPreset);
+      const uploadResponse = await fetch(url, { method: "POST", body: formData });
+      if (!uploadResponse.ok) throw new Error(`Upload failed: ${uploadResponse.statusText}`);
+      const data = await uploadResponse.json();
+      return data.secure_url as string;
+    } catch {
+      return null;
     }
   };
 
   const handleKeepPhoto = async () => {
     if (capturedPhoto) {
-      try {
-        const uploadedUrl = await uploadImageToCloudinary(capturedPhoto);
-
-        if (uploadedUrl) {
-          const newPhoto = {
-            id: reportPhotos.length + 1,
-            src: uploadedUrl,
-            title: `Photo ${reportPhotos.length + 1}`,
-            elevation: "New photo",
-          };
-          setReportPhotos([...reportPhotos, newPhoto]);
-        } else {
-          const newPhoto = {
-            id: reportPhotos.length + 1,
-            src: capturedPhoto,
-            title: `Photo ${reportPhotos.length + 1}`,
-            elevation: "New photo",
-          };
-          setReportPhotos([...reportPhotos, newPhoto]);
-        }
-      } catch (error) {
-        console.error("Error handling photo:", error);
-        const newPhoto = {
-          id: reportPhotos.length + 1,
-          src: capturedPhoto,
-          title: `Photo ${reportPhotos.length + 1}`,
-          elevation: "New photo",
-        };
-        setReportPhotos([...reportPhotos, newPhoto]);
-      }
+      const uploadedUrl = await uploadImageToCloudinary(capturedPhoto);
+      const newPhoto: PhotoInfo = {
+        id: photos.length + 1,
+        url: uploadedUrl ?? capturedPhoto,
+        description: `Photo ${photos.length + 1}`,
+      };
+      setPhotos([...photos, newPhoto]);
     }
-
     setShowPhotoModal(false);
     setCapturedPhoto(null);
-  };
-
-  const uploadImageToCloudinary = async (base64Photo: string) => {
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-
-    if (!cloudName || !uploadPreset) {
-      console.error(
-        "Cloudinary credentials not found in environment variables",
-      );
-      return null;
-    }
-
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
-
-    try {
-      const response = await fetch(base64Photo);
-      const blob = await response.blob();
-
-      const formData = new FormData();
-      formData.append("file", blob);
-      formData.append("upload_preset", uploadPreset);
-
-      const uploadResponse = await fetch(url, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error(`Upload failed: ${uploadResponse.statusText}`);
-      }
-
-      const data = await uploadResponse.json();
-      console.log("Cloudinary uploaded URL:", data.secure_url);
-      return data.secure_url;
-    } catch (error) {
-      console.error("Upload to Cloudinary failed:", error);
-      return null;
-    }
   };
 
   const handleCloseModal = () => {
@@ -190,7 +147,10 @@ const Report: React.FC = () => {
   };
 
   const handleAddDensityShot = () => {
-    navigate(`/field-tech/add-density-test`);
+    const jobNumber = report?.job?.jobNumber ?? "";
+    navigate(
+      `/field-tech/add-density-test?reportId=${reportId}&jobId=${jobId}&jobNumber=${jobNumber}`,
+    );
   };
 
   const handleShowAllDensity = () => {
@@ -201,14 +161,34 @@ const Report: React.FC = () => {
     navigate(`/job/${jobId}/report/${reportId}/all-photos`);
   };
 
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error || !report) {
+    return (
+      <>
+        <HeaderWithBackButton title={`Job #${jobId}`} subtitle={`Report ${reportId}`} />
+        <Container maxWidth="xl" sx={{ my: 3 }}>
+          <Typography color="error">{error ?? "Report not found."}</Typography>
+        </Container>
+      </>
+    );
+  }
+
+  const densityTests: DensityTestInfo[] = report.densityTests ?? [];
+
   return (
     <>
       <HeaderWithBackButton
         title={`Job #${jobId}`}
-        subtitle={`Report ${reportId}`}
+        subtitle={`Report ${report.reportNumber}`}
       />
       <Container maxWidth="xl" sx={{ my: 3, mb: 12 }}>
-        {/* Density Test Section */}
         <Stack gap={1}>
           <Box id="densityTestSection">
             <HeaderTitle
@@ -216,7 +196,6 @@ const Report: React.FC = () => {
               showAll={true}
               onClick={handleShowAllDensity}
             />
-
             <Box
               sx={{
                 display: "flex",
@@ -225,8 +204,8 @@ const Report: React.FC = () => {
                 borderRadius: 2,
               }}
             >
-              {report.densityTests.length > 0 ? (
-                report.densityTests.map((test) => (
+              {densityTests.length > 0 ? (
+                densityTests.map((test: DensityTestInfo, index: number) => (
                   <Accordion
                     key={test.id}
                     disableGutters
@@ -238,16 +217,12 @@ const Report: React.FC = () => {
                   >
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1-content"
-                      id="panel1-header"
+                      aria-controls={`panel${test.id}-content`}
+                      id={`panel${test.id}-header`}
                       sx={{
                         minHeight: 40,
-                        "&.Mui-expanded": {
-                          minHeight: 40,
-                        },
-                        "& .MuiAccordionSummary-content": {
-                          margin: 0,
-                        },
+                        "&.Mui-expanded": { minHeight: 40 },
+                        "& .MuiAccordionSummary-content": { margin: 0 },
                       }}
                     >
                       <Box
@@ -257,11 +232,13 @@ const Report: React.FC = () => {
                           width: "100%",
                         }}
                       >
-                        <Typography component="span">{test.name}</Typography>
+                        <Typography component="span">
+                          {test.testArea ?? `Density Test #${test.testNumber || index + 1}`}
+                        </Typography>
                         <Typography
-                          color={test.pass ? "success.main" : "error.main"}
+                          color={test.passed ? "success.main" : "error.main"}
                         >
-                          {test.pass ? "PASS" : "FAIL"}
+                          {test.passed ? "PASS" : "FAIL"}
                         </Typography>
                       </Box>
                     </AccordionSummary>
@@ -269,25 +246,32 @@ const Report: React.FC = () => {
                       sx={{ display: "flex", justifyContent: "space-between" }}
                     >
                       <Box>
+                        {test.location && (
+                          <Typography variant="body2">
+                            Location: {test.location}
+                          </Typography>
+                        )}
                         <Typography variant="body2">
-                          Location: {test.location}
+                          Elevation: {test.elevationValue}{" "}
+                          {test.elevationUnit ?? ""}
+                          {test.elevationReference
+                            ? ` (${test.elevationReference})`
+                            : ""}
                         </Typography>
                         <Typography variant="body2">
-                          Elevation: {test.elevation}
+                          Compaction: {test.compactionPercentage.toFixed(1)}%
+                          (spec: {test.compactionSpecification}
+                          {test.compactionSpecificationUnit ?? "%"})
                         </Typography>
                         <Typography variant="body2">
-                          Material: {test.material}
-                        </Typography>
-                        <Typography variant="body2">
-                          Density: {test.density}
-                        </Typography>
-                        <Typography variant="body2">
-                          Compaction Specification:
-                          {test.compactionSpecification}
+                          Density: {test.densityValue}
                         </Typography>
                       </Box>
-                      <IconButton sx={{ height: "100px" }}>
-                        <EditIcon onClick={handleClickEdit}></EditIcon>
+                      <IconButton
+                        sx={{ height: "100px" }}
+                        onClick={() => handleClickEdit(test.id)}
+                      >
+                        <EditIcon />
                       </IconButton>
                     </AccordionDetails>
                   </Accordion>
@@ -307,6 +291,7 @@ const Report: React.FC = () => {
               </SolidBackgroundColorButton>
             </Box>
           </Box>
+
           <Box id="reportMemoSection" sx={{ my: 2 }}>
             <Typography variant="h5" sx={{ mb: 1 }}>
               Report
@@ -327,10 +312,11 @@ const Report: React.FC = () => {
                   sx={{ backgroundColor: "white" }}
                   minRows={2}
                   fullWidth
+                  value={purpose}
+                  onChange={(e) => { setPurpose(e.target.value); setMemoSaved(false); }}
                 />
               </Box>
               <Box>
-                {/* <Typography variant="h6">Comment/Observations</Typography> */}
                 <TextField
                   id="report-comment-observations"
                   label="Comments / observations"
@@ -338,10 +324,11 @@ const Report: React.FC = () => {
                   sx={{ backgroundColor: "white" }}
                   minRows={5}
                   fullWidth
+                  value={comments}
+                  onChange={(e) => { setComments(e.target.value); setMemoSaved(false); }}
                 />
               </Box>
               <Box>
-                {/* <Typography variant="h6">Conclusion</Typography> */}
                 <TextField
                   id="report-conclusion"
                   label="Conclusion"
@@ -349,19 +336,40 @@ const Report: React.FC = () => {
                   sx={{ backgroundColor: "white" }}
                   minRows={2}
                   fullWidth
+                  value={conclusion}
+                  onChange={(e) => {
+                    setConclusion(e.target.value);
+                    setMemoSaved(false);
+                  }}
                 />
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+                {memoSaved && (
+                  <Typography variant="body2" color="success.main" sx={{ alignSelf: "center" }}>
+                    Saved
+                  </Typography>
+                )}
+                <Button
+                  variant="contained"
+                  disabled={savingMemo}
+                  onClick={handleSaveMemo}
+                  sx={{ borderRadius: 2 }}
+                >
+                  {savingMemo ? "Saving…" : "Save Memo"}
+                </Button>
               </Box>
             </Stack>
           </Box>
+
           <Box id="reportPhotos" sx={{ my: 2 }}>
             <HeaderTitle
               title="Report Photos"
               showAll={true}
               onClick={handleShowAllPhotos}
             />
-            {reportPhotos.length > 0 ? (
+            {photos.length > 0 ? (
               <Stack gap={2}>
-                {reportPhotos.map((photo) => (
+                {photos.map((photo: PhotoInfo, index: number) => (
                   <Card
                     key={photo.id}
                     sx={{
@@ -372,28 +380,36 @@ const Report: React.FC = () => {
                       boxShadow: "none",
                     }}
                   >
-                    <Box
-                      component="img"
-                      sx={{
-                        width: "100%",
-                        height: "auto",
-                        maxWidth: "100px",
-                        borderRadius: 2,
-                        mr: 2,
-                      }}
-                      alt="Report photos"
-                      src={photo.src}
-                    />
+                    {photo.url && (
+                      <Box
+                        component="img"
+                        sx={{
+                          width: "100%",
+                          height: "auto",
+                          maxWidth: "100px",
+                          borderRadius: 2,
+                          mr: 2,
+                        }}
+                        alt="Report photo"
+                        src={photo.url}
+                      />
+                    )}
                     <Box>
-                      <Typography variant="h6">Figure {photo.id}</Typography>
-                      <Typography variant="body2">{photo.title}</Typography>
-                      <Typography variant="body2">{photo.elevation}</Typography>
+                      <Typography variant="h6">Figure {index + 1}</Typography>
+                      {photo.code && (
+                        <Typography variant="body2">{photo.code}</Typography>
+                      )}
+                      {photo.description && (
+                        <Typography variant="body2">
+                          {photo.description}
+                        </Typography>
+                      )}
                     </Box>
                   </Card>
                 ))}
               </Stack>
             ) : (
-              <Card sx={{ padding: 2, borderRadius: 2 }}>No density tests</Card>
+              <Card sx={{ padding: 2, borderRadius: 2 }}>No photos</Card>
             )}
             <Box
               sx={{
@@ -406,7 +422,6 @@ const Report: React.FC = () => {
                 sx={{ display: "flex", justifyContent: "space-around", mb: 1 }}
               >
                 <UploadWidget />
-
                 <SolidBackgroundColorButton
                   icon={<CameraAltIcon sx={{ fontSize: "1.25rem" }} />}
                   handleClick={() => setShowPhotoModal(true)}
@@ -442,12 +457,7 @@ const Report: React.FC = () => {
                 component="img"
                 src={capturedPhoto}
                 alt="Captured photo"
-                sx={{
-                  width: "100%",
-                  height: "auto",
-                  borderRadius: 2,
-                  mb: 2,
-                }}
+                sx={{ width: "100%", height: "auto", borderRadius: 2, mb: 2 }}
               />
             </Box>
           ) : (
@@ -467,9 +477,7 @@ const Report: React.FC = () => {
           {capturedPhoto ? (
             <>
               <Button
-                onClick={() => {
-                  setCapturedPhoto(null);
-                }}
+                onClick={() => setCapturedPhoto(null)}
                 variant="outlined"
                 color="secondary"
               >
@@ -505,4 +513,5 @@ const Report: React.FC = () => {
     </>
   );
 };
+
 export default Report;

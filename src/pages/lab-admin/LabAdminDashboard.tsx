@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Avatar, Stack } from "@mui/material";
+import ScheduleCalendarView from "@/components/schedule/ScheduleCalendarView";
 import {
   Schedule as ScheduleIcon,
   Add as AddIcon,
@@ -26,16 +27,7 @@ const LabAdminDashboard: React.FC = () => {
   const renderContent = () => {
     switch (selectedSection) {
       case "schedule":
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Schedule
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Schedule management content will appear here.
-            </Typography>
-          </Box>
-        );
+        return <ScheduleCalendarView />;
       case "createJob":
         return (
           <Box sx={{ p: 3 }}>
