@@ -9,7 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { apiService } from "../services/apiService";
-import { API_CONFIG, isRenderBackend } from "../config/api";
+import { API_CONFIG } from "../config/api";
 
 const BackendStatus: React.FC = () => {
   const [status, setStatus] = useState<
@@ -60,7 +60,7 @@ const BackendStatus: React.FC = () => {
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Environment:{" "}
-          {isRenderBackend() ? "Production (Render)" : "Development (Local)"}
+          {import.meta.env.PROD ? "Production" : "Development (Local)"}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Full API URL: {backendUrl}/api/health
@@ -189,21 +189,15 @@ const BackendStatus: React.FC = () => {
       )}
 
       <Typography variant="body2" color="text.secondary">
-        <strong>Note:</strong> Make sure your Render backend is running and
-        accessible. If you get CORS errors, ensure your backend allows requests
-        from your frontend domain.
+        <strong>Note:</strong> Make sure your backend is running and accessible.
+        If you get CORS errors, ensure your backend allows requests from your
+        frontend domain.
       </Typography>
 
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
         <strong>Debug Info:</strong> Check browser console for detailed error
         messages. Common issues: CORS policy, backend not running, or incorrect
         endpoints.
-      </Typography>
-
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        <strong>Current Status:</strong> Backend is running but has database
-        connection issues. Check Render dashboard for missing environment
-        variables (DB_SSLMODE, DB_HOST, etc.).
       </Typography>
     </Box>
   );

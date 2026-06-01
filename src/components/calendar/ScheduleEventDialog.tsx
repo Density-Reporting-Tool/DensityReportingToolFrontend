@@ -134,22 +134,12 @@ export default function ScheduleEventDialog({
           initialEvent!.id,
           buildUpdatePayload()
         );
-        const body = res.data;
-        if (body.success && body.data) {
-          onSaved(body.data);
-          onClose();
-        } else {
-          setErrors([body.message ?? "Update failed"].concat(body.errors ?? []));
-        }
+        onSaved(res.data);
+        onClose();
       } else {
         const res = await schedulingApiService.createScheduleJob(buildCreatePayload());
-        const body = res.data;
-        if (body.success && body.data) {
-          onSaved(body.data);
-          onClose();
-        } else {
-          setErrors([body.message ?? "Create failed"].concat(body.errors ?? []));
-        }
+        onSaved(res.data);
+        onClose();
       }
     } catch (err) {
       setErrors([err instanceof Error ? err.message : "Request failed"]);
@@ -164,14 +154,9 @@ export default function ScheduleEventDialog({
     setSubmitting(true);
     setErrors([]);
     try {
-      const res = await schedulingApiService.deleteScheduleJob(initialEvent.id);
-      const body = res.data;
-      if (body.success) {
-        onDeleted(initialEvent.id);
-        onClose();
-      } else {
-        setErrors([body.message ?? "Delete failed"].concat(body.errors ?? []));
-      }
+      await schedulingApiService.deleteScheduleJob(initialEvent.id);
+      onDeleted(initialEvent.id);
+      onClose();
     } catch (err) {
       setErrors([err instanceof Error ? err.message : "Request failed"]);
     } finally {

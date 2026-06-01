@@ -117,7 +117,8 @@ const LabAdminCreateJob: React.FC = () => {
         clientName: client,
         projectName,
         siteAddress,
-        startDate: startDate || undefined,
+        startDate: startDate || null,
+        endDate: null,
       });
       setSaveSuccess(true);
     } catch (err) {

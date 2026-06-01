@@ -8,7 +8,7 @@ class ProctorApiService {
     try {
       console.log("Getting all proctors for the job id: ", jobNumber);
       return await apiService.get<ProctorData[]>(
-        `/api/proctors/job/${jobNumber}`,
+        ENDPOINTS.PROCTOR.JOB(jobNumber),
       );
     } catch (error) {
       console.error("Error fetching proctors for a job id", error);
@@ -21,7 +21,7 @@ class ProctorApiService {
     try {
       console.log("Getting proctor details for proctor id: ", proctorId);
       const response = await apiService.get<ProctorData>(
-        `/api/proctors/${proctorId}`,
+        `/api/proctor/${proctorId}`,
       );
       console.log(response);
       return response;
@@ -38,7 +38,7 @@ class ProctorApiService {
     try {
       console.log("Creating proctor with data:", proctorData);
       return await apiService.post<ProctorCreateResponse>(
-        ENDPOINTS.PROCTOR.LAB_ADMIN.CREATE,
+        ENDPOINTS.PROCTOR.CREATE,
         proctorData,
       );
     } catch (error) {

@@ -87,11 +87,8 @@ export default function CalendarView() {
         setCreateRange(null)
         try {
             const res = await schedulingApiService.getScheduleJobByEventId(id)
-            const body = res.data
-            if (body.success && body.data) {
-                setSelectedEvent(body.data)
-                setDialogOpen(true)
-            }
+            setSelectedEvent(res.data)
+            setDialogOpen(true)
         } catch {
             setSelectedEvent(null)
             setDialogOpen(true)
@@ -104,26 +101,22 @@ export default function CalendarView() {
         schedulingApiService
             .getEventsInRange(startUtcIso, endUtcIso)
             .then((response) => {
-                const body = response.data
-                if (body.success && body.data) {
-                    const mapped: EventInput[] = body.data.map((dto: ScheduleJobReadDTO) => ({
-                        id: String(dto.id),
-                        title: `${dto.job.jobNumber} - ${dto.job.siteAddress}`,
-                        start: dto.startDateTime,
-                        end: dto.endDateTime,
-                        backgroundColor: getColorForPerson(dto.personalInfoId),
-                        extendedProps: {
-                            jobId: dto.jobId,
-                            jobNumber: dto.job.jobNumber,
-                            siteAddress: dto.job.siteAddress,
-                            status: dto.status,
-                            personalInfoId: dto.personalInfoId,
-                        },
-                    }))
-                    successCallback(mapped)
-                } else {
-                    failureCallback(new Error(body.message ?? 'Failed to load events'))
-                }
+                const events = Array.isArray(response.data) ? response.data : []
+                const mapped: EventInput[] = events.map((dto: ScheduleJobReadDTO) => ({
+                    id: String(dto.id),
+                    title: `${dto.job.jobNumber} - ${dto.job.siteAddress}`,
+                    start: dto.startDateTime,
+                    end: dto.endDateTime,
+                    backgroundColor: getColorForPerson(dto.personalInfoId),
+                    extendedProps: {
+                        jobId: dto.jobId,
+                        jobNumber: dto.job.jobNumber,
+                        siteAddress: dto.job.siteAddress,
+                        status: dto.status,
+                        personalInfoId: dto.personalInfoId,
+                    },
+                }))
+                successCallback(mapped)
             })
             .catch((err) => failureCallback(err instanceof Error ? err : new Error(String(err))))
     }

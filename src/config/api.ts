@@ -19,7 +19,7 @@ export const API_CONFIG = {
   // API endpoints
   ENDPOINTS: ENDPOINTS,
 
-  // Request timeout in milliseconds (longer for Render's cold starts)
+  // Request timeout in milliseconds
   TIMEOUT: import.meta.env.PROD ? 60000 : 30000,
 
   // Retry configuration
@@ -27,24 +27,12 @@ export const API_CONFIG = {
     MAX_ATTEMPTS: 3,
     DELAY: 1000,
   },
-
-  // Render-specific settings
-  RENDER: {
-    // Handle Render's cold start delays
-    COLD_START_DELAY: 5000,
-    // Retry on 502/503 errors (common during cold starts)
-    RETRY_ON_STATUS: [502, 503, 504],
-  },
 };
 
 // Helper function to build full API URL
 export const buildApiUrl = (endpoint: string): string => {
   const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const fullUrl = `${API_CONFIG.BASE_URL}${normalizedEndpoint}`;
-  console.log(
-    `Building API URL: ${fullUrl} (BASE_URL: ${API_CONFIG.BASE_URL})`,
-  );
-  return fullUrl;
+  return `${API_CONFIG.BASE_URL}${normalizedEndpoint}`;
 };
 
 // Helper function to get auth headers
@@ -53,18 +41,5 @@ export const getAuthHeaders = (): Record<string, string> => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-// Helper function to check if we're connecting to Render
-export const isRenderBackend = (): boolean => {
-  return (
-    API_CONFIG.BASE_URL.includes("onrender.com") ||
-    API_CONFIG.BASE_URL.includes("ondigitalocean.app")
-  );
-};
-
 // Helper function to get appropriate timeout for current environment
-export const getRequestTimeout = (): number => {
-  if (isRenderBackend()) {
-    return API_CONFIG.TIMEOUT;
-  }
-  return 30000;
-};
+export const getRequestTimeout = (): number => API_CONFIG.TIMEOUT;

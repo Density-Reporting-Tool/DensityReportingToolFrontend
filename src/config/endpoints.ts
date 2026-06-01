@@ -45,12 +45,6 @@ export const ENDPOINTS = {
     JOB: (jobNumber: string) => `/api/proctor/job/${jobNumber}`,
     JOB_ID: (jobId: number) => `/api/proctor/job-id/${jobId}`,
   },
-  PEOPLE: {
-    LIST: "/api/people",
-  },
-  SCHEDULING: {
-    EVENTS: "/api/scheduling/events",
-  },
   HEALTH: {
     HEALTH: "/health",
     HOME: "/home",
